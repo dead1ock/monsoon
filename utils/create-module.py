@@ -37,7 +37,7 @@ open(module_filepath + "/include/.gitkeep", 'a').close()
 open(module_filepath + "/example/.gitkeep", 'a').close()
 open(module_filepath + "/test/.gitkeep", 'a').close()
 
-cmakeFile = open(module_filepath + "/CMakeFiles.txt", 'a')
+cmakeFile = open(module_filepath + "/CMakeLists.txt", 'a')
 cmakeFile.write("PROJECT(" + module_name + ")")
 cmakeFile.close()
 
