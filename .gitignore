@@ -1,3 +1,6 @@
 modules/
 build/
 bin/
+__pycache__/
+config.py
+modules.py

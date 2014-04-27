@@ -1,0 +1,6 @@
+# This file contains a list of the modules you wish the boostrap script to check out
+# in this environment.
+
+repositories = [
+	# Name			Repository URL										  Default Branch
+]
