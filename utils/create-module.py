@@ -1,6 +1,7 @@
 import sys
 import os
 import errno
+import shutil
 
 module_name = sys.argv[1]
 module_filepath = str("modules/" + module_name)
@@ -11,6 +12,8 @@ if os.path.exists(module_filepath):
 	sys.exit()
 
 print ('Creating Module - ' , module_name)
+
+type = input("Type? [lib, exe]: ")
 
 os.makedirs(module_filepath)
 
@@ -24,7 +27,7 @@ os.makedirs(module_filepath + "/doc")
 os.makedirs(module_filepath + "/src")
 os.makedirs(module_filepath + "/dsrc")
 os.makedirs(module_filepath + "/external")
-os.makedirs(module_filepath + "/include")
+os.makedirs(module_filepath + "/include/" + module_name)
 os.makedirs(module_filepath + "/example")
 os.makedirs(module_filepath + "/test")
 
@@ -33,16 +36,29 @@ open(module_filepath + "/doc/.gitkeep", 'a').close()
 open(module_filepath + "/src/.gitkeep", 'a').close()
 open(module_filepath + "/dsrc/.gitkeep", 'a').close()
 open(module_filepath + "/external/.gitkeep", 'a').close()
-open(module_filepath + "/include/.gitkeep", 'a').close()
+open(module_filepath + "/include/" + module_name + "/.gitkeep", 'a').close()
 open(module_filepath + "/example/.gitkeep", 'a').close()
 open(module_filepath + "/test/.gitkeep", 'a').close()
 
 cmakeFile = open(module_filepath + "/CMakeLists.txt", 'a')
-cmakeFile.write("PROJECT(" + module_name + ")")
+cmakeFile.write("CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)\n")
+cmakeFile.write("PROJECT(" + module_name + " C CXX)\n\n")
+
+cmakeFile.write("INCLUDE_DIRECTORIES(include/"+ module_name)
+cmakeFile.write("INCLUDE(Sources.cmake)"\n")
+
+if type == "lib":
+	cmakeFile.write("ADD_LIBRARY(" + module_name + " ${MODULE_SOURCES})\n")
+	cmakeFile.write("SET_TARGET_PROPERTIES(" + module_name + " PROPERTIES LINKER_LANGUAGE CXX)\n")
+elif type == "exe":
+	cmakeFile.write("ADD_EXECUTABLE(" + module_name + " ${MODULE_SOURCES})\n");
+
 cmakeFile.close()
 
+shutil.copyfile("Sources.cmake.in", "Sources.cmake")
+
 readmeFile = open(module_filepath + "/README.md", 'a')
-readmeFile.write("Monsoon Game Engine: " + module_name + " Module\n========================")
+readmeFile.write("#Monsoon Game Engine\n##Module: " + module_name + "\n")
 readmeFile.close()
 
 # Do initial commit.
