@@ -30,3 +30,13 @@ build files using cmake.
 To create a new module run the python script "create-module.py" located in the utils directory. You will be prompted for the name of your new module and it's type (exe or lib). A new folder will be created in the modules directory and will be populated with the standard module directory structure, a README markdown file, and  CMakeLists.txt file to get you going.
 
 If you want your module to be cloned automatically when bootstrapping the environment, add it to modules.py.in and reconfigure the environment.
+
+####Module Directory Structure
+All modules conform to the following directory structure:
+doc/ - Module documentation, usually in markdown format.
+dsrc/ - Module data files.
+example/ - If this module is a library, use this directory for example/demo projects.
+external/ - Dependencies for this specific module.
+include/ - Public header files only.
+src/ - Private header files and source files.
+test/ - Unit tests.
