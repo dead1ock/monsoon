@@ -1,4 +1,0 @@
-# This file contains default configuration settings.
-
-git_user="$git_user"
-git_pass="$git_pass"
