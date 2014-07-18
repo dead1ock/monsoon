@@ -5,16 +5,21 @@
 #
 
 #
-# Platform independent sources.
-#
-SET(MODULE_SRC
-	)
-
-#
 # Platform dependent sources.
 #
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	SET(MODULE_PLATFORM_SRC
+		Include/D3D11ColorMaterial.h
+		Include/D3D.h
+		Include/D3D11Renderer.h
+		Include/D3D11VertexBuffer.h
+		Include/D3D11Window.h
+
+		Src/D3D11ColorMaterial.cpp
+		Src/D3D.cpp
+		Src/D3D11Renderer.cpp
+		Src/D3D11VertexBuffer.cpp
+		Src/D3D11Window.cpp
 		)
 ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	SET(MODULE_PLATFORM_SRC

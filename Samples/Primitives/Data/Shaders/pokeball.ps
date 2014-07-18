@@ -1,0 +1,27 @@
+float4 TexturePixelShader(PixelInputType input) : SV_TARGET
+{    
+     // Shift coordinates 0.5 to the left and down, then scale x3.
+     float x = (input.tex.x - 0.5) * 5;
+     float y = (input.tex.y - 0.5) * 5;
+    
+     // x^2 + y^2 = diameter of circle
+     float r = sqrt(((x*x)+(y*y)))/2;
+
+     // Shade upper red portion of pokeball.
+     if(r < 1.0 && r > 0.3 && y < -0.08)
+        return float4(1, 0, 0, 1);
+
+     // Shade bottom white portion of white.
+     if(r < 1.0 && r > 0.3 && y > 0.08)
+        return float4(1, 1, 1, 1);
+    
+     // Shade white center botton.
+     if(r < 0.25 && r > 0.15)
+        return float4(1, 1, 1, 1);
+           
+     if(r < 0.09)
+          return float4(1, 1, 1, 1);
+     
+     // Otherwise, shade black.
+     return float4(0, 0, 0, 1);
+}
