@@ -5,7 +5,7 @@
 
 #include "D3D11VertexBuffer.h"
 
-using namespace monsoon::renderer;
+using namespace Monsoon::Renderer;
 
 
 DX11VertexBuffer::DX11VertexBuffer() {

@@ -7,7 +7,7 @@
 
 #include <Windows.h>
 
-using namespace monsoon::renderer;
+using namespace Monsoon::Renderer;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 

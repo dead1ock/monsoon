@@ -12,8 +12,8 @@
 #include "RendererSettings.h"
 #include "VertexBuffer.h"
 
-namespace monsoon {
-	namespace renderer {
+namespace Monsoon {
+	namespace Renderer {
 
 		/**
 		* Responsible for the setup and teardown of a Canvas (RenderWindow) and GPU resources (vertex buffers, shaders, meshes, textures, ect..).

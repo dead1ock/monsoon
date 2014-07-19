@@ -11,14 +11,14 @@
 #include "Platform\DynLib.h"
 #include "Renderer\Renderer.h"
 
-namespace monsoon {
+namespace Monsoon {
 	/*
 	* Manages the initialization and shutdown of sub-systems (rendering, sound, physics, networking, simulation ect...) and
 	* handles the application loop.
 	*/
 	class DYNLIB Application : boost::noncopyable {
 	public:
-		Application(renderer::Renderer* renderer);
+		Application(Renderer::Renderer* renderer);
 		~Application();
 
 		void Run();
@@ -34,7 +34,7 @@ namespace monsoon {
 		*/
 		void Shutdown();
 
-		renderer::Renderer* mRenderer;
+		Renderer::Renderer* mRenderer;
 	};
 }
 

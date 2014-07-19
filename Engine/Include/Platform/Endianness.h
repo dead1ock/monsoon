@@ -8,9 +8,9 @@
 
 #include <algorithm>
 
-namespace monsoon {
-	namespace platform {
-		namespace endianness {
+namespace Monsoon {
+	namespace Platform {
+		namespace Endianness {
 			/*
 			* Swaps bytes in memory from start to T, recursively.
 			*/

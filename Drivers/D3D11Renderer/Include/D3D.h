@@ -22,8 +22,8 @@
 
 #include "D3D11Window.h"
 
-namespace monsoon {
-	namespace renderer {
+namespace Monsoon {
+	namespace Renderer {
 
 		/**
 		* Initializes and destroys D3D11 Device/Context and provides a wrapper for D3D commands.

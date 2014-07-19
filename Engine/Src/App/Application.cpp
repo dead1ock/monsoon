@@ -24,9 +24,9 @@ bool randomBool() {
 }
 // TEMP
 
-namespace monsoon {
+namespace Monsoon {
 
-	Application::Application(renderer::Renderer* renderer)
+	Application::Application(Renderer::Renderer* renderer)
 		: mRenderer(renderer)
 	{
 

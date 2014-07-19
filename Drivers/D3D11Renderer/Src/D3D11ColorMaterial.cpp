@@ -7,7 +7,7 @@
 
 #include "D3D11ColorMaterial.h"
 
-using namespace monsoon::renderer;
+using namespace Monsoon::Renderer;
 
 ColorMaterial::ColorMaterial()
 {

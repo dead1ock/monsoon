@@ -10,8 +10,8 @@
 
 #include "D3D.h"
 
-namespace monsoon {
-	namespace renderer {
+namespace Monsoon {
+	namespace Renderer {
 
 		struct VertexType
 		{

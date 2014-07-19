@@ -10,8 +10,8 @@
 
 #include <platform/types.h>
 
-namespace monsoon {
-	namespace renderer {
+namespace Monsoon {
+	namespace Renderer {
 		class DX11Window
 		{
 		public:

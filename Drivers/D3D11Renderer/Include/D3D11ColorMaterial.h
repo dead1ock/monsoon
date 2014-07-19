@@ -8,8 +8,8 @@
 
 #include "D3D11VertexBuffer.h"
 
-namespace monsoon {
-	namespace renderer {
+namespace Monsoon {
+	namespace Renderer {
 
 		class ColorMaterial
 		{

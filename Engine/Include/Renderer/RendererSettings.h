@@ -8,8 +8,8 @@
 
 #include <platform/types.h>
 
-namespace monsoon {
-	namespace renderer {
+namespace Monsoon {
+	namespace Renderer {
 
 		/**
 		* Renderer Settings

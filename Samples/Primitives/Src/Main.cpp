@@ -14,11 +14,11 @@
 #include <App/Application.h>
 #include <D3D11Renderer.h>
 
-using namespace monsoon;
+using namespace Monsoon;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow) {
-	renderer::DX11Renderer* renderer = new renderer::DX11Renderer(renderer::RendererSettings());
-	Application application((renderer::Renderer*)renderer);
+	Renderer::DX11Renderer* renderer = new Renderer::DX11Renderer(Renderer::RendererSettings());
+	Application application((Renderer::Renderer*)renderer);
 	application.Run();
 	return 0;
 }

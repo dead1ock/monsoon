@@ -8,7 +8,7 @@
 #include "D3D11Renderer.h"
 #include "D3D11VertexBuffer.h"
 
-using namespace monsoon::renderer;
+using namespace Monsoon::Renderer;
 
 DX11Renderer::DX11Renderer(RendererSettings& settings)
 : Renderer(settings),

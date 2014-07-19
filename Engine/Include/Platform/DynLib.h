@@ -15,8 +15,8 @@
 #elif MONSOON_OS_LINUX
 #endif
 
-namespace monsoon {
-	namespace platform {
+namespace Monsoon {
+	namespace Platform {
 		
 		/**
 		* Manages the loading, freeing, and symbol lookup of dynamic libraries across multiple

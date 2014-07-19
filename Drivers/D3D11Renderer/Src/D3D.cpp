@@ -8,7 +8,7 @@
 
 #include <platform/types.h>
 
-using namespace monsoon::renderer;
+using namespace Monsoon::Renderer;
 
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;

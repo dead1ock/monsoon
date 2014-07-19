@@ -6,8 +6,8 @@
 #ifndef _MONSOON_VERTEX_BUFFER_H_
 #define _MONSOON_VERTEX_BUFFER_H_
 
-namespace monsoon {
-	namespace renderer {
+namespace Monsoon {
+	namespace Renderer {
 
 		/*
 		 * VertexBuffer Interface.

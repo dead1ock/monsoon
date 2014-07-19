@@ -9,7 +9,7 @@
 #include <string>
 #include <memory>
 
- namespace monsoon
+ namespace Monsoon
  {
 	 //
 	 // Atomic Types
