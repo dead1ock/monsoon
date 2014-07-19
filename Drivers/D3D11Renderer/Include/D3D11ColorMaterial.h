@@ -11,11 +11,11 @@
 namespace Monsoon {
 	namespace Renderer {
 
-		class ColorMaterial
+		class D3D11ColorMaterial
 		{
 		public:
-			ColorMaterial();
-			~ColorMaterial();
+			D3D11ColorMaterial();
+			~D3D11ColorMaterial();
 
 			bool Load(ID3D11Device* device, HWND windowHandle);
 			void Release();

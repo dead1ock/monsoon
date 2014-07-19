@@ -19,11 +19,11 @@ namespace Monsoon {
 			D3DXCOLOR color;
 		};
 
-		class DX11VertexBuffer : public VertexBuffer
+		class D3D11VertexBuffer : public VertexBuffer
 		{
 		public:
-			DX11VertexBuffer();
-			~DX11VertexBuffer();
+			D3D11VertexBuffer();
+			~D3D11VertexBuffer();
 
 			void Allocate(ID3D11Device* device);
 			void Free();

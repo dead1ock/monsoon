@@ -9,7 +9,7 @@
 
 using namespace Monsoon::Renderer;
 
-ColorMaterial::ColorMaterial()
+D3D11ColorMaterial::D3D11ColorMaterial()
 {
 	mVertexShader = nullptr;
 	mPixelShader = nullptr;
@@ -17,12 +17,12 @@ ColorMaterial::ColorMaterial()
 	mMatrixBuffer = nullptr;
 }
 
-ColorMaterial::~ColorMaterial()
+D3D11ColorMaterial::~D3D11ColorMaterial()
 {
 
 }
 
-bool ColorMaterial::Load(ID3D11Device* device, HWND windowHandle)
+bool D3D11ColorMaterial::Load(ID3D11Device* device, HWND windowHandle)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
@@ -126,7 +126,7 @@ bool ColorMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	return true;
 }
 
-void ColorMaterial::Release()
+void D3D11ColorMaterial::Release()
 {
 	if (mMatrixBuffer)
 		mMatrixBuffer->Release();
@@ -141,7 +141,7 @@ void ColorMaterial::Release()
 		mVertexShader->Release();
 }
 
-void ColorMaterial::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix,
+void D3D11ColorMaterial::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix,
 	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix)
 {
 	//

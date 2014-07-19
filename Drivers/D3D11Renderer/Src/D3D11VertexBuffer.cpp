@@ -8,15 +8,15 @@
 using namespace Monsoon::Renderer;
 
 
-DX11VertexBuffer::DX11VertexBuffer() {
+D3D11VertexBuffer::D3D11VertexBuffer() {
 	
 }
 
-DX11VertexBuffer::~DX11VertexBuffer() {
+D3D11VertexBuffer::~D3D11VertexBuffer() {
 
 }
 
-void DX11VertexBuffer::Allocate(ID3D11Device* device) {
+void D3D11VertexBuffer::Allocate(ID3D11Device* device) {
 	mDevice = device;
 
 	VertexType* vertices;
@@ -89,7 +89,7 @@ void DX11VertexBuffer::Allocate(ID3D11Device* device) {
 	indices = 0;
 }
 
-void DX11VertexBuffer::Free()
+void D3D11VertexBuffer::Free()
 {
 	if (mIndexBuffer)
 	{
@@ -104,7 +104,7 @@ void DX11VertexBuffer::Free()
 	}
 }
 
-void DX11VertexBuffer::Render(ID3D11DeviceContext* context) {
+void D3D11VertexBuffer::Render(ID3D11DeviceContext* context) {
 	unsigned int stride;
 	unsigned int offset;
 

@@ -11,7 +11,7 @@ using namespace Monsoon::Renderer;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 
-DX11Window::DX11Window(std::string windowName, unsigned short screenWidth, unsigned short screenHeight, bool fullscreen) {
+D3D11Window::D3D11Window(std::string windowName, unsigned short screenWidth, unsigned short screenHeight, bool fullscreen) {
 	ZeroMemory(&msg, sizeof(MSG));
 	mFullscreen = fullscreen;
 	mWindowName = windowName;
@@ -19,11 +19,11 @@ DX11Window::DX11Window(std::string windowName, unsigned short screenWidth, unsig
 	mScreenWidth = screenWidth;
 }
 
-DX11Window::~DX11Window() {
+D3D11Window::~D3D11Window() {
 
 }
 
-bool DX11Window::Initialize()
+bool D3D11Window::Initialize()
 {
 	WNDCLASSEX wc;
 	DEVMODE dmScreenSettings;
@@ -82,7 +82,7 @@ bool DX11Window::Initialize()
 	return true;
 }
 
-void DX11Window::Shutdown()
+void D3D11Window::Shutdown()
 {
 
 	// Leave full screen mode.
@@ -99,7 +99,7 @@ void DX11Window::Shutdown()
 	return;
 }
 
-bool DX11Window::Update()
+bool D3D11Window::Update()
 {
 	// Handle the windows messages.
 	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))

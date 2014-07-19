@@ -12,11 +12,11 @@
 
 namespace Monsoon {
 	namespace Renderer {
-		class DX11Window
+		class D3D11Window
 		{
 		public:
-			DX11Window(std::string windowName, unsigned short screenWidth, unsigned short screenHeight, bool fullscreen);
-			~DX11Window();
+			D3D11Window(std::string windowName, unsigned short screenWidth, unsigned short screenHeight, bool fullscreen);
+			~D3D11Window();
 
 			bool Initialize();
 

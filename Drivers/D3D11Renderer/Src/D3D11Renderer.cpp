@@ -10,17 +10,17 @@
 
 using namespace Monsoon::Renderer;
 
-DX11Renderer::DX11Renderer(RendererSettings& settings)
+D3D11Renderer::D3D11Renderer(RendererSettings& settings)
 : Renderer(settings),
   mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen)
 {
 }
 
-DX11Renderer::~DX11Renderer() {
+D3D11Renderer::~D3D11Renderer() {
 	
 }
 
-bool DX11Renderer::Initialize() {
+bool D3D11Renderer::Initialize() {
 	if (!mWindow.Initialize())
 		return false;
 
@@ -33,7 +33,7 @@ bool DX11Renderer::Initialize() {
 	mVertexBuffer.Allocate(mD3d.GetDevice());
 }
 
-void DX11Renderer::Shutdown() {
+void D3D11Renderer::Shutdown() {
 
 	mVertexBuffer.Free();
 
@@ -42,7 +42,7 @@ void DX11Renderer::Shutdown() {
 	mWindow.Shutdown();
 }
 
-bool DX11Renderer::Update() {
+bool D3D11Renderer::Update() {
 	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
 
 	//

@@ -15,21 +15,21 @@
 
 namespace Monsoon {
 	namespace Renderer{
-		class DRIVER DX11Renderer : Renderer
+		class DRIVER D3D11Renderer : Renderer
 		{
 		public:
-			DX11Renderer(RendererSettings& settings);
-			~DX11Renderer();
+			D3D11Renderer(RendererSettings& settings);
+			~D3D11Renderer();
 
 			bool Initialize();
 			void Shutdown();
 			bool Update();
 
 		private:
-			DX11Window mWindow;
+			D3D11Window mWindow;
 			D3D mD3d;
-			DX11VertexBuffer mVertexBuffer;
-			ColorMaterial mColorMaterial;
+			D3D11VertexBuffer mVertexBuffer;
+			D3D11ColorMaterial mColorMaterial;
 		};
 	}
 }

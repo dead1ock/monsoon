@@ -29,7 +29,7 @@ D3D::~D3D() {
 
 }
 
-bool D3D::Initialize(DX11Window& renderWindow) {
+bool D3D::Initialize(D3D11Window& renderWindow) {
 
 	if (!CreateDeviceAndSwapChain(renderWindow))
 		return false;
@@ -72,7 +72,7 @@ void D3D::Shutdown() {
 		mDevice->Release();
 }
 
-bool D3D::CreateDeviceAndSwapChain(DX11Window& renderWindow) {
+bool D3D::CreateDeviceAndSwapChain(D3D11Window& renderWindow) {
 	HRESULT result;
 	U32 error, createDeviceFlags = 0;
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -148,7 +148,7 @@ bool D3D::CreateRenderTarget() {
 	return true;
 }
 
-bool D3D::CreateDepthStencilBuffer(DX11Window& renderWindow) {
+bool D3D::CreateDepthStencilBuffer(D3D11Window& renderWindow) {
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
@@ -216,7 +216,7 @@ bool D3D::CreateDepthStencilBuffer(DX11Window& renderWindow) {
 	return true;
 }
 
-bool D3D::CreateViewport(DX11Window& renderWindow) {
+bool D3D::CreateViewport(D3D11Window& renderWindow) {
 	D3D11_VIEWPORT viewport;
 
 	viewport.Width = (float)renderWindow.getWidth();

@@ -34,7 +34,7 @@ namespace Monsoon {
 			D3D();
 			~D3D();
 
-			bool Initialize(DX11Window& renderWindow);
+			bool Initialize(D3D11Window& renderWindow);
 			void Shutdown();
 
 			void BeginScene();
@@ -44,10 +44,10 @@ namespace Monsoon {
 			ID3D11DeviceContext* GetContext() { return mContext; }
 
 		private:
-			bool CreateDeviceAndSwapChain(DX11Window& renderWindow);
+			bool CreateDeviceAndSwapChain(D3D11Window& renderWindow);
 			bool CreateRenderTarget();
-			bool CreateDepthStencilBuffer(DX11Window& renderWindow);
-			bool CreateViewport(DX11Window& renderWindow);
+			bool CreateDepthStencilBuffer(D3D11Window& renderWindow);
+			bool CreateViewport(D3D11Window& renderWindow);
 			bool SetRasterState();
 
 			ID3D11Device* mDevice;
