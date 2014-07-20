@@ -13,17 +13,6 @@
 //
 #include "App/Application.h"
 
-// TEMP
-float rand_FloatRange(float a, float b)
-{
-	return ((b - a)*((float)rand() / RAND_MAX)) + a;
-}
-
-bool randomBool() {
-	return rand() % 2 == 1;
-}
-// TEMP
-
 namespace Monsoon {
 
 	Application::Application(Renderer::Renderer* renderer)
@@ -34,14 +23,11 @@ namespace Monsoon {
 
 
 	Application::~Application() {
-		srand(NULL);
+		
 	}
 
 	bool Application::Initialize() {
 		// Initialize Sub-Systems
-		AllocConsole();
-		freopen("CONOUT$", "w", stdout);
-
 		mRenderer->Initialize();
 		return true;
 	}
@@ -53,15 +39,26 @@ namespace Monsoon {
 	}
 
 	void Application::Run() {
-		
-			bool quit = false;
-			while (!quit) {
-				// Update Sub-Systems.
-				quit = !mRenderer->Update();
+		//
+		// Initialization
+		//
+		Initialize();
+		OnInitialize();
 
-			}
-		
+		//
+		// Main Loop
+		//
+		bool quit = false;
+		while (!quit) {
+			// Update Sub-Systems.
+			quit = !mRenderer->Update();
 
+		}
+		
+		//
+		// Shutdown
+		//
+		OnShutdown();
 		Shutdown();
 	}
 

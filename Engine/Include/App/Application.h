@@ -23,20 +23,31 @@ namespace Monsoon {
 
 		void Run();
 
+	protected:
+		/**
+		* Called after engine sub-systems are initialized.
+		*/
+		virtual void OnInitialize()=0;
+
+		/**
+		* Called before engine sub-systems are shutdown.
+		*/
+		virtual void OnShutdown()=0;
+
+
+		Renderer::Renderer* mRenderer;
+
+	private:
 		/**
 		* Initializes each simulation sub-system and checks for initialization failures.
 		*/
 		bool Initialize();
-
-	private:
-		
 
 		/**
 		* Shuts down each simulation sub-system.
 		*/
 		void Shutdown();
 
-		Renderer::Renderer* mRenderer;
 	};
 }
 
