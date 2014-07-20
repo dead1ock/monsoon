@@ -14,6 +14,7 @@ D3D11Renderer::D3D11Renderer(RendererSettings& settings)
 : Renderer(settings),
   mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen)
 {
+	mVertexBuffers.reserve(MONSOON_MAX_ENTITIES);
 }
 
 D3D11Renderer::~D3D11Renderer() {
@@ -29,13 +30,12 @@ bool D3D11Renderer::Initialize() {
 
 	if (!mColorMaterial.Load(mD3d.GetDevice(), mWindow.getHandle()))
 		return false;
-
-	mVertexBuffer.Allocate(mD3d.GetDevice());
 }
 
 void D3D11Renderer::Shutdown() {
 
-	mVertexBuffer.Free();
+	for (int x = 0; x < mVertexBuffers.size(); x++)
+		mVertexBuffers[x].Free();
 
 	mColorMaterial.Release();
 	mD3d.Shutdown();
@@ -70,7 +70,7 @@ bool D3D11Renderer::Update() {
 	// Setup the position of the camera in the world.
 	position.x = 0;
 	position.y = 0;
-	position.z = -2.5;
+	position.z = -10.0;
 
 	// Setup where the camera is looking by default.
 	lookAt.x = 0.0f;
@@ -103,10 +103,19 @@ bool D3D11Renderer::Update() {
 
 	mD3d.BeginScene();
 
-	mVertexBuffer.Render(mD3d.GetContext());
-	mColorMaterial.Render(mD3d.GetContext(), 6, worldMatrix, viewMatrix, projectionMatrix);
+	for (int x = 0; x < mVertexBuffers.size(); x++) {
+		mVertexBuffers[x].Render(mD3d.GetContext());
+		mColorMaterial.Render(mD3d.GetContext(), 6, worldMatrix, viewMatrix, projectionMatrix);
+	}
 
 	mD3d.EndScene();
 
 	return true;
+}
+
+void D3D11Renderer::CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount)
+{
+	D3D11VertexBuffer vBuffer;
+	vBuffer.Allocate(mD3d.GetDevice(), vertices, vertexCount, indicies, indexCount);
+	mVertexBuffers.push_back(vBuffer);
 }

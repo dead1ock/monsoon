@@ -53,14 +53,14 @@ namespace Monsoon {
 	}
 
 	void Application::Run() {
-		if (Initialize()) {	
+		
 			bool quit = false;
 			while (!quit) {
 				// Update Sub-Systems.
 				quit = !mRenderer->Update();
 
 			}
-		}
+		
 
 		Shutdown();
 	}

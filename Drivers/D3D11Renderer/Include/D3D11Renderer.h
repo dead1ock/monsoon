@@ -6,6 +6,8 @@
 #ifndef _MONSOON_DX11_RENDERER_
 #define _MONSOON_DX11_RENDERER_
 
+#include <vector>
+
 #include <Renderer/Renderer.h>
 
 #include "D3D.h"
@@ -15,6 +17,7 @@
 
 namespace Monsoon {
 	namespace Renderer{
+
 		class DRIVER D3D11Renderer : Renderer
 		{
 		public:
@@ -25,10 +28,12 @@ namespace Monsoon {
 			void Shutdown();
 			bool Update();
 
+			void CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount);
+
 		private:
 			D3D11Window mWindow;
 			D3D mD3d;
-			D3D11VertexBuffer mVertexBuffer;
+			std::vector<D3D11VertexBuffer> mVertexBuffers;
 			D3D11ColorMaterial mColorMaterial;
 		};
 	}

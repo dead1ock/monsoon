@@ -26,6 +26,9 @@
 	 typedef unsigned long long U64;
 	 typedef signed long long I64;
 
+	 #define MONSOON_MAX_ENTITIES 2000
+	 typedef U32 Entity;
+
 #ifdef MONSOON_64
 	 typedef U64 MEM_ADDRESS;
 #else

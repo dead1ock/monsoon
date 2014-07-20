@@ -16,45 +16,24 @@ D3D11VertexBuffer::~D3D11VertexBuffer() {
 
 }
 
-void D3D11VertexBuffer::Allocate(ID3D11Device* device) {
+void D3D11VertexBuffer::Allocate(ID3D11Device* device, ColorVertex* vertices, int vertexCount, unsigned long* indices, int indexCount) {
 	mDevice = device;
 
-	VertexType* vertices;
-	unsigned long* indices;
+	VertexType* d3dVertices;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 
-	mVertexCount = 4;
-	mIndexCount = 6;
+	mVertexCount = vertexCount;
+	mIndexCount = indexCount;
 
-	vertices = new VertexType[mVertexCount];
-	indices = new unsigned long[mIndexCount];
+	d3dVertices = new VertexType[mVertexCount];
 
-	//
-	// Temporary Vertex Buffer Input
-	//
-	vertices[0].position = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);  // Bottom left.
-	vertices[0].color = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-
-	vertices[1].position = D3DXVECTOR3(-1.0f, 1.0f, 0.0f);  // Top left
-	vertices[1].color = D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f);
-
-	vertices[2].position = D3DXVECTOR3(1.0f, 1.0f, 0.0f);  // Top right.
-	vertices[2].color = D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f);
-
-	vertices[3].position = D3DXVECTOR3(1.0f, -1.0f, 0.0f);  // Bottom right.
-	vertices[3].color = D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f);
-
-	//
-	// Temporary Index Buffer Input
-	//
-	indices[0] = 0;  // Bottom left.
-	indices[1] = 1;  // Top left.
-	indices[2] = 2;  // Top right.
-	indices[3] = 0;
-	indices[4] = 2;
-	indices[5] = 3;
+	for (int x = 0; x < vertexCount; x++)
+	{
+		d3dVertices[x].position = D3DXVECTOR3(vertices[x].x, vertices[x].y, vertices[x].z);
+		d3dVertices[x].color = D3DXCOLOR(vertices[x].r, vertices[x].g, vertices[x].b, vertices[x].a);
+	}
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.ByteWidth = sizeof(VertexType)* mVertexCount;
@@ -63,7 +42,7 @@ void D3D11VertexBuffer::Allocate(ID3D11Device* device) {
 	vertexBufferDesc.MiscFlags = 0;
 	vertexBufferDesc.StructureByteStride = 0;
 
-	vertexData.pSysMem = vertices;
+	vertexData.pSysMem = d3dVertices;
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
@@ -81,12 +60,6 @@ void D3D11VertexBuffer::Allocate(ID3D11Device* device) {
 	indexData.SysMemSlicePitch = 0;
 
 	result = device->CreateBuffer(&indexBufferDesc, &indexData, &mIndexBuffer);
-
-	delete[] vertices;
-	vertices = 0;
-
-	delete[] indices;
-	indices = 0;
 }
 
 void D3D11VertexBuffer::Free()

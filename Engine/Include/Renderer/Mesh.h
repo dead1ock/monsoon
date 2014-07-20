@@ -6,9 +6,8 @@
 #ifndef _MONSOON_D3D_MESH_H_
 #define _MONSOON_D3D_MESH_H_
 
-namespace monsoon {
-	namespace d3d11_renderer {
-		template<class MaterialType>
+namespace Monsoon {
+	namespace Renderer {
 		class Mesh
 		{
 		public:
@@ -16,7 +15,7 @@ namespace monsoon {
 			~Mesh();
 
 		private:
-			Material
+			
 		};
 	}
 }

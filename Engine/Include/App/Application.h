@@ -23,11 +23,13 @@ namespace Monsoon {
 
 		void Run();
 
-	private:
 		/**
 		* Initializes each simulation sub-system and checks for initialization failures.
 		*/
 		bool Initialize();
+
+	private:
+		
 
 		/**
 		* Shuts down each simulation sub-system.

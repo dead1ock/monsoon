@@ -25,7 +25,7 @@ namespace Monsoon {
 			D3D11VertexBuffer();
 			~D3D11VertexBuffer();
 
-			void Allocate(ID3D11Device* device);
+			void Allocate(ID3D11Device* device, ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount);
 			void Free();
 
 			void Render(ID3D11DeviceContext* deviceContext);

@@ -9,6 +9,27 @@
 namespace Monsoon {
 	namespace Renderer {
 
+		struct ColorVertex
+		{
+			float x, y, z;
+			float r, b, g, a;
+
+			void SetPosition(float _x, float _y, float _z)
+			{
+				x = _x;
+				y = _y;
+				z = _z;
+			}
+
+			void SetColor(float _r, float _b, float _g, float _a)
+			{
+				r = _r;
+				b = _b;
+				g = _g;
+				a = _a;
+			}
+		};
+
 		/*
 		 * VertexBuffer Interface.
 		 */

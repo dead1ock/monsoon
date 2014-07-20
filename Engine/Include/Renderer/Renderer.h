@@ -27,6 +27,8 @@ namespace Monsoon {
 			virtual bool Initialize() = 0;
 			virtual void Shutdown() = 0;
 			virtual bool Update() = 0;
+
+			virtual void CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount)=0;
 		};
 	}
 }
