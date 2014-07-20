@@ -76,11 +76,11 @@ protected:
 		indices[5] = 3;
 
 		mRenderer->CreateVertexBuffer(vertices, 4, indices, 6);
-
 	}
 
 	void OnShutdown() {
-
+		mRenderer->DestroyVertexBuffer(1);
+		mRenderer->DestroyVertexBuffer(0);
 	}
 
 };

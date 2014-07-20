@@ -28,12 +28,14 @@ namespace Monsoon {
 			void Shutdown();
 			bool Update();
 
-			void CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount);
+			int CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount);
+			void DestroyVertexBuffer(int vbHandle);
 
 		private:
 			D3D11Window mWindow;
 			D3D mD3d;
 			std::vector<D3D11VertexBuffer> mVertexBuffers;
+			std::vector<int> mFreeIndexList;
 			D3D11ColorMaterial mColorMaterial;
 		};
 	}

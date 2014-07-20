@@ -34,8 +34,9 @@ bool D3D11Renderer::Initialize() {
 
 void D3D11Renderer::Shutdown() {
 
-	for (int x = 0; x < mVertexBuffers.size(); x++)
-		mVertexBuffers[x].Free();
+	for (std::vector<D3D11VertexBuffer>::iterator i = mVertexBuffers.begin(); i < mVertexBuffers.end(); i++)
+		i->Free();
+	mVertexBuffers.empty();
 
 	mColorMaterial.Release();
 	mD3d.Shutdown();
@@ -46,7 +47,7 @@ bool D3D11Renderer::Update() {
 	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
 
 	//
-	// TEMP
+	// TEMP CAMERA CODE
 	//
 	const float SCREEN_DEPTH = 1000.0f;
 	const float SCREEN_NEAR = 0.1f;
@@ -95,7 +96,7 @@ bool D3D11Renderer::Update() {
 	// Finally create the view matrix from the three updated vectors.
 	D3DXMatrixLookAtLH(&viewMatrix, &position, &lookAt, &up);
 	//
-	// TEMP
+	// TEMP CAMERA CODE
 	//
 
 	if (!mWindow.Update())
@@ -103,8 +104,8 @@ bool D3D11Renderer::Update() {
 
 	mD3d.BeginScene();
 
-	for (int x = 0; x < mVertexBuffers.size(); x++) {
-		mVertexBuffers[x].Render(mD3d.GetContext());
+	for (std::vector<D3D11VertexBuffer>::iterator i = mVertexBuffers.begin(); i < mVertexBuffers.end(); i++) {
+		i->Render(mD3d.GetContext());
 		mColorMaterial.Render(mD3d.GetContext(), 6, worldMatrix, viewMatrix, projectionMatrix);
 	}
 
@@ -113,9 +114,27 @@ bool D3D11Renderer::Update() {
 	return true;
 }
 
-void D3D11Renderer::CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount)
+int nextFreeId = 0;
+
+int D3D11Renderer::CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount)
 {
-	D3D11VertexBuffer vBuffer;
-	vBuffer.Allocate(mD3d.GetDevice(), vertices, vertexCount, indicies, indexCount);
-	mVertexBuffers.push_back(vBuffer);
+	int vbHandle = 0;
+	if (mFreeIndexList.size()) {
+		vbHandle = mFreeIndexList.back();
+		mFreeIndexList.pop_back();
+	}
+	else
+	{
+		vbHandle = mVertexBuffers.size();
+		mVertexBuffers.push_back(D3D11VertexBuffer());
+	}
+
+	mVertexBuffers[vbHandle].Allocate(mD3d.GetDevice(), vertices, vertexCount, indicies, indexCount);
+	return vbHandle;
+}
+
+void D3D11Renderer::DestroyVertexBuffer(int vbHandle)
+{
+	mVertexBuffers[vbHandle].Free();
+	mFreeIndexList.push_back(vbHandle);
 }

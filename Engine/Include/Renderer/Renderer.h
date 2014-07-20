@@ -28,7 +28,8 @@ namespace Monsoon {
 			virtual void Shutdown() = 0;
 			virtual bool Update() = 0;
 
-			virtual void CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount)=0;
+			virtual int CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount)=0;
+			virtual void DestroyVertexBuffer(int vbHandle)=0;
 		};
 	}
 }
