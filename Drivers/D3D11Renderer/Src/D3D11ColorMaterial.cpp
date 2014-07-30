@@ -141,13 +141,12 @@ void D3D11ColorMaterial::Release()
 		mVertexShader->Release();
 }
 
-void D3D11ColorMaterial::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix,
+void D3D11ColorMaterial::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
 	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix)
 {
 	//
 	// Map Material Inputs
 	//
-
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -180,5 +179,4 @@ void D3D11ColorMaterial::Render(ID3D11DeviceContext* deviceContext, int indexCou
 	deviceContext->IASetInputLayout(mLayout);
 	deviceContext->VSSetShader(mVertexShader, NULL, 0);
 	deviceContext->PSSetShader(mPixelShader, NULL, 0);
-	deviceContext->DrawIndexed(indexCount, 0, 0);
 }

@@ -16,7 +16,7 @@ D3D11VertexBuffer::~D3D11VertexBuffer() {
 
 }
 
-void D3D11VertexBuffer::Allocate(ID3D11Device* device, ColorVertex* vertices, int vertexCount, unsigned long* indices, int indexCount) {
+void D3D11VertexBuffer::Allocate(ID3D11Device* device, ColorVertex* vertices, int vertexCount, unsigned int* indices, int indexCount) {
 	mDevice = device;
 
 	VertexType* d3dVertices;
@@ -35,7 +35,7 @@ void D3D11VertexBuffer::Allocate(ID3D11Device* device, ColorVertex* vertices, in
 		d3dVertices[x].color = D3DXCOLOR(vertices[x].r, vertices[x].g, vertices[x].b, vertices[x].a);
 	}
 
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 	vertexBufferDesc.ByteWidth = sizeof(VertexType)* mVertexCount;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
@@ -48,8 +48,8 @@ void D3D11VertexBuffer::Allocate(ID3D11Device* device, ColorVertex* vertices, in
 
 	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &mVertexBuffer);
 
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.ByteWidth = sizeof(unsigned long)* mIndexCount;
+	indexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	indexBufferDesc.ByteWidth = sizeof(unsigned int)* mIndexCount;
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
@@ -84,7 +84,9 @@ void D3D11VertexBuffer::Render(ID3D11DeviceContext* context) {
 	stride = sizeof(VertexType);
 	offset = 0;
 
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	context->IASetVertexBuffers(0, 1, &mVertexBuffer, &stride, &offset);
 	context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->DrawIndexed(mIndexCount, 0, 0);
+	
 }

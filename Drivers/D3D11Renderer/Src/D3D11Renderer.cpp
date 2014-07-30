@@ -56,8 +56,6 @@ bool D3D11Renderer::Update() {
 
 	D3DXMatrixPerspectiveFovLH(&projectionMatrix, fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_DEPTH);
 
-	D3DXMatrixIdentity(&worldMatrix);
-
 	D3DXVECTOR3 up, position, lookAt;
 	float yaw, pitch, roll;
 	D3DXMATRIX rotationMatrix;
@@ -99,14 +97,20 @@ bool D3D11Renderer::Update() {
 	// TEMP CAMERA CODE
 	//
 
+	D3DXMatrixIdentity(&worldMatrix);
+
 	if (!mWindow.Update())
 		return false;
 
 	mD3d.BeginScene();
 
-	for (std::vector<D3D11VertexBuffer>::iterator i = mVertexBuffers.begin(); i < mVertexBuffers.end(); i++) {
-		i->Render(mD3d.GetContext());
-		mColorMaterial.Render(mD3d.GetContext(), 6, worldMatrix, viewMatrix, projectionMatrix);
+	for (int x = 0; x < mMeshComponents.size(); x++) {
+		D3DXMatrixIdentity(&worldMatrix);
+		D3DXMatrixRotationYawPitchRoll(&worldMatrix, mMeshComponents[x].yaw, mMeshComponents[x].pitch, mMeshComponents[x].roll);
+		D3DXMatrixTranslation(&worldMatrix, mMeshComponents[x].x, mMeshComponents[x].y, mMeshComponents[x].z);
+
+		mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
+		mVertexBuffers[mMeshComponents[x].VertexBuffer].Render(mD3d.GetContext());
 	}
 
 	mD3d.EndScene();
@@ -116,7 +120,7 @@ bool D3D11Renderer::Update() {
 
 int nextFreeId = 0;
 
-int D3D11Renderer::CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned long* indicies, int indexCount)
+int D3D11Renderer::CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount)
 {
 	int vbHandle = 0;
 	if (mFreeIndexList.size()) {
@@ -137,4 +141,14 @@ void D3D11Renderer::DestroyVertexBuffer(int vbHandle)
 {
 	mVertexBuffers[vbHandle].Free();
 	mFreeIndexList.push_back(vbHandle);
+}
+
+void D3D11Renderer::AttachMeshComponent(Monsoon::Entity entity, MeshComponent& component)
+{
+	mMeshComponents.push_back(component);
+}
+
+void D3D11Renderer::DetachMeshComponent(Monsoon::Entity entity)
+{
+	mMeshComponents.erase(mMeshComponents.end() - 1);
 }

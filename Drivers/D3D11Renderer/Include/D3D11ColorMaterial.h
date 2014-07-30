@@ -19,7 +19,7 @@ namespace Monsoon {
 
 			bool Load(ID3D11Device* device, HWND windowHandle);
 			void Release();
-			void Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix,
+			void Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
 				D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix);
 
 		private:

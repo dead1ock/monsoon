@@ -262,7 +262,7 @@ void D3D::BeginScene() {
 	color[3] = 1.0f;
 
 	mContext->ClearRenderTargetView(mRenderTargetView, color);
-	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0xFF);
 }
 
 void D3D::EndScene() {
