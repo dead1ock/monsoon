@@ -34,6 +34,8 @@ namespace Monsoon {
 		*/
 		virtual void OnShutdown()=0;
 
+		virtual void OnUpdate() = 0;
+
 
 		Renderer::Renderer* mRenderer;
 

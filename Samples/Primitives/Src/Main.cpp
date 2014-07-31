@@ -121,9 +121,10 @@ protected:
 		Renderer::MeshComponent cube_one;
 		cube_one.VertexBuffer = cube;
 		cube_one.x = -5.0f;
-		cube_one.yaw = 1.6;
 		mRenderer->AttachMeshComponent(3, cube_one);
+	}
 
+	void OnUpdate() {
 
 	}
 

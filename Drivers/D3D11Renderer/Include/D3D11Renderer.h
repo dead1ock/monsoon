@@ -13,6 +13,7 @@
 #include "D3D.h"
 #include "D3D11Window.h"
 #include "D3D11ColorMaterial.h"
+#include "Util/PackedArray.h"
 
 
 namespace Monsoon {
@@ -34,13 +35,15 @@ namespace Monsoon {
 			void AttachMeshComponent(Entity entity, MeshComponent& component);
 			void DetachMeshComponent(Entity entity);
 
+			MeshComponent& GetMeshComponent(Entity entity);
+
 		private:
 			D3D11Window mWindow;
 			D3D mD3d;
 			std::vector<D3D11VertexBuffer> mVertexBuffers;
 			std::vector<int> mFreeIndexList;
 
-			std::vector<MeshComponent> mMeshComponents;
+			Util::PackedArray<Entity, MeshComponent> mMeshComponents;
 			D3D11ColorMaterial mColorMaterial;
 		};
 	}

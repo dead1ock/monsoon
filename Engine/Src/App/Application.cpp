@@ -52,7 +52,7 @@ namespace Monsoon {
 		while (!quit) {
 			// Update Sub-Systems.
 			quit = !mRenderer->Update();
-
+			OnUpdate();
 		}
 		
 		//

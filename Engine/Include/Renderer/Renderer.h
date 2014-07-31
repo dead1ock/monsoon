@@ -54,6 +54,7 @@ namespace Monsoon {
 
 			virtual void AttachMeshComponent(Entity entity, MeshComponent& component)=0;
 			virtual void DetachMeshComponent(Entity entity)=0;
+			virtual MeshComponent& GetMeshComponent(Entity entity) = 0;
 		};
 	}
 }

@@ -104,9 +104,8 @@ bool D3D11Renderer::Update() {
 
 	mD3d.BeginScene();
 
-	for (int x = 0; x < mMeshComponents.size(); x++) {
+	for (int x = 0; x < mMeshComponents.Size(); x++) {
 		D3DXMatrixIdentity(&worldMatrix);
-		D3DXMatrixRotationYawPitchRoll(&worldMatrix, mMeshComponents[x].yaw, mMeshComponents[x].pitch, mMeshComponents[x].roll);
 		D3DXMatrixTranslation(&worldMatrix, mMeshComponents[x].x, mMeshComponents[x].y, mMeshComponents[x].z);
 
 		mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
@@ -145,10 +144,14 @@ void D3D11Renderer::DestroyVertexBuffer(int vbHandle)
 
 void D3D11Renderer::AttachMeshComponent(Monsoon::Entity entity, MeshComponent& component)
 {
-	mMeshComponents.push_back(component);
+	mMeshComponents.Add(entity, component);
 }
 
 void D3D11Renderer::DetachMeshComponent(Monsoon::Entity entity)
 {
-	mMeshComponents.erase(mMeshComponents.end() - 1);
+	mMeshComponents.Remove(entity);
+}
+
+MeshComponent& D3D11Renderer::GetMeshComponent(Monsoon::Entity entity) {
+	return mMeshComponents[entity];
 }
