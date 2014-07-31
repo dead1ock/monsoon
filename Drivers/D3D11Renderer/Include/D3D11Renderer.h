@@ -38,6 +38,7 @@ namespace Monsoon {
 			MeshComponent& GetMeshComponent(Entity entity);
 
 			VertexBufferHandle CreatePlane(float width, float height);
+			VertexBufferHandle CreateCube(float length);
 
 		private:
 			D3D11Window mWindow;

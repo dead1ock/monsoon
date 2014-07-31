@@ -53,55 +53,7 @@ protected:
 		delete indices;
 		delete vertices;
 
-		unsigned int* cube_indices = new unsigned int[36]
-		{
-				// front face
-				0, 1, 2,
-				0, 2, 3,
-				// back face
-				4, 6, 5,
-				4, 7, 6,
-				// left face
-				4, 5, 1,
-				4, 1, 0,
-				// right face
-				3, 2, 6,
-				3, 6, 7,
-				// top face
-				1, 5, 6,
-				1, 6, 2,
-				// bottom face
-				4, 0, 3,
-				4, 3, 7
-		};
-
-		vertices = new Renderer::ColorVertex[8];
-
-		vertices[0].SetPosition(-1.0f, -1.0f, -1.0f);
-		vertices[0].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
-
-		vertices[1].SetPosition(-1, 1, -1);
-		vertices[1].SetColor(1.0f, 0.5f, 1.0f, 1.0f);
-
-		vertices[2].SetPosition(1, 1, -1);
-		vertices[2].SetColor(1.0f, 0.5f, 0.5f, 1.0f);
-
-		vertices[3].SetPosition(1, -1, -1);
-		vertices[3].SetColor(1.0f, 0.5f, 0.0f, 1.0f);
-
-		vertices[4].SetPosition(-1, -1, 1);
-		vertices[4].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
-
-		vertices[5].SetPosition(-1, 1, 1);
-		vertices[5].SetColor(1.0f, 0.5f, 1.0f, 1.0f);
-
-		vertices[6].SetPosition(1, 1, 1);
-		vertices[6].SetColor(1.0f, 0.5f, 0.5f, 1.0f);
-
-		vertices[7].SetPosition(1, -1, 1);
-		vertices[7].SetColor(1.0f, 0.5f, 0.0f, 1.0f);
-
-		int cube = mRenderer->CreateVertexBuffer(vertices, 8, cube_indices, 36);
+		int cube = mRenderer->CreateCube(1.0f);
 
 		Renderer::MeshComponent triangle_one;
 		triangle_one.VertexBuffer = triangle;

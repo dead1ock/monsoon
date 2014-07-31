@@ -157,7 +157,7 @@ MeshComponent& D3D11Renderer::GetMeshComponent(Monsoon::Entity entity) {
 }
 
 VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
-	ColorVertex* vertices = new ColorVertex[4];
+	ColorVertex vertices[4];
 
 	vertices[0].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f) * -1.0f, 0.0f);
 	vertices[0].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -171,10 +171,61 @@ VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
 	vertices[3].SetPosition((width / 2.0f), (height / 2.0f) * -1.0f, 0.0f);
 	vertices[3].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-	unsigned int* indices = new unsigned int[6] {
+	unsigned int indices[6] = {
 		0, 1, 2,
 		0, 2, 3
 	};
 
 	return CreateVertexBuffer(vertices, 4, indices, 6);
+}
+
+VertexBufferHandle D3D11Renderer::CreateCube(float length) {
+	ColorVertex vertices[8];
+
+	vertices[0].SetPosition(-1.0f * length, -1.0f * length, -1.0f * length);
+	vertices[0].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+
+	vertices[1].SetPosition(-1.0f * length, 1.0f * length, -1 * length);
+	vertices[1].SetColor(1.0f, 0.5f, 1.0f, 1.0f);
+
+	vertices[2].SetPosition(1.0f * length, 1.0f * length, -1.0f * length);
+	vertices[2].SetColor(1.0f, 0.5f, 0.5f, 1.0f);
+
+	vertices[3].SetPosition(1.0f * length, -1.0f * length, -1.0f * length);
+	vertices[3].SetColor(1.0f, 0.5f, 0.0f, 1.0f);
+
+	vertices[4].SetPosition(-1.0f * length, -1.0f * length, 1.0f * length);
+	vertices[4].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+
+	vertices[5].SetPosition(-1.0f * length, 1.0f * length, 1.0f * length);
+	vertices[5].SetColor(1.0f, 0.5f, 1.0f, 1.0f);
+
+	vertices[6].SetPosition(1.0f * length, 1.0f * length, 1.0f * length);
+	vertices[6].SetColor(1.0f, 0.5f, 0.5f, 1.0f);
+
+	vertices[7].SetPosition(1.0f * length, -1.0f * length, 1.0f * length);
+	vertices[7].SetColor(1.0f, 0.5f, 0.0f, 1.0f);
+	
+	unsigned int indices[36] =
+	{
+			0, 1, 2,
+			0, 2, 3,
+			
+			4, 6, 5,
+			4, 7, 6,
+			
+			4, 5, 1,
+			4, 1, 0,
+			
+			3, 2, 6,
+			3, 6, 7,
+			
+			1, 5, 6,
+			1, 6, 2,
+			
+			4, 0, 3,
+			4, 3, 7
+	};
+
+	return CreateVertexBuffer(vertices, 8, indices, 36);
 }
