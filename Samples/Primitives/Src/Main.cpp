@@ -122,6 +122,11 @@ protected:
 		cube_one.VertexBuffer = cube;
 		cube_one.x = -5.0f;
 		mRenderer->AttachMeshComponent(3, cube_one);
+
+		Renderer::MeshComponent plane;
+		plane.VertexBuffer = mRenderer->CreatePlane(10.0f, 7.0f);
+		plane.z = 1.0f;
+		mRenderer->AttachMeshComponent(4, plane);
 	}
 
 	void OnUpdate() {
@@ -129,13 +134,11 @@ protected:
 	}
 
 	void OnShutdown() {
+		mRenderer->DetachMeshComponent(4);
 		mRenderer->DetachMeshComponent(3);
 		mRenderer->DetachMeshComponent(2);
 		mRenderer->DetachMeshComponent(1);
 		mRenderer->DetachMeshComponent(0);
-
-		mRenderer->DestroyVertexBuffer(1);
-		mRenderer->DestroyVertexBuffer(0);
 	}
 
 };

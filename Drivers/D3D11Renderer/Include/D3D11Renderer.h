@@ -29,13 +29,15 @@ namespace Monsoon {
 			void Shutdown();
 			bool Update();
 
-			int CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount);
-			void DestroyVertexBuffer(int vbHandle);
+			VertexBufferHandle CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount);
+			void DestroyVertexBuffer(VertexBufferHandle vbHandle);
 
 			void AttachMeshComponent(Entity entity, MeshComponent& component);
 			void DetachMeshComponent(Entity entity);
 
 			MeshComponent& GetMeshComponent(Entity entity);
+
+			VertexBufferHandle CreatePlane(float width, float height);
 
 		private:
 			D3D11Window mWindow;

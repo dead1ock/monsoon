@@ -119,7 +119,7 @@ bool D3D11Renderer::Update() {
 
 int nextFreeId = 0;
 
-int D3D11Renderer::CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount)
+VertexBufferHandle D3D11Renderer::CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount)
 {
 	int vbHandle = 0;
 	if (mFreeIndexList.size()) {
@@ -136,7 +136,7 @@ int D3D11Renderer::CreateVertexBuffer(ColorVertex* vertices, int vertexCount, un
 	return vbHandle;
 }
 
-void D3D11Renderer::DestroyVertexBuffer(int vbHandle)
+void D3D11Renderer::DestroyVertexBuffer(VertexBufferHandle vbHandle)
 {
 	mVertexBuffers[vbHandle].Free();
 	mFreeIndexList.push_back(vbHandle);
@@ -154,4 +154,27 @@ void D3D11Renderer::DetachMeshComponent(Monsoon::Entity entity)
 
 MeshComponent& D3D11Renderer::GetMeshComponent(Monsoon::Entity entity) {
 	return mMeshComponents[entity];
+}
+
+VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
+	ColorVertex* vertices = new ColorVertex[4];
+
+	vertices[0].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f) * -1.0f, 0.0f);
+	vertices[0].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+	vertices[1].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f), 0.0f);
+	vertices[1].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+	vertices[2].SetPosition((width / 2.0f), (height / 2.0f), 0.0f);
+	vertices[2].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+	vertices[3].SetPosition((width / 2.0f), (height / 2.0f) * -1.0f, 0.0f);
+	vertices[3].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+	unsigned int* indices = new unsigned int[6] {
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	return CreateVertexBuffer(vertices, 4, indices, 6);
 }

@@ -49,12 +49,15 @@ namespace Monsoon {
 			virtual void Shutdown() = 0;
 			virtual bool Update() = 0;
 
-			virtual int CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount)=0;
-			virtual void DestroyVertexBuffer(int vbHandle)=0;
+			virtual VertexBufferHandle CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount) = 0;
+			virtual void DestroyVertexBuffer(VertexBufferHandle vbHandle) = 0;
 
 			virtual void AttachMeshComponent(Entity entity, MeshComponent& component)=0;
 			virtual void DetachMeshComponent(Entity entity)=0;
 			virtual MeshComponent& GetMeshComponent(Entity entity) = 0;
+
+			// Primitives
+			virtual VertexBufferHandle CreatePlane(float width, float height) = 0;
 		};
 	}
 }
