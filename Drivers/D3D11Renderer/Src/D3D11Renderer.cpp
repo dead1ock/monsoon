@@ -182,28 +182,30 @@ VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
 VertexBufferHandle D3D11Renderer::CreateCube(float length) {
 	ColorVertex vertices[8];
 
-	vertices[0].SetPosition(-1.0f * length, -1.0f * length, -1.0f * length);
+	float halfLength = length / 2.0f;
+
+	vertices[0].SetPosition(-1.0f * halfLength, -1.0f * halfLength, -1.0f * halfLength);
 	vertices[0].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
 
-	vertices[1].SetPosition(-1.0f * length, 1.0f * length, -1 * length);
+	vertices[1].SetPosition(-1.0f * halfLength, 1.0f * halfLength, -1 * halfLength);
 	vertices[1].SetColor(1.0f, 0.5f, 1.0f, 1.0f);
 
-	vertices[2].SetPosition(1.0f * length, 1.0f * length, -1.0f * length);
+	vertices[2].SetPosition(1.0f * halfLength, 1.0f * halfLength, -1.0f * halfLength);
 	vertices[2].SetColor(1.0f, 0.5f, 0.5f, 1.0f);
 
-	vertices[3].SetPosition(1.0f * length, -1.0f * length, -1.0f * length);
+	vertices[3].SetPosition(1.0f * halfLength, -1.0f * halfLength, -1.0f * halfLength);
 	vertices[3].SetColor(1.0f, 0.5f, 0.0f, 1.0f);
 
-	vertices[4].SetPosition(-1.0f * length, -1.0f * length, 1.0f * length);
+	vertices[4].SetPosition(-1.0f * halfLength, -1.0f * halfLength, 1.0f * halfLength);
 	vertices[4].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
 
-	vertices[5].SetPosition(-1.0f * length, 1.0f * length, 1.0f * length);
+	vertices[5].SetPosition(-1.0f * halfLength, 1.0f * halfLength, 1.0f * halfLength);
 	vertices[5].SetColor(1.0f, 0.5f, 1.0f, 1.0f);
 
-	vertices[6].SetPosition(1.0f * length, 1.0f * length, 1.0f * length);
+	vertices[6].SetPosition(1.0f * halfLength, 1.0f * halfLength, 1.0f * halfLength);
 	vertices[6].SetColor(1.0f, 0.5f, 0.5f, 1.0f);
 
-	vertices[7].SetPosition(1.0f * length, -1.0f * length, 1.0f * length);
+	vertices[7].SetPosition(1.0f * halfLength, -1.0f * halfLength, 1.0f * halfLength);
 	vertices[7].SetColor(1.0f, 0.5f, 0.0f, 1.0f);
 	
 	unsigned int indices[36] =
