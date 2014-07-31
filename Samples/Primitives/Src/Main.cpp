@@ -79,6 +79,12 @@ protected:
 		plane.VertexBuffer = mRenderer->CreatePlane(10.0f, 7.0f);
 		plane.z = 1.0f;
 		mRenderer->AttachMeshComponent(4, plane);
+
+		Renderer::MeshComponent pyramid;
+		pyramid.VertexBuffer = mRenderer->CreatePyramid(1.0f, 1.0f);
+		pyramid.x = 4.0f;
+		pyramid.y = 1.0f;
+		mRenderer->AttachMeshComponent(5, pyramid);
 	}
 
 	void OnUpdate() {
@@ -86,6 +92,7 @@ protected:
 	}
 
 	void OnShutdown() {
+		mRenderer->DetachMeshComponent(5);
 		mRenderer->DetachMeshComponent(4);
 		mRenderer->DetachMeshComponent(3);
 		mRenderer->DetachMeshComponent(2);

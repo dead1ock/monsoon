@@ -59,6 +59,7 @@ namespace Monsoon {
 			// Primitives
 			virtual VertexBufferHandle CreatePlane(float width, float height) = 0;
 			virtual VertexBufferHandle CreateCube(float length) = 0;
+			virtual VertexBufferHandle CreatePyramid(float base, float height) = 0;
 		};
 	}
 }

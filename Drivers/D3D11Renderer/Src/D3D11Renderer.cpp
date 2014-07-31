@@ -107,7 +107,7 @@ bool D3D11Renderer::Update() {
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
 		D3DXMatrixIdentity(&worldMatrix);
 		D3DXMatrixTranslation(&worldMatrix, mMeshComponents[x].x, mMeshComponents[x].y, mMeshComponents[x].z);
-
+		//D3DXMatrixRotationYawPitchRoll(&worldMatrix, mMeshComponents[x].yaw, mMeshComponents[x].pitch, mMeshComponents[x].roll);
 		mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 		mVertexBuffers[mMeshComponents[x].VertexBuffer].Render(mD3d.GetContext());
 	}
@@ -230,4 +230,41 @@ VertexBufferHandle D3D11Renderer::CreateCube(float length) {
 	};
 
 	return CreateVertexBuffer(vertices, 8, indices, 36);
+}
+
+VertexBufferHandle D3D11Renderer::CreatePyramid(float base, float height)
+{
+	ColorVertex vertices[5];
+
+	float halfHeight = height / 2.0f;
+	float halfBase = base / 2.0f;
+
+	vertices[0].SetPosition(-1.0f * halfBase, -1.0f * halfHeight, -1.0f * halfBase);
+	vertices[0].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+
+	vertices[1].SetPosition(-1.0f * halfBase, -1.0f * halfHeight, 1.0f * halfBase);
+	vertices[1].SetColor(1.0f, 0.5f, 1.0f, 1.0f);
+
+	vertices[2].SetPosition(1.0f * halfBase, -1.0f * halfHeight, 1.0f * halfBase);
+	vertices[2].SetColor(1.0f, 0.5f, 0.5f, 1.0f);
+
+	vertices[3].SetPosition(1.0f * halfBase, -1.0f * halfHeight, -1.0f * halfBase);
+	vertices[3].SetColor(1.0f, 0.5f, 0.0f, 1.0f);
+
+	vertices[4].SetPosition(0.0f, 1.0f * halfHeight, 0.0f);
+	vertices[4].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+
+	unsigned int indices[18] =
+	{
+		// Bottom
+		0, 1, 2,
+		0, 2, 3,
+
+		0, 4, 1,
+		1, 4, 2,
+		2, 4, 3,
+		3, 4, 0
+	};
+
+	return CreateVertexBuffer(vertices, 5, indices, 18);
 }

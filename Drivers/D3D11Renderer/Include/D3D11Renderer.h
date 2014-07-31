@@ -39,6 +39,7 @@ namespace Monsoon {
 
 			VertexBufferHandle CreatePlane(float width, float height);
 			VertexBufferHandle CreateCube(float length);
+			VertexBufferHandle CreatePyramid(float base, float height);
 
 		private:
 			D3D11Window mWindow;
