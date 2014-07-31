@@ -240,19 +240,19 @@ VertexBufferHandle D3D11Renderer::CreatePyramid(float base, float height)
 	float halfBase = base / 2.0f;
 
 	vertices[0].SetPosition(-1.0f * halfBase, -1.0f * halfHeight, -1.0f * halfBase);
-	vertices[0].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+	vertices[0].SetColor(1.0f, 0.0f, 1.0f, 1.0f);
 
 	vertices[1].SetPosition(-1.0f * halfBase, -1.0f * halfHeight, 1.0f * halfBase);
-	vertices[1].SetColor(1.0f, 0.5f, 1.0f, 1.0f);
+	vertices[1].SetColor(1.0f, 0.0f, 1.0f, 1.0f);
 
 	vertices[2].SetPosition(1.0f * halfBase, -1.0f * halfHeight, 1.0f * halfBase);
-	vertices[2].SetColor(1.0f, 0.5f, 0.5f, 1.0f);
+	vertices[2].SetColor(1.0f, 0.5f, 1.0f, 1.0f);
 
 	vertices[3].SetPosition(1.0f * halfBase, -1.0f * halfHeight, -1.0f * halfBase);
-	vertices[3].SetColor(1.0f, 0.5f, 0.0f, 1.0f);
+	vertices[3].SetColor(1.0f, 0.0f, 1.0f, 1.0f);
 
 	vertices[4].SetPosition(0.0f, 1.0f * halfHeight, 0.0f);
-	vertices[4].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+	vertices[4].SetColor(1.0f, 0.0f, 1.0f, 1.0f);
 
 	unsigned int indices[18] =
 	{
