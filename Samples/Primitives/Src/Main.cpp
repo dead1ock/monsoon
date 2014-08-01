@@ -16,6 +16,8 @@
 
 using namespace Monsoon;
 
+float tick = 0;
+
 class PrimitivesApplication : public Application
 {
 public:
@@ -49,12 +51,14 @@ protected:
 		Renderer::MeshComponent plane;
 		plane.VertexBuffer = mRenderer->CreatePlane(10.0f, 7.0f);
 		plane.pitch = 1.57f;
-		plane.z = 1.0f;
+		plane.y = -1.0f;
 		mRenderer->AttachMeshComponent(2, plane);
 	}
 
 	void OnUpdate() {
-
+		mRenderer->GetMeshComponent(0).yaw = tick;
+		mRenderer->GetMeshComponent(0).y = cos(tick) + 1.0f;
+		tick += 0.03f;
 	}
 
 	void OnShutdown() {

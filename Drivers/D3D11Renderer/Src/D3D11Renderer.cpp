@@ -114,7 +114,7 @@ bool D3D11Renderer::Update() {
 		D3DXMatrixTranslation(&translation, mMeshComponents[x].x, mMeshComponents[x].y, mMeshComponents[x].z);
 		D3DXMatrixRotationYawPitchRoll(&rotation, mMeshComponents[x].yaw, mMeshComponents[x].pitch, mMeshComponents[x].roll);
 		
-		D3DXMatrixMultiply(&worldMatrix, &translation, &rotation);
+		D3DXMatrixMultiply(&worldMatrix, &rotation, &translation);
 		
 		mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 		mVertexBuffers[mMeshComponents[x].VertexBuffer].Render(mD3d.GetContext());
