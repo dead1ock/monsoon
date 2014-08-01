@@ -33,32 +33,39 @@ public:
 protected:
 
 	void OnInitialize() {
-
-		int triangle = mRenderer->CreatePyramid(1.75f, 1.75f);
-
-		int cube = mRenderer->CreateCube(1.0f);
+		Renderer::VertexBufferHandle pyramidVB = mRenderer->CreatePyramid(1.75f, 1.75f);
+		Renderer::VertexBufferHandle cubeVB = mRenderer->CreateCube(1.0f);
+		Renderer::VertexBufferHandle planeVB = mRenderer->CreatePlane(10.0f, 7.0f);
 
 		Renderer::MeshComponent triangle_one;
-		triangle_one.VertexBuffer = triangle;
+		triangle_one.VertexBuffer = pyramidVB;
 		triangle_one.x = 2.0f;
 		mRenderer->AttachMeshComponent(0, triangle_one);
 
 		Renderer::MeshComponent cube_one;
-		cube_one.VertexBuffer = cube;
+		cube_one.VertexBuffer = cubeVB;
 		cube_one.x = -2.0f;
 		mRenderer->AttachMeshComponent(1, cube_one);
 
 		Renderer::MeshComponent plane;
-		plane.VertexBuffer = mRenderer->CreatePlane(10.0f, 7.0f);
+		plane.VertexBuffer = planeVB;
 		plane.pitch = 1.57f;
 		plane.y = -1.0f;
 		mRenderer->AttachMeshComponent(2, plane);
 	}
 
 	void OnUpdate() {
-		mRenderer->GetMeshComponent(0).yaw = tick;
-		mRenderer->GetMeshComponent(0).y = cos(tick) + 1.0f;
-		tick += 0.03f;
+		Renderer::Camera& camera = mRenderer->GetCamera();
+		Renderer::MeshComponent& pyramidMesh = mRenderer->GetMeshComponent(0);
+
+		pyramidMesh.yaw = tick;
+		pyramidMesh.y = cos(tick * 4.0f) + 1.0f;
+
+		camera.x = cos(tick) * 8.0f;
+		camera.y = 5.0f;
+		camera.z = sin(tick) * 8.0f;
+
+		tick += 0.01f;
 	}
 
 	void OnShutdown() {

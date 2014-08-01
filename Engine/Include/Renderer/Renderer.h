@@ -36,6 +36,21 @@ namespace Monsoon {
 			float yaw, pitch, roll;
 		};
 
+		struct Camera
+		{
+			Camera() {
+				x = 0.0f;
+				y = 0.0f;
+				z = 0.0f;
+				yaw = 0.0f;
+				pitch = 0.0f;
+				roll = 0.0f;
+			}
+
+			float x, y, z;
+			float yaw, pitch, roll;
+		};
+
 		/**
 		* Responsible for the setup and teardown of a Canvas (RenderWindow) and GPU resources (vertex buffers, shaders, meshes, textures, ect..).
 		*/
@@ -60,6 +75,9 @@ namespace Monsoon {
 			virtual VertexBufferHandle CreatePlane(float width, float height) = 0;
 			virtual VertexBufferHandle CreateCube(float length) = 0;
 			virtual VertexBufferHandle CreatePyramid(float base, float height) = 0;
+
+			// Camera
+			virtual Camera& GetCamera() = 0;
 		};
 	}
 }

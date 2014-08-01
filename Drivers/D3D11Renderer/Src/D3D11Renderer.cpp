@@ -10,6 +10,9 @@
 
 using namespace Monsoon::Renderer;
 
+const float SCREEN_DEPTH = 1000.0f;
+const float SCREEN_NEAR = 0.1f;
+
 D3D11Renderer::D3D11Renderer(RendererSettings& settings)
 : Renderer(settings),
   mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen)
@@ -43,73 +46,46 @@ void D3D11Renderer::Shutdown() {
 	mWindow.Shutdown();
 }
 
-float tick = 0;
-
 bool D3D11Renderer::Update() {
 	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
-
-	//
-	// TEMP CAMERA CODE
-	//
-	const float SCREEN_DEPTH = 1000.0f;
-	const float SCREEN_NEAR = 0.1f;
 	float fieldOfView = (float)D3DX_PI / 4.0f;
 	float screenAspect = (float)mWindow.getWidth() / (float)mWindow.getHeight();
 
 	D3DXMatrixPerspectiveFovLH(&projectionMatrix, fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_DEPTH);
 
 	D3DXVECTOR3 up, position, lookAt;
-	float yaw, pitch, roll;
 	D3DXMATRIX rotationMatrix;
 
-
-	// Setup the vector that points upwards.
 	up.x = 0.0f;
 	up.y = 1.0f;
 	up.z = 0.0f;
 
-	// Setup the position of the camera in the world.
-	position.x = cos(tick) * 8.0f;
-	position.y = 5.0f;
-	position.z = sin(tick) * 8.0f;
-	tick += 0.005f;
+	position.x = defaultCamera.x;
+	position.y = defaultCamera.y;
+	position.z = defaultCamera.z;
 
-	// Setup where the camera is looking by default.
 	lookAt.x = 0.0f;
 	lookAt.y = 0.0f;
 	lookAt.z = 0.0f;
 
-	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
-	pitch = 0;
-	yaw = 0;
-	roll = 0;
+	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, defaultCamera.yaw, defaultCamera.pitch, defaultCamera.roll);
 
-	// Create the rotation matrix from the yaw, pitch, and roll values.
-	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, yaw, pitch, roll);
-
-	// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
 	D3DXVec3TransformCoord(&lookAt, &lookAt, &rotationMatrix);
 	D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
 
-	// Translate the rotated camera position to the location of the viewer.
-	//lookAt = position + lookAt;
-
-	// Finally create the view matrix from the three updated vectors.
 	D3DXMatrixLookAtLH(&viewMatrix, &position, &lookAt, &up);
-	//
-	// TEMP CAMERA CODE
-	//
-
-	D3DXMatrixIdentity(&worldMatrix);
 
 	if (!mWindow.Update())
 		return false;
 
 	mD3d.BeginScene();
 
+	D3DXMATRIX translation, rotation;
+
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
 		D3DXMatrixIdentity(&worldMatrix);
-		D3DXMATRIX translation, rotation;
+		D3DXMatrixIdentity(&translation);
+		D3DXMatrixIdentity(&rotation);
 		
 		D3DXMatrixTranslation(&translation, mMeshComponents[x].x, mMeshComponents[x].y, mMeshComponents[x].z);
 		D3DXMatrixRotationYawPitchRoll(&rotation, mMeshComponents[x].yaw, mMeshComponents[x].pitch, mMeshComponents[x].roll);

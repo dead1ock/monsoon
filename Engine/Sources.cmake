@@ -16,6 +16,7 @@ SET(MODULE_SRC
 	Include/Renderer/Renderer.h
 	Include/Renderer/RendererSettings.h
 	Include/Renderer/VertexBuffer.h
+	Include/Util/PackedArray.h
 	
 	# Private Sources (Source/)
 	Src/App/Application.cpp

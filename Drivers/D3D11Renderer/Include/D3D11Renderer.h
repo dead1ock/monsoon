@@ -41,11 +41,14 @@ namespace Monsoon {
 			VertexBufferHandle CreateCube(float length);
 			VertexBufferHandle CreatePyramid(float base, float height);
 
+			Camera& GetCamera() { return defaultCamera; }
+
 		private:
 			D3D11Window mWindow;
 			D3D mD3d;
 			std::vector<D3D11VertexBuffer> mVertexBuffers;
 			std::vector<int> mFreeIndexList;
+			Camera defaultCamera;
 
 			Util::PackedArray<Entity, MeshComponent> mMeshComponents;
 			D3D11ColorMaterial mColorMaterial;
