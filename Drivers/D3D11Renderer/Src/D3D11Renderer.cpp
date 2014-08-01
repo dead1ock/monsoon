@@ -43,6 +43,8 @@ void D3D11Renderer::Shutdown() {
 	mWindow.Shutdown();
 }
 
+float tick = 0;
+
 bool D3D11Renderer::Update() {
 	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
 
@@ -67,19 +69,20 @@ bool D3D11Renderer::Update() {
 	up.z = 0.0f;
 
 	// Setup the position of the camera in the world.
-	position.x = 0;
-	position.y = 0;
-	position.z = -10.0;
+	position.x = cos(tick) * 8.0f;
+	position.y = 5.0f;
+	position.z = sin(tick) * 8.0f;
+	tick += 0.005f;
 
 	// Setup where the camera is looking by default.
 	lookAt.x = 0.0f;
 	lookAt.y = 0.0f;
-	lookAt.z = 1.0f;
+	lookAt.z = 0.0f;
 
 	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
-	pitch = 0 * 0.0174532925f;
-	yaw = 0 * 0.0174532925f;
-	roll = 0 * 0.0174532925f;
+	pitch = 0;
+	yaw = 0;
+	roll = 0;
 
 	// Create the rotation matrix from the yaw, pitch, and roll values.
 	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, yaw, pitch, roll);
@@ -89,7 +92,7 @@ bool D3D11Renderer::Update() {
 	D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
 
 	// Translate the rotated camera position to the location of the viewer.
-	lookAt = position + lookAt;
+	//lookAt = position + lookAt;
 
 	// Finally create the view matrix from the three updated vectors.
 	D3DXMatrixLookAtLH(&viewMatrix, &position, &lookAt, &up);
@@ -106,8 +109,13 @@ bool D3D11Renderer::Update() {
 
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
 		D3DXMatrixIdentity(&worldMatrix);
-		D3DXMatrixTranslation(&worldMatrix, mMeshComponents[x].x, mMeshComponents[x].y, mMeshComponents[x].z);
-		//D3DXMatrixRotationYawPitchRoll(&worldMatrix, mMeshComponents[x].yaw, mMeshComponents[x].pitch, mMeshComponents[x].roll);
+		D3DXMATRIX translation, rotation;
+		
+		D3DXMatrixTranslation(&translation, mMeshComponents[x].x, mMeshComponents[x].y, mMeshComponents[x].z);
+		D3DXMatrixRotationYawPitchRoll(&rotation, mMeshComponents[x].yaw, mMeshComponents[x].pitch, mMeshComponents[x].roll);
+		
+		D3DXMatrixMultiply(&worldMatrix, &translation, &rotation);
+		
 		mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 		mVertexBuffers[mMeshComponents[x].VertexBuffer].Render(mD3d.GetContext());
 	}
@@ -160,13 +168,13 @@ VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
 	ColorVertex vertices[4];
 
 	vertices[0].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f) * -1.0f, 0.0f);
-	vertices[0].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+	vertices[0].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
 
 	vertices[1].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f), 0.0f);
-	vertices[1].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+	vertices[1].SetColor(1.0f, 0.0f, 1.0f, 1.0f);
 
 	vertices[2].SetPosition((width / 2.0f), (height / 2.0f), 0.0f);
-	vertices[2].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+	vertices[2].SetColor(0.0f, 1.0f, 1.0f, 1.0f);
 
 	vertices[3].SetPosition((width / 2.0f), (height / 2.0f) * -1.0f, 0.0f);
 	vertices[3].SetColor(1.0f, 1.0f, 1.0f, 1.0f);

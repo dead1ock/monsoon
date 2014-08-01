@@ -38,31 +38,19 @@ protected:
 
 		Renderer::MeshComponent triangle_one;
 		triangle_one.VertexBuffer = triangle;
-		triangle_one.x = 1;
-		triangle_one.z = 2.0f;
+		triangle_one.x = 2.0f;
 		mRenderer->AttachMeshComponent(0, triangle_one);
-
-		Renderer::MeshComponent triangle_two;
-		triangle_two.VertexBuffer = triangle;
-		triangle_two.y = 2;
-		triangle_two.z = 2.0f;
-		mRenderer->AttachMeshComponent(1, triangle_two);
-
-		Renderer::MeshComponent triangle_three;
-		triangle_three.VertexBuffer = triangle;
-		triangle_three.x = -1;
-		triangle_three.z = 2.0f;
-		mRenderer->AttachMeshComponent(2, triangle_three);
 
 		Renderer::MeshComponent cube_one;
 		cube_one.VertexBuffer = cube;
-		cube_one.x = -5.0f;
-		mRenderer->AttachMeshComponent(3, cube_one);
+		cube_one.x = -2.0f;
+		mRenderer->AttachMeshComponent(1, cube_one);
 
 		Renderer::MeshComponent plane;
 		plane.VertexBuffer = mRenderer->CreatePlane(10.0f, 7.0f);
-		plane.z = 3.0f;
-		mRenderer->AttachMeshComponent(4, plane);
+		plane.pitch = 1.57f;
+		plane.z = 1.0f;
+		mRenderer->AttachMeshComponent(2, plane);
 	}
 
 	void OnUpdate() {
@@ -70,8 +58,6 @@ protected:
 	}
 
 	void OnShutdown() {
-		mRenderer->DetachMeshComponent(4);
-		mRenderer->DetachMeshComponent(3);
 		mRenderer->DetachMeshComponent(2);
 		mRenderer->DetachMeshComponent(1);
 		mRenderer->DetachMeshComponent(0);
