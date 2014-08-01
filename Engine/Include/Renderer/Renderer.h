@@ -38,17 +38,35 @@ namespace Monsoon {
 
 		struct Camera
 		{
+			enum Projection
+			{
+				PERSPECTIVE,
+				ORTHOGRAPHIC
+			};
+
 			Camera() {
 				x = 0.0f;
 				y = 0.0f;
 				z = 0.0f;
+				
 				yaw = 0.0f;
 				pitch = 0.0f;
 				roll = 0.0f;
+
+				mode = PERSPECTIVE;
+				
+				orthoWidth = 45.0f;
+				orthoHeight = 30.0f;
+
+				nearClip = 0.1f;
+				farClip = 1000.0f;
 			}
 
 			float x, y, z;
 			float yaw, pitch, roll;
+			Projection mode;
+			float orthoWidth, orthoHeight;
+			float nearClip, farClip;
 		};
 
 		/**

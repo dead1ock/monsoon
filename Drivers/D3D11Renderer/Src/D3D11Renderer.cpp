@@ -10,9 +10,6 @@
 
 using namespace Monsoon::Renderer;
 
-const float SCREEN_DEPTH = 1000.0f;
-const float SCREEN_NEAR = 0.1f;
-
 D3D11Renderer::D3D11Renderer(RendererSettings& settings)
 : Renderer(settings),
   mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen)
@@ -51,7 +48,11 @@ bool D3D11Renderer::Update() {
 	float fieldOfView = (float)D3DX_PI / 4.0f;
 	float screenAspect = (float)mWindow.getWidth() / (float)mWindow.getHeight();
 
-	D3DXMatrixPerspectiveFovLH(&projectionMatrix, fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_DEPTH);
+	if (defaultCamera.mode == Camera::PERSPECTIVE)
+		D3DXMatrixPerspectiveFovLH(&projectionMatrix, fieldOfView, screenAspect, defaultCamera.nearClip, defaultCamera.farClip);
+	else if (defaultCamera.mode == Camera::ORTHOGRAPHIC)
+		D3DXMatrixOrthoLH(&projectionMatrix, defaultCamera.orthoWidth, defaultCamera.orthoHeight, defaultCamera.nearClip, defaultCamera.farClip);
+	
 	D3DXVECTOR3 up, position, lookAt;
 	D3DXMATRIX rotationMatrix;
 

@@ -41,6 +41,7 @@ protected:
 
 	void OnInitialize() {
 		mRenderer->GetCamera().z = -30.0f;
+		mRenderer->GetCamera().mode = Renderer::Camera::ORTHOGRAPHIC;
 
 		//
 		// Assign Entity Ids
@@ -86,7 +87,7 @@ protected:
 		U16 leftKeyState = GetAsyncKeyState(VK_LEFT);
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
-
+		U16 spaceKeyState = GetAsyncKeyState(VK_SPACE);
 	}
 
 	void OnShutdown() {
