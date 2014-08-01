@@ -23,7 +23,7 @@ namespace Monsoon {
 
 
 	Application::~Application() {
-		
+		delete mRenderer;
 	}
 
 	bool Application::Initialize() {

@@ -52,7 +52,6 @@ bool D3D11Renderer::Update() {
 	float screenAspect = (float)mWindow.getWidth() / (float)mWindow.getHeight();
 
 	D3DXMatrixPerspectiveFovLH(&projectionMatrix, fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_DEPTH);
-
 	D3DXVECTOR3 up, position, lookAt;
 	D3DXMATRIX rotationMatrix;
 
