@@ -18,7 +18,8 @@
 using namespace Monsoon;
 
 float tick = 0;
-const float PLAYER_SPEED = 0.08f;
+const float PLAYER_BASE_SPEED = 0.1f;
+float playerSpeedMod = 1.0f;
 
 float rand_FloatRange(float a, float b)
 {
@@ -95,13 +96,30 @@ protected:
 		if (rightKeyState)
 			mRenderer->GetMeshComponent(player).roll -= 0.05f;
 		if (upKeyState) {
-			mRenderer->GetMeshComponent(player).x += PLAYER_SPEED * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
-			mRenderer->GetMeshComponent(player).y += PLAYER_SPEED * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+			// Speed up.
+			if (playerSpeedMod < 2.0f)
+				playerSpeedMod += 0.1f;
 		}
-		if (downKeyState) {
-			mRenderer->GetMeshComponent(player).x -= PLAYER_SPEED * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
-			mRenderer->GetMeshComponent(player).y -= PLAYER_SPEED * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+		else {
+			// Slow down.
+			if (playerSpeedMod > 1.0f)
+				playerSpeedMod -= 0.05f;
+			else
+				playerSpeedMod = 1.0f;
 		}
+
+		mRenderer->GetMeshComponent(player).x += playerSpeedMod * PLAYER_BASE_SPEED * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+		mRenderer->GetMeshComponent(player).y += playerSpeedMod * PLAYER_BASE_SPEED * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+
+		if (mRenderer->GetMeshComponent(player).x > 23.0f)
+			mRenderer->GetMeshComponent(player).x = -23.0f;
+		else if (mRenderer->GetMeshComponent(player).x < -23.0f)
+			mRenderer->GetMeshComponent(player).x = 23.0f;
+		
+		if (mRenderer->GetMeshComponent(player).y > 16.0f)
+			mRenderer->GetMeshComponent(player).y = -16.0f;
+		else if (mRenderer->GetMeshComponent(player).y < -16.0f)
+			mRenderer->GetMeshComponent(player).y = 16.0f;
 	}
 
 	void OnShutdown() {
