@@ -18,6 +18,7 @@
 using namespace Monsoon;
 
 float tick = 0;
+const float PLAYER_SPEED = 0.08f;
 
 float rand_FloatRange(float a, float b)
 {
@@ -88,6 +89,19 @@ protected:
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
 		U16 spaceKeyState = GetAsyncKeyState(VK_SPACE);
+
+		if (leftKeyState)
+			mRenderer->GetMeshComponent(player).roll += 0.05f;
+		if (rightKeyState)
+			mRenderer->GetMeshComponent(player).roll -= 0.05f;
+		if (upKeyState) {
+			mRenderer->GetMeshComponent(player).x += PLAYER_SPEED * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+			mRenderer->GetMeshComponent(player).y += PLAYER_SPEED * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+		}
+		if (downKeyState) {
+			mRenderer->GetMeshComponent(player).x -= PLAYER_SPEED * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+			mRenderer->GetMeshComponent(player).y -= PLAYER_SPEED * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+		}
 	}
 
 	void OnShutdown() {
