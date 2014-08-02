@@ -80,6 +80,9 @@ protected:
 			astroidMesh.VertexBuffer = astroidVB;
 			astroidMesh.x = rand_FloatRange(-10.0f, 10.0f);
 			astroidMesh.y = rand_FloatRange(-10.0f, 10.0f);
+			astroidMesh.pitch = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
+			astroidMesh.yaw = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
+			astroidMesh.roll = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
 			mRenderer->AttachMeshComponent(mAstroids[x], astroidMesh);
 		}
 	}
@@ -96,21 +99,24 @@ protected:
 		if (rightKeyState)
 			mRenderer->GetMeshComponent(player).roll -= 0.05f;
 		if (upKeyState) {
-			// Speed up.
 			if (playerSpeedMod < 2.0f)
+				// Speed up.
 				playerSpeedMod += 0.1f;
 		}
 		else {
-			// Slow down.
 			if (playerSpeedMod > 1.0f)
+				// Slow down.
 				playerSpeedMod -= 0.05f;
 			else
+				// Reset speed modifier.
 				playerSpeedMod = 1.0f;
 		}
 
+		// Move player in the direction it is rotated.
 		mRenderer->GetMeshComponent(player).x += playerSpeedMod * PLAYER_BASE_SPEED * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
 		mRenderer->GetMeshComponent(player).y += playerSpeedMod * PLAYER_BASE_SPEED * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
 
+		// Wrap coordinates around when the player leaves the screen.
 		if (mRenderer->GetMeshComponent(player).x > 23.0f)
 			mRenderer->GetMeshComponent(player).x = -23.0f;
 		else if (mRenderer->GetMeshComponent(player).x < -23.0f)
@@ -120,6 +126,23 @@ protected:
 			mRenderer->GetMeshComponent(player).y = -16.0f;
 		else if (mRenderer->GetMeshComponent(player).y < -16.0f)
 			mRenderer->GetMeshComponent(player).y = 16.0f;
+
+		// Update Asteroids
+		for (int x = 0; x < 10; x++)
+		{
+			mRenderer->GetMeshComponent(mAstroids[x]).x += PLAYER_BASE_SPEED * cos(mRenderer->GetMeshComponent(mAstroids[x]).roll + (D3DX_PI / 2.0f));
+			mRenderer->GetMeshComponent(mAstroids[x]).y += PLAYER_BASE_SPEED * sin(mRenderer->GetMeshComponent(mAstroids[x]).roll + (D3DX_PI / 2.0f));
+
+			if (mRenderer->GetMeshComponent(mAstroids[x]).x > 23.0f)
+				mRenderer->GetMeshComponent(mAstroids[x]).x = -23.0f;
+			else if (mRenderer->GetMeshComponent(mAstroids[x]).x < -23.0f)
+				mRenderer->GetMeshComponent(mAstroids[x]).x = 23.0f;
+
+			if (mRenderer->GetMeshComponent(mAstroids[x]).y > 16.0f)
+				mRenderer->GetMeshComponent(mAstroids[x]).y = -16.0f;
+			else if (mRenderer->GetMeshComponent(mAstroids[x]).y < -16.0f)
+				mRenderer->GetMeshComponent(mAstroids[x]).y = 16.0f;
+		}
 	}
 
 	void OnShutdown() {
