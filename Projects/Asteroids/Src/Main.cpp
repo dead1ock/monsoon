@@ -17,7 +17,7 @@
 
 using namespace Monsoon;
 
-float tick = 0;
+float nextId = 1;
 const float PLAYER_BASE_SPEED = 0.1f;
 float playerSpeedMod = 1.0f;
 
@@ -32,7 +32,7 @@ public:
 	Asteroids()
 		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings()))) {
 		mAstroids.resize(20);
-		mBullets.resize(100);
+		mBullets.reserve(200);
 	}
 
 	~Asteroids() {
@@ -48,20 +48,16 @@ protected:
 		//
 		// Assign Entity Ids
 		//
-		player = 1;
+		player = nextId++;
 
-		U32 nextId = 2;
-		for (int x = 0; x < mAstroids.size(); x++)
+		for (int x = 0; x < 10; x++)
 			mAstroids[x] = nextId++;
-
-		for (int x = 0; x < mBullets.size(); x++)
-			mBullets[x] = nextId++;
 
 		//
 		// Create Meshes
 		//
 		playerVB = mRenderer->CreatePyramid(0.8f, 1.0f);
-		bulletVB = mRenderer->CreatePyramid(0.5f, 1.0f);
+		bulletVB = mRenderer->CreatePyramid(0.25f, 0.5f);
 		astroidVB = mRenderer->CreateCube(0.75f);
 
 		//
@@ -86,6 +82,8 @@ protected:
 			mRenderer->AttachMeshComponent(mAstroids[x], astroidMesh);
 		}
 	}
+
+	int mActiveBullets = 0;
 
 	void OnUpdate() {
 		U16 upKeyState = GetAsyncKeyState(VK_UP);
@@ -116,6 +114,19 @@ protected:
 		mRenderer->GetMeshComponent(player).x += playerSpeedMod * PLAYER_BASE_SPEED * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
 		mRenderer->GetMeshComponent(player).y += playerSpeedMod * PLAYER_BASE_SPEED * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
 
+		if ((mActiveBullets < 200) && spaceKeyState)
+		{
+			Renderer::MeshComponent bullet = mRenderer->GetMeshComponent(player);
+			bullet.VertexBuffer = bulletVB;
+			bullet.x += cos(bullet.roll + (D3DX_PI / 2.0f));
+			bullet.y += sin(bullet.roll + (D3DX_PI / 2.0f));
+			mBullets.push_back(nextId++);
+			mRenderer->AttachMeshComponent(*(mBullets.end() - 1), bullet);
+			mActiveBullets++;
+		}
+			
+		
+
 		// Wrap coordinates around when the player leaves the screen.
 		if (mRenderer->GetMeshComponent(player).x > 23.0f)
 			mRenderer->GetMeshComponent(player).x = -23.0f;
@@ -142,6 +153,40 @@ protected:
 				mRenderer->GetMeshComponent(mAstroids[x]).y = -16.0f;
 			else if (mRenderer->GetMeshComponent(mAstroids[x]).y < -16.0f)
 				mRenderer->GetMeshComponent(mAstroids[x]).y = 16.0f;
+		}
+
+		// Update Bullets
+		for (std::vector<Entity>::iterator i = mBullets.begin(); i != mBullets.end(); )
+		{
+			mRenderer->GetMeshComponent(*i).x += PLAYER_BASE_SPEED * cos(mRenderer->GetMeshComponent(*i).roll + (D3DX_PI / 2.0f));
+			mRenderer->GetMeshComponent(*i).y += PLAYER_BASE_SPEED * sin(mRenderer->GetMeshComponent(*i).roll + (D3DX_PI / 2.0f));
+
+			if (mRenderer->GetMeshComponent(*i).x > 23.0f)
+			{
+				mRenderer->DetachMeshComponent(*i);
+				i = mBullets.erase(i);
+				mActiveBullets--;
+			}
+			else if (mRenderer->GetMeshComponent(*i).x < -23.0f)
+			{
+				mRenderer->DetachMeshComponent(*i);
+				i = mBullets.erase(i);
+				mActiveBullets--;
+			}
+			else if (mRenderer->GetMeshComponent(*i).y > 16.0f)
+			{
+				mRenderer->DetachMeshComponent(*i);
+				i = mBullets.erase(i);
+				mActiveBullets--;
+			}
+			else if (mRenderer->GetMeshComponent(*i).y < -16.0f)
+			{
+				mRenderer->DetachMeshComponent(*i);
+				i = mBullets.erase(i);
+				mActiveBullets--;
+			}
+			else
+				i++;
 		}
 	}
 

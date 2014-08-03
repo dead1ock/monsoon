@@ -13,7 +13,7 @@
 #include "D3D.h"
 #include "D3D11Window.h"
 #include "D3D11ColorMaterial.h"
-#include "Util/PackedArray.h"
+#include "Util/PackedPool.h"
 
 
 namespace Monsoon {
@@ -50,7 +50,7 @@ namespace Monsoon {
 			std::vector<int> mFreeIndexList;
 			Camera defaultCamera;
 
-			Util::PackedArray<Entity, MeshComponent> mMeshComponents;
+			Util::PackedPool<Entity, MeshComponent> mMeshComponents;
 			D3D11ColorMaterial mColorMaterial;
 		};
 	}

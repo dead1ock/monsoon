@@ -83,17 +83,17 @@ bool D3D11Renderer::Update() {
 	D3DXMATRIX translation, rotation;
 
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
-		D3DXMatrixIdentity(&worldMatrix);
+ 		D3DXMatrixIdentity(&worldMatrix);
 		D3DXMatrixIdentity(&translation);
 		D3DXMatrixIdentity(&rotation);
 		
-		D3DXMatrixTranslation(&translation, mMeshComponents[x].x, mMeshComponents[x].y, mMeshComponents[x].z);
-		D3DXMatrixRotationYawPitchRoll(&rotation, mMeshComponents[x].yaw, mMeshComponents[x].pitch, mMeshComponents[x].roll);
+		D3DXMatrixTranslation(&translation, mMeshComponents.At(x).x, mMeshComponents.At(x).y, mMeshComponents.At(x).z);
+		D3DXMatrixRotationYawPitchRoll(&rotation, mMeshComponents.At(x).yaw, mMeshComponents.At(x).pitch, mMeshComponents.At(x).roll);
 		
 		D3DXMatrixMultiply(&worldMatrix, &rotation, &translation);
 		
 		mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
-		mVertexBuffers[mMeshComponents[x].VertexBuffer].Render(mD3d.GetContext());
+		mVertexBuffers[mMeshComponents.At(x).VertexBuffer].Render(mD3d.GetContext());
 	}
 
 	mD3d.EndScene();
