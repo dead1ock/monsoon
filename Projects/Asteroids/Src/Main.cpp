@@ -17,7 +17,6 @@
 
 using namespace Monsoon;
 
-float nextId = 1;
 const float PLAYER_BASE_SPEED = 0.1f;
 float playerSpeedMod = 1.0f;
 
@@ -25,11 +24,6 @@ float rand_FloatRange(float a, float b)
 {
 	return ((b - a)*((float)rand() / RAND_MAX)) + a;
 }
-
-enum GameState
-{
-
-};
 
 class Asteroids : public Application
 {
@@ -56,7 +50,7 @@ protected:
 		//
 		// Assign Entity Ids
 		//
-		player = nextId++;
+		player = mEntityManager.CreateEntity("player");
 
 		//
 		// Create Meshes
@@ -124,7 +118,7 @@ protected:
 			bullet.VertexBuffer = bulletVB;
 			bullet.x += cos(bullet.roll + (D3DX_PI / 2.0f));
 			bullet.y += sin(bullet.roll + (D3DX_PI / 2.0f));
-			mBullets.push_back(nextId++);
+			mBullets.push_back(mEntityManager.CreateEntity());
 			mBulletAABBs.push_back(Math::AABB(bullet.x, bullet.y, 0.25f, 0.5f));
 			mRenderer->AttachMeshComponent(*(mBullets.end() - 1), bullet);
 			mActiveBullets++;
@@ -156,6 +150,7 @@ protected:
 
 			if (mRenderer->GetMeshComponent(*i).x > 23.0f)
 			{
+				mEntityManager.DestroyEntity(*i);
 				mRenderer->DetachMeshComponent(*i);
 				i = mBullets.erase(i);
 				mBulletAABBs.erase(mBulletAABBs.begin() + z);
@@ -163,6 +158,7 @@ protected:
 			}
 			else if (mRenderer->GetMeshComponent(*i).x < -23.0f)
 			{
+				mEntityManager.DestroyEntity(*i);
 				mRenderer->DetachMeshComponent(*i);
 				i = mBullets.erase(i);
 				mBulletAABBs.erase(mBulletAABBs.begin() + z);
@@ -170,6 +166,7 @@ protected:
 			}
 			else if (mRenderer->GetMeshComponent(*i).y > 16.0f)
 			{
+				mEntityManager.DestroyEntity(*i);
 				mRenderer->DetachMeshComponent(*i);
 				i = mBullets.erase(i);
 				mBulletAABBs.erase(mBulletAABBs.begin() + z);
@@ -177,6 +174,7 @@ protected:
 			}
 			else if (mRenderer->GetMeshComponent(*i).y < -16.0f)
 			{
+				mEntityManager.DestroyEntity(*i);
 				mRenderer->DetachMeshComponent(*i);
 				i = mBullets.erase(i);
 				mBulletAABBs.erase(mBulletAABBs.begin() + z);
@@ -229,11 +227,13 @@ protected:
 				if (mAsteroidAABBs[x].Intersects(mBulletAABBs[y]))
 				{
 					// Destroy asteroid.
+					mEntityManager.DestroyEntity(mAstroids[x]);
 					mRenderer->DetachMeshComponent(mAstroids[x]);
 					mAstroids.erase(mAstroids.begin() + x);
 					mAsteroidAABBs.erase(mAsteroidAABBs.begin() + x);
 
 					// Destroy bullet.
+					mEntityManager.DestroyEntity(mBullets[y]);
 					mRenderer->DetachMeshComponent(mBullets[y]);
 					mBullets.erase(mBullets.begin() + y);
 					mBulletAABBs.erase(mBulletAABBs.begin() + y);
@@ -261,7 +261,7 @@ protected:
 
 	void GenerateAsteroids() {
 		for (int x = 0; x < rand() % 100; x++)
-			mAstroids.push_back(nextId++);
+			mAstroids.push_back(mEntityManager.CreateEntity());
 
 		//
 		// Generate

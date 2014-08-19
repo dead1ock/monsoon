@@ -7,6 +7,8 @@
 SET(MODULE_SRC
 	#Public Sources (Include/)
 	Include/App/Application.h
+	Include/ECS/EntityManager.h
+	Include/Math/AABB.h
 	Include/Platform/DynLib.h
 	Include/Platform/Endianness.h
 	Include/Platform/Export.h
@@ -20,6 +22,8 @@ SET(MODULE_SRC
 	
 	# Private Sources (Source/)
 	Src/App/Application.cpp
+	Src/ECS/EntityMAnager.cpp
+	Src/Math/AABB.cpp
 	)
 
 #
@@ -46,3 +50,5 @@ SOURCE_GROUP(App "App/*")
 SOURCE_GROUP(Platform "Platform/*")
 SOURCE_GROUP(Renderer "Renderer/*")
 SOURCE_GROUP(Util "Util/*")
+SOURCE_GROUP(ECS "ECS/*")
+SOURCE_GROUP(Math "Math/*")
