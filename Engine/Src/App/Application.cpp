@@ -17,6 +17,8 @@ namespace Monsoon {
 
 	Application::Application(Renderer::Renderer* renderer)
 		: mRenderer(renderer)
+		, mEventManager()
+		, mEntityManager(&mEventManager)
 	{
 
 	}

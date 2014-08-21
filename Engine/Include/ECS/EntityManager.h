@@ -4,18 +4,19 @@
 */
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <list>
 
 #include <Platform/DynLib.h>
 #include <Platform/Types.h>
+#include <Event/EventManager.h>
 
 namespace Monsoon {
 	namespace ECS {
 		class DYNLIB EntityManager
 		{
 		public:
-			EntityManager();
+			EntityManager(Event::EventManager* eventManager);
 			~EntityManager();
 
 			Entity CreateEntity(std::string identifier);
@@ -25,8 +26,9 @@ namespace Monsoon {
 			void DestroyEntity(Entity entity);
 
 		private:
+			Event::EventManager* mEventManager;
 			Monsoon::Entity mNextEntityHandle;
-			std::map<std::string, Monsoon::Entity> mEntities;
+			std::unordered_map<std::string, Monsoon::Entity> mEntities;
 			std::list<Monsoon::Entity> mEntityFreeList;
 		};
 	}

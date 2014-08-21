@@ -12,11 +12,13 @@
 #include "ECS/EntityManager.h"
 
 using namespace Monsoon::ECS;
+using namespace Monsoon::Event;
 
-EntityManager::EntityManager()
+EntityManager::EntityManager(EventManager* eventManager)
 : mNextEntityHandle(0)
+, mEventManager(eventManager)
 {
-
+	
 }
 
 EntityManager::~EntityManager()
@@ -60,6 +62,7 @@ Monsoon::Entity EntityManager::FindEntity(std::string identifier)
 void EntityManager::DestroyEntity(Monsoon::Entity entity)
 {
 	mEntityFreeList.push_back(entity);
+	mEventManager->Invoke("Entity::Destroyed", (void*)entity);
 }
 
 void EntityManager::DestroyEntity(std::string identifier)
@@ -70,5 +73,6 @@ void EntityManager::DestroyEntity(std::string identifier)
 	else {
 		mEntityFreeList.push_back(entity->second);
 		mEntities.erase(entity);
+		mEventManager->Invoke("Entity::Destroyed", (void*)entity->second);
 	}
 }

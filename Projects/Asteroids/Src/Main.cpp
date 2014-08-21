@@ -67,6 +67,12 @@ protected:
 		mRenderer->AttachMeshComponent(player, playerMesh);
 
 		GenerateAsteroids();
+
+		Renderer::Renderer* renderer = mRenderer;
+		mEventManager.Subscribe("Entity::Destroyed", [renderer](void* arg) {
+			renderer->DetachMeshComponent((Monsoon::Entity)arg);
+			return 0;
+		});
 	}
 
 	int mActiveBullets = 0;
@@ -151,7 +157,6 @@ protected:
 			if (mRenderer->GetMeshComponent(*i).x > 23.0f)
 			{
 				mEntityManager.DestroyEntity(*i);
-				mRenderer->DetachMeshComponent(*i);
 				i = mBullets.erase(i);
 				mBulletAABBs.erase(mBulletAABBs.begin() + z);
 				mActiveBullets--;
@@ -159,7 +164,6 @@ protected:
 			else if (mRenderer->GetMeshComponent(*i).x < -23.0f)
 			{
 				mEntityManager.DestroyEntity(*i);
-				mRenderer->DetachMeshComponent(*i);
 				i = mBullets.erase(i);
 				mBulletAABBs.erase(mBulletAABBs.begin() + z);
 				mActiveBullets--;
@@ -167,7 +171,6 @@ protected:
 			else if (mRenderer->GetMeshComponent(*i).y > 16.0f)
 			{
 				mEntityManager.DestroyEntity(*i);
-				mRenderer->DetachMeshComponent(*i);
 				i = mBullets.erase(i);
 				mBulletAABBs.erase(mBulletAABBs.begin() + z);
 				mActiveBullets--;
@@ -175,7 +178,6 @@ protected:
 			else if (mRenderer->GetMeshComponent(*i).y < -16.0f)
 			{
 				mEntityManager.DestroyEntity(*i);
-				mRenderer->DetachMeshComponent(*i);
 				i = mBullets.erase(i);
 				mBulletAABBs.erase(mBulletAABBs.begin() + z);
 				mActiveBullets--;
@@ -228,13 +230,11 @@ protected:
 				{
 					// Destroy asteroid.
 					mEntityManager.DestroyEntity(mAstroids[x]);
-					mRenderer->DetachMeshComponent(mAstroids[x]);
 					mAstroids.erase(mAstroids.begin() + x);
 					mAsteroidAABBs.erase(mAsteroidAABBs.begin() + x);
 
 					// Destroy bullet.
 					mEntityManager.DestroyEntity(mBullets[y]);
-					mRenderer->DetachMeshComponent(mBullets[y]);
 					mBullets.erase(mBullets.begin() + y);
 					mBulletAABBs.erase(mBulletAABBs.begin() + y);
 					mActiveBullets--;
@@ -282,6 +282,8 @@ protected:
 	}
 
 	void OnShutdown() {
+		mEventManager.Unsubscribe("Entity::Destroyed", 0);
+
 		mRenderer->DestroyVertexBuffer(astroidVB);
 		mRenderer->DestroyVertexBuffer(bulletVB);
 		mRenderer->DestroyVertexBuffer(playerVB);

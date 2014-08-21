@@ -11,6 +11,7 @@
 #include "Platform\DynLib.h"
 #include "Renderer\Renderer.h"
 #include "ECS\EntityManager.h"
+#include "Event\EventManager.h"
 
 namespace Monsoon {
 	/*
@@ -40,6 +41,7 @@ namespace Monsoon {
 
 		Renderer::Renderer* mRenderer;
 		ECS::EntityManager mEntityManager;
+		Event::EventManager mEventManager;
 
 	private:
 		/**
