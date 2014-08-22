@@ -12,6 +12,7 @@
 #include "Renderer\Renderer.h"
 #include "ECS\EntityManager.h"
 #include "Event\EventManager.h"
+#include "Platform\Clock.h"
 
 namespace Monsoon {
 	/*
@@ -42,6 +43,7 @@ namespace Monsoon {
 		Renderer::Renderer* mRenderer;
 		ECS::EntityManager mEntityManager;
 		Event::EventManager mEventManager;
+		Platform::Clock mGameClock;
 
 	private:
 		/**

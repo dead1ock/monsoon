@@ -53,6 +53,7 @@ namespace Monsoon {
 		bool quit = false;
 		while (!quit) {
 			// Update Sub-Systems.
+			mGameClock.Update();
 			quit = !mRenderer->Update();
 			OnUpdate();
 		}

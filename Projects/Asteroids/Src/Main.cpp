@@ -17,8 +17,10 @@
 
 using namespace Monsoon;
 
-const float PLAYER_BASE_SPEED = 0.1f;
-float playerSpeedMod = 1.0f;
+const float PLAYER_BASE_SPEED = 4.0f;
+float playerSpeedMod = 2.0f;
+const float BULLET_SPEED = PLAYER_BASE_SPEED * 4.0f;
+const float ASTEROID_SPEED = 6.0f;
 
 float rand_FloatRange(float a, float b)
 {
@@ -68,9 +70,8 @@ protected:
 
 		GenerateAsteroids();
 
-		Renderer::Renderer* renderer = mRenderer;
-		mEventManager.Subscribe("Entity::Destroyed", [renderer](void* arg) {
-			renderer->DetachMeshComponent((Monsoon::Entity)arg);
+		mEventManager.Subscribe("Entity::Destroyed", [this](void* arg) {
+			mRenderer->DetachMeshComponent((Monsoon::Entity)arg);
 			return 0;
 		});
 	}
@@ -85,9 +86,9 @@ protected:
 		U16 spaceKeyState = GetAsyncKeyState(VK_SPACE);
 
 		if (leftKeyState)
-			mRenderer->GetMeshComponent(player).roll += 0.05f;
+			mRenderer->GetMeshComponent(player).roll += mGameClock.getDeltaTime() * 3.0f;
 		if (rightKeyState)
-			mRenderer->GetMeshComponent(player).roll -= 0.05f;
+			mRenderer->GetMeshComponent(player).roll -= mGameClock.getDeltaTime() * 3.0f;
 		if (upKeyState) {
 			if (playerSpeedMod < 2.0f)
 				// Speed up.
@@ -103,8 +104,8 @@ protected:
 		}
 
 		// Move player in the direction it is rotated.
-		mRenderer->GetMeshComponent(player).x += playerSpeedMod * PLAYER_BASE_SPEED * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
-		mRenderer->GetMeshComponent(player).y += playerSpeedMod * PLAYER_BASE_SPEED * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+		mRenderer->GetMeshComponent(player).x += playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+		mRenderer->GetMeshComponent(player).y += playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
 
 		// Wrap coordinates around when the player leaves the screen.
 		if (mRenderer->GetMeshComponent(player).x > 23.0f)
@@ -133,8 +134,8 @@ protected:
 		// Update Asteroids
 		for (int x = 0; x < mAstroids.size(); x++)
 		{
-			mRenderer->GetMeshComponent(mAstroids[x]).x += PLAYER_BASE_SPEED * cos(mRenderer->GetMeshComponent(mAstroids[x]).roll + (D3DX_PI / 2.0f));
-			mRenderer->GetMeshComponent(mAstroids[x]).y += PLAYER_BASE_SPEED * sin(mRenderer->GetMeshComponent(mAstroids[x]).roll + (D3DX_PI / 2.0f));
+			mRenderer->GetMeshComponent(mAstroids[x]).x += ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(mRenderer->GetMeshComponent(mAstroids[x]).roll + (D3DX_PI / 2.0f));
+			mRenderer->GetMeshComponent(mAstroids[x]).y += ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(mRenderer->GetMeshComponent(mAstroids[x]).roll + (D3DX_PI / 2.0f));
 
 			if (mRenderer->GetMeshComponent(mAstroids[x]).x > 23.0f)
 				mRenderer->GetMeshComponent(mAstroids[x]).x = -23.0f;
@@ -151,8 +152,8 @@ protected:
 		int z = 0;
 		for (std::vector<Entity>::iterator i = mBullets.begin(); i != mBullets.end(); )
 		{
-			mRenderer->GetMeshComponent(*i).x += (PLAYER_BASE_SPEED * 4.0f) * cos(mRenderer->GetMeshComponent(*i).roll + (D3DX_PI / 2.0f));
-			mRenderer->GetMeshComponent(*i).y += (PLAYER_BASE_SPEED * 4.0f) * sin(mRenderer->GetMeshComponent(*i).roll + (D3DX_PI / 2.0f));
+			mRenderer->GetMeshComponent(*i).x += BULLET_SPEED * mGameClock.getDeltaTime() * cos(mRenderer->GetMeshComponent(*i).roll + (D3DX_PI / 2.0f));
+			mRenderer->GetMeshComponent(*i).y += BULLET_SPEED * mGameClock.getDeltaTime() * sin(mRenderer->GetMeshComponent(*i).roll + (D3DX_PI / 2.0f));
 
 			if (mRenderer->GetMeshComponent(*i).x > 23.0f)
 			{

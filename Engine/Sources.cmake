@@ -10,6 +10,7 @@ SET(MODULE_SRC
 	Include/ECS/EntityManager.h
 	Include/Event/EventManager.h
 	Include/Math/AABB.h
+	Include/Platform/Clock.h
 	Include/Platform/DynLib.h
 	Include/Platform/Endianness.h
 	Include/Platform/Export.h
@@ -26,6 +27,7 @@ SET(MODULE_SRC
 	Src/ECS/EntityMAnager.cpp
 	Src/Event/EventManager.cpp
 	Src/Math/AABB.cpp
+	Src/Platform/Clock.cpp
 	)
 
 #
