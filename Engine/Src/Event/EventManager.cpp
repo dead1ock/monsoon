@@ -36,6 +36,13 @@ ListenerHandle EventManager::Subscribe(EventType type, EventCallback callback)
 	return listener.Handle;
 }
 
+void EventManager::Unsubscribe(EventType type)
+{
+	auto listeners = mListeners.find(type);
+	if (listeners != mListeners.end())
+		listeners->second.clear();
+}
+
 void EventManager::Unsubscribe(EventType type, U32 listenerId)
 {
 	auto listeners = mListeners.find(type);
