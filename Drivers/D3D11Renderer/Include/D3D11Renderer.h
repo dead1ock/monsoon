@@ -22,7 +22,7 @@ namespace Monsoon {
 		class DRIVER D3D11Renderer : Renderer
 		{
 		public:
-			D3D11Renderer(RendererSettings& settings);
+			D3D11Renderer(RendererSettings& settings, Scene::SpatialSystem* spatialSystem);
 			~D3D11Renderer();
 
 			bool Initialize();
@@ -52,6 +52,8 @@ namespace Monsoon {
 
 			Util::PackedPool<Entity, MeshComponent> mMeshComponents;
 			D3D11ColorMaterial mColorMaterial;
+
+			Scene::SpatialSystem* mSpatialSystem;
 		};
 	}
 }

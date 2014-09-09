@@ -12,6 +12,8 @@
 #include "RendererSettings.h"
 #include "VertexBuffer.h"
 
+#include "Scene/SpatialSystem.h"
+
 namespace Monsoon {
 	namespace Renderer {
 
@@ -21,19 +23,11 @@ namespace Monsoon {
 		struct MeshComponent
 		{
 			MeshComponent() {
-				x = 0;
-				y = 0;
-				z = 0;
-				yaw = 0;
-				pitch = 0;
-				roll = 0;
 				VertexBuffer = -1;
 				Material = -1;
 			}
 			VertexBufferHandle VertexBuffer;
 			MaterialHandle Material;
-			float x, y, z;
-			float yaw, pitch, roll;
 		};
 
 		struct Camera
@@ -75,7 +69,7 @@ namespace Monsoon {
 		class DRIVER Renderer
 		{
 		public:
-			Renderer(RendererSettings& settings) { };
+			Renderer(RendererSettings& settings, Scene::SpatialSystem* spatialSystem) { };
 			virtual ~Renderer() { };
 
 			virtual bool Initialize() = 0;

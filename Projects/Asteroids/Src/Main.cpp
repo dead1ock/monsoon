@@ -31,7 +31,7 @@ class Asteroids : public Application
 {
 public:
 	Asteroids()
-		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings())))
+		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mSpatialSystem)))
 		, playerAABB(Math::AABB(-5.0f, 0.0f, 1.0f, 1.0f)) {
 		mAstroids.reserve(20);
 		mAsteroidAABBs.reserve(20);
@@ -67,10 +67,12 @@ protected:
 		Renderer::MeshComponent playerMesh;
 		playerMesh.VertexBuffer = playerVB;
 		mRenderer->AttachMeshComponent(player, playerMesh);
+		mSpatialSystem.AttachSpatialComponent(player, Scene::SpatialComponent());
 
 		GenerateAsteroids();
 
 		mEventManager.Subscribe("Entity::Destroyed", [this](void* arg) {
+			mSpatialSystem.DetachSpatialComponent((Monsoon::Entity)arg);
 			mRenderer->DetachMeshComponent((Monsoon::Entity)arg);
 			return 0;
 		});
@@ -85,10 +87,12 @@ protected:
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
 		U16 spaceKeyState = GetAsyncKeyState(VK_SPACE);
 
+		Scene::SpatialComponent& playerSpatialComponent = mSpatialSystem.GetSpatialComponent(player);
+
 		if (leftKeyState)
-			mRenderer->GetMeshComponent(player).roll += mGameClock.getDeltaTime() * 3.0f;
+			playerSpatialComponent.roll += mGameClock.getDeltaTime() * 3.0f;
 		if (rightKeyState)
-			mRenderer->GetMeshComponent(player).roll -= mGameClock.getDeltaTime() * 3.0f;
+			playerSpatialComponent.roll -= mGameClock.getDeltaTime() * 3.0f;
 		if (upKeyState) {
 			if (playerSpeedMod < 2.0f)
 				// Speed up.
@@ -104,112 +108,102 @@ protected:
 		}
 
 		// Move player in the direction it is rotated.
-		mRenderer->GetMeshComponent(player).x += playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
-		mRenderer->GetMeshComponent(player).y += playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(mRenderer->GetMeshComponent(player).roll + (D3DX_PI / 2.0f));
+		playerSpatialComponent.x += playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(playerSpatialComponent.roll + (D3DX_PI / 2.0f));
+		playerSpatialComponent.y += playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(playerSpatialComponent.roll + (D3DX_PI / 2.0f));
+
+		playerAABB = Math::AABB(playerSpatialComponent.x, playerSpatialComponent.y, 0.8f, 1.0f);
 
 		// Wrap coordinates around when the player leaves the screen.
-		if (mRenderer->GetMeshComponent(player).x > 23.0f)
-			mRenderer->GetMeshComponent(player).x = -23.0f;
-		else if (mRenderer->GetMeshComponent(player).x < -23.0f)
-			mRenderer->GetMeshComponent(player).x = 23.0f;
+		if (playerSpatialComponent.x > 23.0f)
+			playerSpatialComponent.x = -23.0f;
+		else if (playerSpatialComponent.x < -23.0f)
+			playerSpatialComponent.x = 23.0f;
 		
-		if (mRenderer->GetMeshComponent(player).y > 16.0f)
-			mRenderer->GetMeshComponent(player).y = -16.0f;
-		else if (mRenderer->GetMeshComponent(player).y < -16.0f)
-			mRenderer->GetMeshComponent(player).y = 16.0f;
+		if (playerSpatialComponent.y > 16.0f)
+			playerSpatialComponent.y = -16.0f;
+		else if (playerSpatialComponent.y < -16.0f)
+			playerSpatialComponent.y = 16.0f;
 
 		// Check for "fire"
 		if ((mActiveBullets < 200) && spaceKeyState)
 		{
-			Renderer::MeshComponent bullet = mRenderer->GetMeshComponent(player);
+			Renderer::MeshComponent bullet;
+			Scene::SpatialComponent bulletSpatialComponent = playerSpatialComponent; // Copy player position.
 			bullet.VertexBuffer = bulletVB;
-			bullet.x += cos(bullet.roll + (D3DX_PI / 2.0f));
-			bullet.y += sin(bullet.roll + (D3DX_PI / 2.0f));
-			mBullets.push_back(mEntityManager.CreateEntity());
-			mBulletAABBs.push_back(Math::AABB(bullet.x, bullet.y, 0.25f, 0.5f));
-			mRenderer->AttachMeshComponent(*(mBullets.end() - 1), bullet);
+
+			bulletSpatialComponent.x += cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
+			bulletSpatialComponent.y += sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
+			
+			auto id = mEntityManager.CreateEntity();
+			mBullets.push_back(id);
+			mBulletAABBs.push_back(Math::AABB(bulletSpatialComponent.x, bulletSpatialComponent.y, 0.25f, 0.5f));
+			mRenderer->AttachMeshComponent(id, bullet);
+			mSpatialSystem.AttachSpatialComponent(id, bulletSpatialComponent);
 			mActiveBullets++;
 		}
 
 		// Update Asteroids
 		for (int x = 0; x < mAstroids.size(); x++)
 		{
-			mRenderer->GetMeshComponent(mAstroids[x]).x += ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(mRenderer->GetMeshComponent(mAstroids[x]).roll + (D3DX_PI / 2.0f));
-			mRenderer->GetMeshComponent(mAstroids[x]).y += ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(mRenderer->GetMeshComponent(mAstroids[x]).roll + (D3DX_PI / 2.0f));
+			Scene::SpatialComponent& asteroidSpatialComponent = mSpatialSystem.GetSpatialComponent(mAstroids[x]);
+			asteroidSpatialComponent.x += ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f));
+			asteroidSpatialComponent.y += ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f));
 
-			if (mRenderer->GetMeshComponent(mAstroids[x]).x > 23.0f)
-				mRenderer->GetMeshComponent(mAstroids[x]).x = -23.0f;
-			else if (mRenderer->GetMeshComponent(mAstroids[x]).x < -23.0f)
-				mRenderer->GetMeshComponent(mAstroids[x]).x = 23.0f;
+			mAsteroidAABBs[x].mX = asteroidSpatialComponent.x;
+			mAsteroidAABBs[x].mY = asteroidSpatialComponent.y;
 
-			if (mRenderer->GetMeshComponent(mAstroids[x]).y > 16.0f)
-				mRenderer->GetMeshComponent(mAstroids[x]).y = -16.0f;
-			else if (mRenderer->GetMeshComponent(mAstroids[x]).y < -16.0f)
-				mRenderer->GetMeshComponent(mAstroids[x]).y = 16.0f;
+			if (asteroidSpatialComponent.x > 23.0f)
+				asteroidSpatialComponent.x = -23.0f;
+			else if (asteroidSpatialComponent.x < -23.0f)
+				asteroidSpatialComponent.x = 23.0f;
+
+			if (asteroidSpatialComponent.y > 16.0f)
+				asteroidSpatialComponent.y = -16.0f;
+			else if (asteroidSpatialComponent.y < -16.0f)
+				asteroidSpatialComponent.y = 16.0f;
 		}
 
 		// Update Bullets
-		int z = 0;
-		for (std::vector<Entity>::iterator i = mBullets.begin(); i != mBullets.end(); )
+		for (int x = (mBullets.size() - 1); x >= 0; x--)
 		{
-			mRenderer->GetMeshComponent(*i).x += BULLET_SPEED * mGameClock.getDeltaTime() * cos(mRenderer->GetMeshComponent(*i).roll + (D3DX_PI / 2.0f));
-			mRenderer->GetMeshComponent(*i).y += BULLET_SPEED * mGameClock.getDeltaTime() * sin(mRenderer->GetMeshComponent(*i).roll + (D3DX_PI / 2.0f));
+			Scene::SpatialComponent& bulletSpatialComponent = mSpatialSystem.GetSpatialComponent(mBullets[x]);
 
-			if (mRenderer->GetMeshComponent(*i).x > 23.0f)
+			bulletSpatialComponent.x += BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
+			bulletSpatialComponent.y += BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
+
+			// Update AABB
+			mBulletAABBs[x].mX = bulletSpatialComponent.x;
+			mBulletAABBs[x].mY = bulletSpatialComponent.y;
+
+			//
+			if (bulletSpatialComponent.x > 23.0f)
 			{
-				mEntityManager.DestroyEntity(*i);
-				i = mBullets.erase(i);
-				mBulletAABBs.erase(mBulletAABBs.begin() + z);
+				mEntityManager.DestroyEntity(mBullets[x]);
+				mBullets.erase(mBullets.begin() + x);
+				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else if (mRenderer->GetMeshComponent(*i).x < -23.0f)
+			else if (bulletSpatialComponent.x < -23.0f)
 			{
-				mEntityManager.DestroyEntity(*i);
-				i = mBullets.erase(i);
-				mBulletAABBs.erase(mBulletAABBs.begin() + z);
+				mEntityManager.DestroyEntity(mBullets[x]);
+				mBullets.erase(mBullets.begin() + x);
+				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else if (mRenderer->GetMeshComponent(*i).y > 16.0f)
+			else if (bulletSpatialComponent.y > 16.0f)
 			{
-				mEntityManager.DestroyEntity(*i);
-				i = mBullets.erase(i);
-				mBulletAABBs.erase(mBulletAABBs.begin() + z);
+				mEntityManager.DestroyEntity(mBullets[x]);
+				mBullets.erase(mBullets.begin() + x);
+				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else if (mRenderer->GetMeshComponent(*i).y < -16.0f)
+			else if (bulletSpatialComponent.y < -16.0f)
 			{
-				mEntityManager.DestroyEntity(*i);
-				i = mBullets.erase(i);
-				mBulletAABBs.erase(mBulletAABBs.begin() + z);
+				mEntityManager.DestroyEntity(mBullets[x]);
+				mBullets.erase(mBullets.begin() + x);
+				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else {
-				i++;
-				z++;
-			}
-		}
-
-		//
-		// Update AABBs
-		//
-
-		// Player
-		playerAABB = Math::AABB(mRenderer->GetMeshComponent(player).x, mRenderer->GetMeshComponent(player).y, 0.8f, 1.0f);
-
-		// Asteroids
-		for (int x = 0; x < mAstroids.size(); x++)
-		{
-			auto asteroid = mRenderer->GetMeshComponent(mAstroids[x]);
-			mAsteroidAABBs[x].mX = asteroid.x;
-			mAsteroidAABBs[x].mY = asteroid.y;
-		}
-
-		// Bullets
-		for (int x = 0; x < mBullets.size(); x++)
-		{
-			auto bullet = mRenderer->GetMeshComponent(mBullets[x]);
-			mBulletAABBs[x].mX = bullet.x;
-			mBulletAABBs[x].mY = bullet.y;
 		}
 
 		//
@@ -269,15 +263,19 @@ protected:
 		//
 		for (int x = 0; x < mAstroids.size(); x++)
 		{
-			Renderer::MeshComponent astroidMesh;
-			astroidMesh.VertexBuffer = astroidVB;
-			astroidMesh.x = rand_FloatRange(-10.0f, 10.0f);
-			astroidMesh.y = rand_FloatRange(-10.0f, 10.0f);
-			astroidMesh.pitch = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
-			astroidMesh.yaw = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
-			astroidMesh.roll = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
-			mRenderer->AttachMeshComponent(mAstroids[x], astroidMesh);
-			mAsteroidAABBs.push_back(Math::AABB(astroidMesh.x, astroidMesh.y, 0.75f, 0.75f));
+			Renderer::MeshComponent asteroidMesh;
+			asteroidMesh.VertexBuffer = astroidVB;
+
+			Scene::SpatialComponent asteroidPosition;
+			asteroidPosition.x = rand_FloatRange(-10.0f, 10.0f);
+			asteroidPosition.y = rand_FloatRange(-10.0f, 10.0f);
+			asteroidPosition.pitch = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
+			asteroidPosition.yaw = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
+			asteroidPosition.roll = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
+
+			mRenderer->AttachMeshComponent(mAstroids[x], asteroidMesh);
+			mSpatialSystem.AttachSpatialComponent(mAstroids[x], asteroidPosition);
+			mAsteroidAABBs.push_back(Math::AABB(asteroidPosition.x, asteroidPosition.y, 0.75f, 0.75f));
 		}
 
 	}

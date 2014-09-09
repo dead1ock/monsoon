@@ -20,6 +20,7 @@ SET(MODULE_SRC
 	Include/Renderer/Renderer.h
 	Include/Renderer/RendererSettings.h
 	Include/Renderer/VertexBuffer.h
+	Include/Scene/SpatialSystem.h
 	Include/Util/PackedPool.h
 	
 	# Private Sources (Source/)
@@ -28,6 +29,7 @@ SET(MODULE_SRC
 	Src/Event/EventManager.cpp
 	Src/Math/AABB.cpp
 	Src/Platform/Clock.cpp
+	Src/Scene/SpatialSystem.cpp
 	)
 
 #
@@ -53,6 +55,7 @@ SET(MODULE_SOURCES ${MODULE_SRC} ${MODULE_PLATFORM_SRC} Sources.cmake)
 SOURCE_GROUP(App "App/*")
 SOURCE_GROUP(Platform "Platform/*")
 SOURCE_GROUP(Renderer "Renderer/*")
+SOURCE_GROUP(Scene "Scene/*")
 SOURCE_GROUP(Util "Util/*")
 SOURCE_GROUP(ECS "ECS/*")
 SOURCE_GROUP(Math "Math/*")

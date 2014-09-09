@@ -8,10 +8,12 @@
 #include "D3D11Renderer.h"
 #include "D3D11VertexBuffer.h"
 
+using namespace Monsoon;
 using namespace Monsoon::Renderer;
 
-D3D11Renderer::D3D11Renderer(RendererSettings& settings)
-: Renderer(settings),
+D3D11Renderer::D3D11Renderer(RendererSettings& settings, Scene::SpatialSystem* spatialSystem)
+: Renderer(settings, spatialSystem),
+  mSpatialSystem(spatialSystem),
   mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen)
 {
 	mVertexBuffers.reserve(MONSOON_MAX_ENTITIES);
@@ -83,12 +85,14 @@ bool D3D11Renderer::Update() {
 	D3DXMATRIX translation, rotation;
 
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
- 		D3DXMatrixIdentity(&worldMatrix);
+		auto spatialComponent = mSpatialSystem->GetSpatialComponent(mMeshComponents.IndexToId(x));
+
+		D3DXMatrixIdentity(&worldMatrix);
 		D3DXMatrixIdentity(&translation);
 		D3DXMatrixIdentity(&rotation);
 		
-		D3DXMatrixTranslation(&translation, mMeshComponents.At(x).x, mMeshComponents.At(x).y, mMeshComponents.At(x).z);
-		D3DXMatrixRotationYawPitchRoll(&rotation, mMeshComponents.At(x).yaw, mMeshComponents.At(x).pitch, mMeshComponents.At(x).roll);
+		D3DXMatrixTranslation(&translation, spatialComponent.x, spatialComponent.y, spatialComponent.z);
+		D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
 		
 		D3DXMatrixMultiply(&worldMatrix, &rotation, &translation);
 		
