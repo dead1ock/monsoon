@@ -59,17 +59,26 @@ namespace Monsoon {
 				Index removeIndex = mIndexTable[id];
 				std::pair<Object, Id>& removeObject = mPackedObjects[removeIndex];
 				 
-				// Swap and pop.
+				// If we are not the end of the vector, swap.
 				// Copy the last element of the array over the one we want to remove, then pop the back.
-				removeObject = *(mPackedObjects.end() - 1);
-				mPackedObjects.pop_back();
+				if (removeIndex != mPackedObjects.size()) {
+					removeObject = *(mPackedObjects.end() - 1);
+					mIndexTable[removeObject.second] = removeIndex;
+				}
 
-				// Update indices.
 				mIndexTable[id] = USHRT_MAX;
-				mIndexTable[removeObject.second] = removeIndex;
+				mPackedObjects.pop_back();
 			}
 
 			inline int Size() { return mPackedObjects.size(); }
+
+			inline bool Exists(Id id) {
+				return (mIndexTable[id] != USHRT_MAX);
+			}
+
+			inline Id IndexToId(Index index) {
+				return (mPackedObjects[index].second);
+			}
 
 		private:
 			std::vector<std::pair<Object, Id>> mPackedObjects;
