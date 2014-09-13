@@ -20,6 +20,7 @@ const float PLAYER_BASE_SPEED = 4.0f;
 float playerSpeedMod = 2.0f;
 const float BULLET_SPEED = PLAYER_BASE_SPEED * 4.0f;
 const float ASTEROID_SPEED = 6.0f;
+const float PLAYER_RESPAWN_TIME = 2.5f;
 
 float rand_FloatRange(float a, float b)
 {
@@ -32,7 +33,7 @@ public:
 	Asteroids()
 		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mSpatialSystem)))
 		, playerAABB(Math::AABB(-5.0f, 0.0f, 1.0f, 1.0f))
-		, playerLives(0) {
+		, currentPlayerLives(0) {
 		mAstroids.reserve(20);
 		mAsteroidAABBs.reserve(20);
 		mBullets.reserve(200);
@@ -69,6 +70,31 @@ protected:
 		mRenderer->AttachMeshComponent(player, playerMesh);
 		mSpatialSystem.AttachSpatialComponent(player, Scene::SpatialComponent());
 
+		Renderer::MeshComponent playerLiveMesh;
+		playerLiveMesh.VertexBuffer = playerVB;
+
+		Scene::SpatialComponent playerLiveTransform;
+		playerLiveTransform.y = 14.0f;
+		playerLiveTransform.x = -19.0f;
+		playerLiveTransform.scaleX = 0.7f;
+		playerLiveTransform.scaleY = 0.7f;
+		playerLiveTransform.scaleZ = 0.7f;
+
+		playerLives[0] = mEntityManager.CreateEntity();
+		mRenderer->AttachMeshComponent(playerLives[0], playerLiveMesh);
+		mSpatialSystem.AttachSpatialComponent(playerLives[0], playerLiveTransform);
+		playerLiveTransform.x += 0.75f;
+
+		playerLives[1] = mEntityManager.CreateEntity();
+		mRenderer->AttachMeshComponent(playerLives[1], playerLiveMesh);
+		mSpatialSystem.AttachSpatialComponent(playerLives[1], playerLiveTransform);
+		playerLiveTransform.x += 0.75f;
+
+		playerLives[2] = mEntityManager.CreateEntity();
+		mRenderer->AttachMeshComponent(playerLives[2], playerLiveMesh);
+		mSpatialSystem.AttachSpatialComponent(playerLives[2], playerLiveTransform);
+		playerLiveTransform.x += 0.75f;
+
 		GenerateAsteroids();
 
 		mEventManager.Subscribe("Entity::Destroyed", [this](void* arg) {
@@ -77,20 +103,23 @@ protected:
 			return 0;
 		});
 
-		playerLives = 3;
+		currentPlayerLives = 3;
 		playerLastShotTime = mGameClock.getTime();
+		playerDead = false;
 	}
 
 	int mActiveBullets = 0;
 
 	void OnUpdate() {
 
-		UpdatePlayerPosition();
+		if (!playerDead)
+			UpdatePlayerPosition();
+
 		UpdateAsteroidPositions();
 		UpdateBulletPositions();
 
 		// Check for "fire"
-		if (((mGameClock.getTime() - playerLastShotTime) > 0.25f) && GetAsyncKeyState(VK_SPACE))
+		if (((mGameClock.getTime() - playerLastShotTime) > 0.25f) && GetAsyncKeyState(VK_SPACE) && !playerDead)
 		{
 			FireBullet();
 		}
@@ -282,9 +311,14 @@ protected:
 		// Player and Bullets -> Asteroids
 		for (int x = 0; x < mAstroids.size();)
 		{
-			if (playerAABB.Intersects(mAsteroidAABBs[x]))
+			if (playerAABB.Intersects(mAsteroidAABBs[x]) && ((mGameClock.getTime() - playerLastDeathTime) > 2.0f) && !playerDead)
 			{
-				//playerLives--;
+				mEntityManager.DestroyEntity(playerLives[currentPlayerLives-1]);
+				playerLastDeathTime = mGameClock.getTime();
+				currentPlayerLives--;
+
+				if (currentPlayerLives < 0)
+					playerDead = true;
 			}
 
 			bool destroy = false;
@@ -328,8 +362,12 @@ private:
 	Renderer::VertexBufferHandle astroidVB;
 
 	Entity player;
-	int playerLives;
+	Entity playerLives[3];
+	int currentPlayerLives;
 	double playerLastShotTime;
+	double playerLastDeathTime;
+	bool playerDead;
+
 	Math::AABB playerAABB;
 	std::vector<Entity> mAstroids;
 	std::vector<Math::AABB> mAsteroidAABBs;
