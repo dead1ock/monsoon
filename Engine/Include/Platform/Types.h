@@ -26,7 +26,7 @@
 	 typedef unsigned long long U64;
 	 typedef signed long long I64;
 
-	 #define MONSOON_MAX_ENTITIES 2000
+	#define MONSOON_MAX_ENTITIES 65536
 	 typedef U32 Entity;
 
 #ifdef MONSOON_64

@@ -87,12 +87,18 @@ protected:
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
 		U16 spaceKeyState = GetAsyncKeyState(VK_SPACE);
 
-		Scene::SpatialComponent& playerSpatialComponent = mSpatialSystem.GetSpatialComponent(player);
+		const auto& playerSpatialComponent = mSpatialSystem.GetSpatialComponent(player);
 
 		if (leftKeyState)
-			playerSpatialComponent.roll += mGameClock.getDeltaTime() * 3.0f;
+			mSpatialSystem.SetOrientation(player, 
+				playerSpatialComponent.yaw,
+				playerSpatialComponent.pitch,
+				playerSpatialComponent.roll + (mGameClock.getDeltaTime() * 3.0f));
 		if (rightKeyState)
-			playerSpatialComponent.roll -= mGameClock.getDeltaTime() * 3.0f;
+			mSpatialSystem.SetOrientation(player,
+				playerSpatialComponent.yaw,
+				playerSpatialComponent.pitch,
+				playerSpatialComponent.roll - (mGameClock.getDeltaTime() * 3.0f));
 		if (upKeyState) {
 			if (playerSpeedMod < 2.0f)
 				// Speed up.
@@ -108,21 +114,23 @@ protected:
 		}
 
 		// Move player in the direction it is rotated.
-		playerSpatialComponent.x += playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(playerSpatialComponent.roll + (D3DX_PI / 2.0f));
-		playerSpatialComponent.y += playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(playerSpatialComponent.roll + (D3DX_PI / 2.0f));
+		mSpatialSystem.SetPosition(player,
+			playerSpatialComponent.x + (playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
+			playerSpatialComponent.y + (playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
+			0.0f);
 
 		playerAABB = Math::AABB(playerSpatialComponent.x, playerSpatialComponent.y, 0.8f, 1.0f);
 
 		// Wrap coordinates around when the player leaves the screen.
 		if (playerSpatialComponent.x > 23.0f)
-			playerSpatialComponent.x = -23.0f;
+			mSpatialSystem.SetPosition(player, - 23.0f, playerSpatialComponent.y, 0.0f);
 		else if (playerSpatialComponent.x < -23.0f)
-			playerSpatialComponent.x = 23.0f;
+			mSpatialSystem.SetPosition(player, 23.0f, playerSpatialComponent.y, 0.0f);
 		
 		if (playerSpatialComponent.y > 16.0f)
-			playerSpatialComponent.y = -16.0f;
+			mSpatialSystem.SetPosition(player, playerSpatialComponent.x, -16.0f, 0.0f);
 		else if (playerSpatialComponent.y < -16.0f)
-			playerSpatialComponent.y = 16.0f;
+			mSpatialSystem.SetPosition(player, playerSpatialComponent.x, 16.0f, 0.0f);
 
 		// Check for "fire"
 		if ((mActiveBullets < 200) && spaceKeyState)
@@ -145,31 +153,35 @@ protected:
 		// Update Asteroids
 		for (int x = 0; x < mAstroids.size(); x++)
 		{
-			Scene::SpatialComponent& asteroidSpatialComponent = mSpatialSystem.GetSpatialComponent(mAstroids[x]);
-			asteroidSpatialComponent.x += ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f));
-			asteroidSpatialComponent.y += ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f));
+			const auto& asteroidSpatialComponent = mSpatialSystem.GetSpatialComponent(mAstroids[x]);
+
+			mSpatialSystem.SetPosition(mAstroids[x],
+				asteroidSpatialComponent.x + (ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				asteroidSpatialComponent.y + (ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				0.0f);
 
 			mAsteroidAABBs[x].mX = asteroidSpatialComponent.x;
 			mAsteroidAABBs[x].mY = asteroidSpatialComponent.y;
 
 			if (asteroidSpatialComponent.x > 23.0f)
-				asteroidSpatialComponent.x = -23.0f;
+				mSpatialSystem.SetPosition(mAstroids[x], -23.0f, asteroidSpatialComponent.y, 0.0f);
 			else if (asteroidSpatialComponent.x < -23.0f)
-				asteroidSpatialComponent.x = 23.0f;
+				mSpatialSystem.SetPosition(mAstroids[x], 23.0f, asteroidSpatialComponent.y, 0.0f);
 
 			if (asteroidSpatialComponent.y > 16.0f)
-				asteroidSpatialComponent.y = -16.0f;
+				mSpatialSystem.SetPosition(mAstroids[x], asteroidSpatialComponent.x, -16.0f, 0.0f);
 			else if (asteroidSpatialComponent.y < -16.0f)
-				asteroidSpatialComponent.y = 16.0f;
+				mSpatialSystem.SetPosition(mAstroids[x], asteroidSpatialComponent.x, 16.0f, 0.0f);
 		}
 
 		// Update Bullets
 		for (int x = (mBullets.size() - 1); x >= 0; x--)
 		{
-			Scene::SpatialComponent& bulletSpatialComponent = mSpatialSystem.GetSpatialComponent(mBullets[x]);
-
-			bulletSpatialComponent.x += BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
-			bulletSpatialComponent.y += BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
+			auto& bulletSpatialComponent = mSpatialSystem.GetSpatialComponent(mBullets[x]);
+			mSpatialSystem.SetPosition(mBullets[x],
+				bulletSpatialComponent.x + (BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				bulletSpatialComponent.y + (BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				0.0f);
 
 			// Update AABB
 			mBulletAABBs[x].mX = bulletSpatialComponent.x;
@@ -215,7 +227,7 @@ protected:
 		{
 			if (playerAABB.Intersects(mAsteroidAABBs[x]))
 			{
-				
+				//mEntityManager.DestroyEntity(player);
 			}
 
 			bool destroy = false;

@@ -36,7 +36,7 @@ void SpatialSystem::SetPosition(Entity entity, float x, float y, float z)
 	if (!mComponents.Exists(entity))
 		return;
 
-	auto component = mComponents[entity];
+	auto& component = mComponents[entity];
 	component.x = x;
 	component.y = y;
 	component.z = z;
@@ -47,7 +47,7 @@ void SpatialSystem::SetOrientation(Entity entity, float yaw, float pitch, float 
 	if (!mComponents.Exists(entity))
 		return;
 
-	auto component = mComponents[entity];
+	auto& component = mComponents[entity];
 	component.yaw = yaw;
 	component.pitch = pitch;
 	component.roll = roll;
@@ -58,13 +58,13 @@ void SpatialSystem::SetScale(Entity entity, float scaleX, float scaleY, float sc
 	if (!mComponents.Exists(entity))
 		return;
 
-	auto component = mComponents[entity];
+	auto& component = mComponents[entity];
 	component.scaleX = scaleX;
 	component.scaleY = scaleY;
 	component.scaleZ = scaleZ;
 }
 
-SpatialComponent& SpatialSystem::GetSpatialComponent(Entity entity)
+const SpatialComponent& SpatialSystem::GetSpatialComponent(Entity entity)
 {
 	return mComponents[entity];
 }
