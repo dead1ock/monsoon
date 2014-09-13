@@ -6,6 +6,7 @@
 #include "Platform/Clock.h"
 
 using namespace Monsoon::Platform;
+using namespace std::chrono;
 
 Clock::Clock() 
 {
@@ -23,10 +24,10 @@ void Clock::Update()
 
 const double Clock::getDeltaTime() const
 {
-	return std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::high_resolution_clock::now() - mLastFrameTime).count();
+	return std::chrono::duration_cast<duration<double>>(std::chrono::high_resolution_clock::now() - mLastFrameTime).count();
 }
 
 const double Clock::getTime() const
 {
-	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	return duration_cast<duration<double>>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 }

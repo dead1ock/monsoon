@@ -64,7 +64,9 @@ void SpatialSystem::SetScale(Entity entity, float scaleX, float scaleY, float sc
 	component.scaleZ = scaleZ;
 }
 
-const SpatialComponent& SpatialSystem::GetSpatialComponent(Entity entity)
+std::pair<const SpatialComponent&, bool> SpatialSystem::GetSpatialComponent(Entity entity)
 {
-	return mComponents[entity];
+	if (mComponents.Exists(entity))
+		return std::pair<const SpatialComponent&, bool>(mComponents[entity], true);
+	return std::pair<const SpatialComponent&, bool>(SpatialComponent(), false);
 }

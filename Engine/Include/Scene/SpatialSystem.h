@@ -52,7 +52,7 @@ namespace Monsoon
 			void SetOrientation(Entity entity, float yaw, float pitch, float roll);
 			void SetScale(Entity entity, float scaleX, float scaleY, float scaleZ);
 
-			const SpatialComponent& GetSpatialComponent(Entity entity);
+			std::pair<const SpatialComponent&, bool> GetSpatialComponent(Entity entity);
 
 		private:
 			Util::PackedPool<Entity, SpatialComponent> mComponents;

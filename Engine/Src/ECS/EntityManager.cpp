@@ -53,7 +53,7 @@ Monsoon::Entity EntityManager::CreateEntity(std::string identifier)
 Monsoon::Entity EntityManager::FindEntity(std::string identifier)
 {
 	auto entity = mEntities.find(identifier);
-	if (entity != mEntities.end())
+	if (entity == mEntities.end())
 		return std::numeric_limits<Monsoon::Entity>::max();
 	else
 		return entity->second;
@@ -72,7 +72,7 @@ void EntityManager::DestroyEntity(std::string identifier)
 		return;
 	else {
 		mEntityFreeList.push_back(entity->second);
-		mEntities.erase(entity);
 		mEventManager->Invoke("Entity::Destroyed", (void*)entity->second);
+		mEntities.erase(entity);
 	}
 }

@@ -85,7 +85,7 @@ bool D3D11Renderer::Update() {
 	D3DXMATRIX translation, rotation;
 
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
-		auto& spatialComponent = mSpatialSystem->GetSpatialComponent(mMeshComponents.IndexToId(x));
+		auto& spatialComponent = mSpatialSystem->GetSpatialComponent(mMeshComponents.IndexToId(x)).first;
 
 		D3DXMatrixIdentity(&worldMatrix);
 		D3DXMatrixIdentity(&translation);
