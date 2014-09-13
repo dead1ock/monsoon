@@ -10,7 +10,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <ctime>
 
 #include <App/Application.h>
 #include <D3D11Renderer.h>
@@ -85,24 +84,90 @@ protected:
 	int mActiveBullets = 0;
 
 	void OnUpdate() {
+
+		UpdatePlayerPosition();
+		UpdateAsteroidPositions();
+		UpdateBulletPositions();
+
+		// Check for "fire"
+		if (((mGameClock.getTime() - playerLastShotTime) > 0.25f) && GetAsyncKeyState(VK_SPACE))
+		{
+			FireBullet();
+		}
+
+		CheckCollisions();
+
+
+		//
+		// If we've run out of asteroids, generate some more.
+		//
+		if (mAstroids.size() == 0)
+		{
+			GenerateAsteroids();
+		}
+	}
+
+	void GenerateAsteroids() {
+		for (int x = 0; x < rand() % 100; x++)
+			mAstroids.push_back(mEntityManager.CreateEntity());
+
+		//
+		// Generate
+		//
+		for (int x = 0; x < mAstroids.size(); x++)
+		{
+			Renderer::MeshComponent asteroidMesh;
+			asteroidMesh.VertexBuffer = astroidVB;
+
+			Scene::SpatialComponent asteroidPosition;
+			asteroidPosition.x = rand_FloatRange(-10.0f, 10.0f);
+			asteroidPosition.y = rand_FloatRange(-10.0f, 10.0f);
+			asteroidPosition.pitch = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
+			asteroidPosition.yaw = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
+			asteroidPosition.roll = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
+
+			mRenderer->AttachMeshComponent(mAstroids[x], asteroidMesh);
+			mSpatialSystem.AttachSpatialComponent(mAstroids[x], asteroidPosition);
+			mAsteroidAABBs.push_back(Math::AABB(asteroidPosition.x, asteroidPosition.y, 0.75f, 0.75f));
+		}
+
+	}
+
+	void FireBullet() {
+		Renderer::MeshComponent bullet;
+		Scene::SpatialComponent bulletSpatialComponent = mSpatialSystem.GetSpatialComponent(player).first; // Copy player position.
+		bullet.VertexBuffer = bulletVB;
+
+		bulletSpatialComponent.x += cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
+		bulletSpatialComponent.y += sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
+
+		auto id = mEntityManager.CreateEntity();
+		mBullets.push_back(id);
+		mBulletAABBs.push_back(Math::AABB(bulletSpatialComponent.x, bulletSpatialComponent.y, 0.25f, 0.5f));
+		mRenderer->AttachMeshComponent(id, bullet);
+		mSpatialSystem.AttachSpatialComponent(id, bulletSpatialComponent);
+		mActiveBullets++;
+		playerLastShotTime = mGameClock.getTime();
+	}
+
+	void UpdatePlayerPosition() {
 		U16 upKeyState = GetAsyncKeyState(VK_UP);
 		U16 leftKeyState = GetAsyncKeyState(VK_LEFT);
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
-		U16 spaceKeyState = GetAsyncKeyState(VK_SPACE);
 
 		const auto& playerSpatialComponent = mSpatialSystem.GetSpatialComponent(player).first;
 
 		if (leftKeyState)
-			mSpatialSystem.SetOrientation(player, 
-				playerSpatialComponent.yaw,
-				playerSpatialComponent.pitch,
-				playerSpatialComponent.roll + (mGameClock.getDeltaTime() * 3.0f));
+			mSpatialSystem.SetOrientation(player,
+			playerSpatialComponent.yaw,
+			playerSpatialComponent.pitch,
+			playerSpatialComponent.roll + (mGameClock.getDeltaTime() * 3.0f));
 		if (rightKeyState)
 			mSpatialSystem.SetOrientation(player,
-				playerSpatialComponent.yaw,
-				playerSpatialComponent.pitch,
-				playerSpatialComponent.roll - (mGameClock.getDeltaTime() * 3.0f));
+			playerSpatialComponent.yaw,
+			playerSpatialComponent.pitch,
+			playerSpatialComponent.roll - (mGameClock.getDeltaTime() * 3.0f));
 		if (upKeyState) {
 			if (playerSpeedMod < 2.0f)
 				// Speed up.
@@ -127,34 +192,17 @@ protected:
 
 		// Wrap coordinates around when the player leaves the screen.
 		if (playerSpatialComponent.x > 23.0f)
-			mSpatialSystem.SetPosition(player, - 23.0f, playerSpatialComponent.y, 0.0f);
+			mSpatialSystem.SetPosition(player, -23.0f, playerSpatialComponent.y, 0.0f);
 		else if (playerSpatialComponent.x < -23.0f)
 			mSpatialSystem.SetPosition(player, 23.0f, playerSpatialComponent.y, 0.0f);
-		
+
 		if (playerSpatialComponent.y > 16.0f)
 			mSpatialSystem.SetPosition(player, playerSpatialComponent.x, -16.0f, 0.0f);
 		else if (playerSpatialComponent.y < -16.0f)
 			mSpatialSystem.SetPosition(player, playerSpatialComponent.x, 16.0f, 0.0f);
+	}
 
-		// Check for "fire"
-		if (((mGameClock.getTime() - playerLastShotTime) > 0.25f) && spaceKeyState)
-		{
-			Renderer::MeshComponent bullet;
-			Scene::SpatialComponent bulletSpatialComponent = playerSpatialComponent; // Copy player position.
-			bullet.VertexBuffer = bulletVB;
-
-			bulletSpatialComponent.x += cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
-			bulletSpatialComponent.y += sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
-			
-			auto id = mEntityManager.CreateEntity();
-			mBullets.push_back(id);
-			mBulletAABBs.push_back(Math::AABB(bulletSpatialComponent.x, bulletSpatialComponent.y, 0.25f, 0.5f));
-			mRenderer->AttachMeshComponent(id, bullet);
-			mSpatialSystem.AttachSpatialComponent(id, bulletSpatialComponent);
-			mActiveBullets++;
-			playerLastShotTime = mGameClock.getTime();
-		}
-
+	void UpdateAsteroidPositions() {
 		// Update Asteroids
 		for (int x = 0; x < mAstroids.size(); x++)
 		{
@@ -178,7 +226,9 @@ protected:
 			else if (asteroidSpatialComponent.y < -16.0f)
 				mSpatialSystem.SetPosition(mAstroids[x], asteroidSpatialComponent.x, 16.0f, 0.0f);
 		}
+	}
 
+	void UpdateBulletPositions() {
 		// Update Bullets
 		for (int x = (mBullets.size() - 1); x >= 0; x--)
 		{
@@ -222,7 +272,9 @@ protected:
 				mActiveBullets--;
 			}
 		}
-
+	}
+	
+	void CheckCollisions() {
 		//
 		// Check Collisions
 		//
@@ -260,41 +312,6 @@ protected:
 			if (destroy == false)
 				x++;
 		}
-
-
-		//
-		// If we've run out of asteroids, generate some more.
-		//
-		if (mAstroids.size() == 0)
-		{
-			GenerateAsteroids();
-		}
-	}
-
-	void GenerateAsteroids() {
-		for (int x = 0; x < rand() % 100; x++)
-			mAstroids.push_back(mEntityManager.CreateEntity());
-
-		//
-		// Generate
-		//
-		for (int x = 0; x < mAstroids.size(); x++)
-		{
-			Renderer::MeshComponent asteroidMesh;
-			asteroidMesh.VertexBuffer = astroidVB;
-
-			Scene::SpatialComponent asteroidPosition;
-			asteroidPosition.x = rand_FloatRange(-10.0f, 10.0f);
-			asteroidPosition.y = rand_FloatRange(-10.0f, 10.0f);
-			asteroidPosition.pitch = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
-			asteroidPosition.yaw = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
-			asteroidPosition.roll = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
-
-			mRenderer->AttachMeshComponent(mAstroids[x], asteroidMesh);
-			mSpatialSystem.AttachSpatialComponent(mAstroids[x], asteroidPosition);
-			mAsteroidAABBs.push_back(Math::AABB(asteroidPosition.x, asteroidPosition.y, 0.75f, 0.75f));
-		}
-
 	}
 
 	void OnShutdown() {
