@@ -68,7 +68,7 @@ void EntityManager::DestroyEntity(Monsoon::Entity entity)
 void EntityManager::DestroyEntity(std::string identifier)
 {
 	auto entity = mEntities.find(identifier);
-	if (entity != mEntities.end())
+	if (entity == mEntities.end())
 		return;
 	else {
 		mEntityFreeList.push_back(entity->second);

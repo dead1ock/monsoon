@@ -62,13 +62,7 @@ protected:
 		bulletVB = mRenderer->CreatePyramid(0.25f, 0.5f);
 		astroidVB = mRenderer->CreateCube(0.75f);
 
-		//
-		// Attach Mesh Components
-		//
-		Renderer::MeshComponent playerMesh;
-		playerMesh.VertexBuffer = playerVB;
-		mRenderer->AttachMeshComponent(player, playerMesh);
-		mSpatialSystem.AttachSpatialComponent(player, Scene::SpatialComponent());
+		SpawnPlayer();
 
 		Renderer::MeshComponent playerLiveMesh;
 		playerLiveMesh.VertexBuffer = playerVB;
@@ -134,6 +128,14 @@ protected:
 		{
 			GenerateAsteroids();
 		}
+
+		//
+		// Respawn the player if it has been over 2 seconds.
+		//
+		if ((mGameClock.getTime() - playerLastDeathTime) > 2.0f && currentPlayerLives > 0 && playerDead)
+		{
+			SpawnPlayer();
+		}
 	}
 
 	void GenerateAsteroids() {
@@ -160,6 +162,15 @@ protected:
 			mAsteroidAABBs.push_back(Math::AABB(asteroidPosition.x, asteroidPosition.y, 0.75f, 0.75f));
 		}
 
+	}
+
+	void SpawnPlayer() {
+		player = mEntityManager.CreateEntity("player");
+		Renderer::MeshComponent playerMesh;
+		playerMesh.VertexBuffer = playerVB;
+		mRenderer->AttachMeshComponent(player, playerMesh);
+		mSpatialSystem.AttachSpatialComponent(player, Scene::SpatialComponent());
+		playerDead = false;
 	}
 
 	void FireBullet() {
@@ -311,14 +322,14 @@ protected:
 		// Player and Bullets -> Asteroids
 		for (int x = 0; x < mAstroids.size();)
 		{
-			if (playerAABB.Intersects(mAsteroidAABBs[x]) && ((mGameClock.getTime() - playerLastDeathTime) > 2.0f) && !playerDead)
+			if (playerAABB.Intersects(mAsteroidAABBs[x]) && !playerDead)
 			{
 				mEntityManager.DestroyEntity(playerLives[currentPlayerLives-1]);
 				playerLastDeathTime = mGameClock.getTime();
 				currentPlayerLives--;
 
-				if (currentPlayerLives < 0)
-					playerDead = true;
+				mEntityManager.DestroyEntity("player");
+				playerDead = true;
 			}
 
 			bool destroy = false;
