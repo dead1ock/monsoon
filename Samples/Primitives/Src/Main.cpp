@@ -63,16 +63,16 @@ protected:
 
 	void OnUpdate() {
 		Renderer::Camera& camera = mRenderer->GetCamera();
-		Scene::SpatialComponent& pyramidMesh = mSpatialSystem.GetSpatialComponent(0);
+		auto& pyramidTransform = mSpatialSystem.GetSpatialComponent(0).first;
 
-		pyramidMesh.yaw += mGameClock.getDeltaTime() * 2.0f;
-		pyramidMesh.y = cos(cameraTheta) + 1.0f;
+		mSpatialSystem.SetOrientation(0, pyramidTransform.yaw + (mGameClock.getDeltaTime() * 2.0f), pyramidTransform.pitch, pyramidTransform.roll);
+		mSpatialSystem.SetPosition(0, pyramidTransform.x, (cos(cameraTheta) + 1.0f), pyramidTransform.z);
 
 		camera.x = cos(cameraTheta) * 8.0f;
 		camera.y = 5.0f;
 		camera.z = sin(cameraTheta) * 8.0f;
 
-		cameraTheta += mGameClock.getDeltaTime() * 1.25f;
+		cameraTheta += mGameClock.getDeltaTime();
 	}
 
 	void OnShutdown() {
