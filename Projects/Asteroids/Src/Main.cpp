@@ -50,6 +50,11 @@ protected:
 		mRenderer->GetCamera().z = -30.0f;
 		mRenderer->GetCamera().mode = Renderer::Camera::ORTHOGRAPHIC;
 
+		currentPlayerLives = 3;
+		playerLastShotTime = mGameClock.getTime();
+		playerDead = false;
+		level = 1;
+
 		//
 		// Create Meshes
 		//
@@ -91,10 +96,6 @@ protected:
 			mRenderer->DetachMeshComponent((Monsoon::Entity)arg);
 			return 0;
 		});
-
-		currentPlayerLives = 3;
-		playerLastShotTime = mGameClock.getTime();
-		playerDead = false;
 	}
 
 	int mActiveBullets = 0;
@@ -121,6 +122,7 @@ protected:
 		//
 		if (mAstroids.size() == 0)
 		{
+			level++;
 			GenerateAsteroids();
 		}
 
@@ -134,14 +136,15 @@ protected:
 	}
 
 	void GenerateAsteroids() {
-		for (int x = 0; x < rand() % 100; x++)
-			mAstroids.push_back(mEntityManager.CreateEntity());
+		int numAsteroids = pow(level + 1, 2);
 
 		//
 		// Generate
 		//
-		for (int x = 0; x < mAstroids.size(); x++)
+		for (int x = 0; x < numAsteroids; x++)
 		{
+			mAstroids.push_back(mEntityManager.CreateEntity());
+
 			Renderer::MeshComponent asteroidMesh;
 			asteroidMesh.VertexBuffer = astroidVB;
 
@@ -373,6 +376,7 @@ private:
 	double playerLastShotTime;
 	double playerLastDeathTime;
 	bool playerDead;
+	int level;
 
 	Math::AABB playerAABB;
 	std::vector<Entity> mAstroids;
