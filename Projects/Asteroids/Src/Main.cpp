@@ -51,11 +51,6 @@ protected:
 		mRenderer->GetCamera().mode = Renderer::Camera::ORTHOGRAPHIC;
 
 		//
-		// Assign Entity Ids
-		//
-		player = mEntityManager.CreateEntity("player");
-
-		//
 		// Create Meshes
 		//
 		playerVB = mRenderer->CreatePyramid(0.8f, 1.0f);
@@ -322,7 +317,7 @@ protected:
 		// Player and Bullets -> Asteroids
 		for (int x = 0; x < mAstroids.size();)
 		{
-			if (playerAABB.Intersects(mAsteroidAABBs[x]) && !playerDead)
+			if (playerAABB.Intersects(mAsteroidAABBs[x]) && !playerDead && ((mGameClock.getTime() - playerLastDeathTime) > 4.0f))
 			{
 				mEntityManager.DestroyEntity(playerLives[currentPlayerLives-1]);
 				playerLastDeathTime = mGameClock.getTime();
