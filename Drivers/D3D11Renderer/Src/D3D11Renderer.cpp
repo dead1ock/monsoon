@@ -85,22 +85,24 @@ bool D3D11Renderer::Update() {
 	D3DXMATRIX translation, rotation, scale;
 
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
-		auto& spatialComponent = mSpatialSystem->GetSpatialComponent(mMeshComponents.IndexToId(x)).first;
+		if (auto component = mSpatialSystem->GetComponent(mMeshComponents.IndexToId(x)))
+		{
+			auto& spatialComponent = *component;
+			D3DXMatrixIdentity(&worldMatrix);
+			D3DXMatrixIdentity(&translation);
+			D3DXMatrixIdentity(&rotation);
+			D3DXMatrixIdentity(&scale);
 
-		D3DXMatrixIdentity(&worldMatrix);
-		D3DXMatrixIdentity(&translation);
-		D3DXMatrixIdentity(&rotation);
-		D3DXMatrixIdentity(&scale);
-		
-		D3DXMatrixTranslation(&translation, spatialComponent.x, spatialComponent.y, spatialComponent.z);
-		D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
-		D3DXMatrixScaling(&scale, spatialComponent.scaleX, spatialComponent.scaleY, spatialComponent.scaleZ);
-		
-		D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
-		D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
-		
-		mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
-		mVertexBuffers[mMeshComponents.At(x).VertexBuffer].Render(mD3d.GetContext());
+			D3DXMatrixTranslation(&translation, spatialComponent.x, spatialComponent.y, spatialComponent.z);
+			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
+			D3DXMatrixScaling(&scale, spatialComponent.scaleX, spatialComponent.scaleY, spatialComponent.scaleZ);
+
+			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
+			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
+
+			mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
+			mVertexBuffers[mMeshComponents.At(x).VertexBuffer].Render(mD3d.GetContext());
+		}
 	}
 
 	mD3d.EndScene();

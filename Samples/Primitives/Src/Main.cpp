@@ -41,14 +41,14 @@ protected:
 		triangle_one.VertexBuffer = pyramidVB;
 		triangleOnePosition.x = 2.0f;
 		mRenderer->AttachMeshComponent(0, triangle_one);
-		mSpatialSystem.AttachSpatialComponent(0, triangleOnePosition);
+		mSpatialSystem.AttachComponent(0, triangleOnePosition);
 
 		Renderer::MeshComponent cube_one;
 		Scene::SpatialComponent cubeOnePosition;
 		cube_one.VertexBuffer = cubeVB;
 		cubeOnePosition.x = -2.0f;
 		mRenderer->AttachMeshComponent(1, cube_one);
-		mSpatialSystem.AttachSpatialComponent(1, cubeOnePosition);
+		mSpatialSystem.AttachComponent(1, cubeOnePosition);
 
 		Renderer::MeshComponent plane;
 		Scene::SpatialComponent planeOnePosition;
@@ -56,14 +56,14 @@ protected:
 		planeOnePosition.pitch = 1.57f;
 		planeOnePosition.y = -1.0f;
 		mRenderer->AttachMeshComponent(2, plane);
-		mSpatialSystem.AttachSpatialComponent(2, planeOnePosition);
+		mSpatialSystem.AttachComponent(2, planeOnePosition);
 
 		cameraTheta = 0.0f;
 	}
 
 	void OnUpdate() {
 		Renderer::Camera& camera = mRenderer->GetCamera();
-		auto& pyramidTransform = mSpatialSystem.GetSpatialComponent(0).first;
+		auto& pyramidTransform = *mSpatialSystem.GetComponent(0);
 
 		mSpatialSystem.SetOrientation(0, pyramidTransform.yaw + (mGameClock.getDeltaTime() * 2.0f), pyramidTransform.pitch, pyramidTransform.roll);
 		mSpatialSystem.SetPosition(0, pyramidTransform.x, (cos(cameraTheta) + 1.0f), pyramidTransform.z);
@@ -76,13 +76,13 @@ protected:
 	}
 
 	void OnShutdown() {
-		mSpatialSystem.DetachSpatialComponent(2);
+		mSpatialSystem.DetachComponent(2);
 		mRenderer->DetachMeshComponent(2);
 
-		mSpatialSystem.DetachSpatialComponent(1);
+		mSpatialSystem.DetachComponent(1);
 		mRenderer->DetachMeshComponent(1);
 
-		mSpatialSystem.DetachSpatialComponent(0);
+		mSpatialSystem.DetachComponent(0);
 		mRenderer->DetachMeshComponent(0);
 	}
 

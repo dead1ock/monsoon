@@ -11,6 +11,7 @@
 #include <Platform/Types.h>
 #include <Util/PackedPool.h>
 #include <Platform/Export.h>
+#include <ECS/System.h>
 
 namespace Monsoon
 {
@@ -39,23 +40,15 @@ namespace Monsoon
 		/**
 		 * Manages entity spatial information, such as position, orientation, and scale.
 		 */
-		class DYNLIB SpatialSystem
+		class DYNLIB SpatialSystem : public ECS::System<SpatialComponent>
 		{
 		public:
-			SpatialSystem();
+			SpatialSystem(Event::EventManager* eventManager);
 			~SpatialSystem();
-
-			void AttachSpatialComponent(Entity entity, SpatialComponent component);
-			void DetachSpatialComponent(Entity entity);
 
 			void SetPosition(Entity entity, float x, float y, float z);
 			void SetOrientation(Entity entity, float yaw, float pitch, float roll);
 			void SetScale(Entity entity, float scaleX, float scaleY, float scaleZ);
-
-			std::pair<const SpatialComponent&, bool> GetSpatialComponent(Entity entity);
-
-		private:
-			Util::PackedPool<Entity, SpatialComponent> mComponents;
 		};
 	}
 }

@@ -19,6 +19,7 @@ namespace Monsoon {
 		: mRenderer(renderer)
 		, mEventManager()
 		, mEntityManager(&mEventManager)
+		, mSpatialSystem(&mEventManager)
 	{
 
 	}

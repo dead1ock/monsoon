@@ -8,7 +8,8 @@
 using namespace Monsoon;
 using namespace Monsoon::Scene;
 
-SpatialSystem::SpatialSystem()
+SpatialSystem::SpatialSystem(Event::EventManager* eventManager)
+: System(eventManager)
 {
 
 }
@@ -16,19 +17,6 @@ SpatialSystem::SpatialSystem()
 SpatialSystem::~SpatialSystem()
 {
 
-}
-
-void SpatialSystem::AttachSpatialComponent(Entity entity, SpatialComponent component)
-{
-	if (!mComponents.Exists(entity))
-		mComponents.Add(entity, component);
-	else
-		mComponents[entity] = component;
-}
-
-void SpatialSystem::DetachSpatialComponent(Entity entity)
-{
-	mComponents.Remove(entity);
 }
 
 void SpatialSystem::SetPosition(Entity entity, float x, float y, float z)
@@ -62,11 +50,4 @@ void SpatialSystem::SetScale(Entity entity, float scaleX, float scaleY, float sc
 	component.scaleX = scaleX;
 	component.scaleY = scaleY;
 	component.scaleZ = scaleZ;
-}
-
-std::pair<const SpatialComponent&, bool> SpatialSystem::GetSpatialComponent(Entity entity)
-{
-	if (mComponents.Exists(entity))
-		return std::pair<const SpatialComponent&, bool>(mComponents[entity], true);
-	return std::pair<const SpatialComponent&, bool>(SpatialComponent(), false);
 }

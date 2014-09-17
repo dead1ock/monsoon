@@ -8,6 +8,7 @@ SET(MODULE_SRC
 	#Public Sources (Include/)
 	Include/App/Application.h
 	Include/ECS/EntityManager.h
+	Include/ECS/System.h
 	Include/Event/EventManager.h
 	Include/Math/AABB.h
 	Include/Platform/Clock.h
@@ -26,6 +27,7 @@ SET(MODULE_SRC
 	# Private Sources (Source/)
 	Src/App/Application.cpp
 	Src/ECS/EntityMAnager.cpp
+	Src/ECS/System.cpp
 	Src/Event/EventManager.cpp
 	Src/Math/AABB.cpp
 	Src/Platform/Clock.cpp

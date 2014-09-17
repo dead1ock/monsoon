@@ -76,23 +76,22 @@ protected:
 
 		playerLives[0] = mEntityManager.CreateEntity();
 		mRenderer->AttachMeshComponent(playerLives[0], playerLiveMesh);
-		mSpatialSystem.AttachSpatialComponent(playerLives[0], playerLiveTransform);
+		mSpatialSystem.AttachComponent(playerLives[0], playerLiveTransform);
 		playerLiveTransform.x += 0.75f;
 
 		playerLives[1] = mEntityManager.CreateEntity();
 		mRenderer->AttachMeshComponent(playerLives[1], playerLiveMesh);
-		mSpatialSystem.AttachSpatialComponent(playerLives[1], playerLiveTransform);
+		mSpatialSystem.AttachComponent(playerLives[1], playerLiveTransform);
 		playerLiveTransform.x += 0.75f;
 
 		playerLives[2] = mEntityManager.CreateEntity();
 		mRenderer->AttachMeshComponent(playerLives[2], playerLiveMesh);
-		mSpatialSystem.AttachSpatialComponent(playerLives[2], playerLiveTransform);
+		mSpatialSystem.AttachComponent(playerLives[2], playerLiveTransform);
 		playerLiveTransform.x += 0.75f;
 
 		GenerateAsteroids();
 
-		mEventManager.Subscribe("Entity::Destroyed", [this](void* arg) {
-			mSpatialSystem.DetachSpatialComponent((Monsoon::Entity)arg);
+		mEventListener = mEventManager.Subscribe("Entity::Destroyed", [this](void* arg) {
 			mRenderer->DetachMeshComponent((Monsoon::Entity)arg);
 			return 0;
 		});
@@ -156,7 +155,7 @@ protected:
 			asteroidPosition.roll = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
 
 			mRenderer->AttachMeshComponent(mAstroids[x], asteroidMesh);
-			mSpatialSystem.AttachSpatialComponent(mAstroids[x], asteroidPosition);
+			mSpatialSystem.AttachComponent(mAstroids[x], asteroidPosition);
 			mAsteroidAABBs.push_back(Math::AABB(asteroidPosition.x, asteroidPosition.y, 0.75f, 0.75f));
 		}
 
@@ -167,13 +166,13 @@ protected:
 		Renderer::MeshComponent playerMesh;
 		playerMesh.VertexBuffer = playerVB;
 		mRenderer->AttachMeshComponent(player, playerMesh);
-		mSpatialSystem.AttachSpatialComponent(player, Scene::SpatialComponent());
+		mSpatialSystem.AttachComponent(player, Scene::SpatialComponent());
 		playerDead = false;
 	}
 
 	void FireBullet() {
 		Renderer::MeshComponent bullet;
-		Scene::SpatialComponent bulletSpatialComponent = mSpatialSystem.GetSpatialComponent(player).first; // Copy player position.
+		Scene::SpatialComponent bulletSpatialComponent = *mSpatialSystem.GetComponent(player); // Copy player position.
 		bullet.VertexBuffer = bulletVB;
 
 		bulletSpatialComponent.x += cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
@@ -183,7 +182,7 @@ protected:
 		mBullets.push_back(id);
 		mBulletAABBs.push_back(Math::AABB(bulletSpatialComponent.x, bulletSpatialComponent.y, 0.25f, 0.5f));
 		mRenderer->AttachMeshComponent(id, bullet);
-		mSpatialSystem.AttachSpatialComponent(id, bulletSpatialComponent);
+		mSpatialSystem.AttachComponent(id, bulletSpatialComponent);
 		mActiveBullets++;
 		playerLastShotTime = mGameClock.getTime();
 	}
@@ -194,7 +193,7 @@ protected:
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
 
-		const auto& playerSpatialComponent = mSpatialSystem.GetSpatialComponent(player).first;
+		const auto& playerSpatialComponent = *mSpatialSystem.GetComponent(player);
 
 		if (leftKeyState)
 			mSpatialSystem.SetOrientation(player,
@@ -244,7 +243,7 @@ protected:
 		// Update Asteroids
 		for (int x = 0; x < mAstroids.size(); x++)
 		{
-			const auto& asteroidSpatialComponent = mSpatialSystem.GetSpatialComponent(mAstroids[x]).first;
+			const auto& asteroidSpatialComponent = *mSpatialSystem.GetComponent(mAstroids[x]);
 
 			mSpatialSystem.SetPosition(mAstroids[x],
 				asteroidSpatialComponent.x + (ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
@@ -270,7 +269,7 @@ protected:
 		// Update Bullets
 		for (int x = (mBullets.size() - 1); x >= 0; x--)
 		{
-			auto& bulletSpatialComponent = mSpatialSystem.GetSpatialComponent(mBullets[x]).first;
+			auto& bulletSpatialComponent = *mSpatialSystem.GetComponent(mBullets[x]);
 			mSpatialSystem.SetPosition(mBullets[x],
 				bulletSpatialComponent.x + (BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
 				bulletSpatialComponent.y + (BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
@@ -358,7 +357,7 @@ protected:
 	}
 
 	void OnShutdown() {
-		mEventManager.Unsubscribe("Entity::Destroyed", 0);
+		mEventManager.Unsubscribe("Entity::Destroyed", mEventListener);
 
 		mRenderer->DestroyVertexBuffer(astroidVB);
 		mRenderer->DestroyVertexBuffer(bulletVB);
@@ -377,6 +376,8 @@ private:
 	double playerLastDeathTime;
 	bool playerDead;
 	int level;
+
+	Event::ListenerHandle mEventListener;
 
 	Math::AABB playerAABB;
 	std::vector<Entity> mAstroids;
