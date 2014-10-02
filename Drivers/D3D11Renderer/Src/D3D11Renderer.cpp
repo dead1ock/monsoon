@@ -32,6 +32,9 @@ bool D3D11Renderer::Initialize() {
 
 	if (!mColorMaterial.Load(mD3d.GetDevice(), mWindow.getHandle()))
 		return false;
+
+	if (!mTextureMaterial.Load(mD3d.GetDevice(), mWindow.getHandle()))
+		return false;
 }
 
 void D3D11Renderer::Shutdown() {
@@ -40,6 +43,7 @@ void D3D11Renderer::Shutdown() {
 		i->Free();
 	mVertexBuffers.empty();
 
+	mTextureMaterial.Release();
 	mColorMaterial.Release();
 	mD3d.Shutdown();
 	mWindow.Shutdown();

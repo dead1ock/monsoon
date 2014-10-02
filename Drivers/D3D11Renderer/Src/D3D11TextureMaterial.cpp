@@ -28,7 +28,7 @@ bool D3D11TextureMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	ID3D10Blob* errorMessage;
 	ID3D10Blob* vertexShaderBuffer;
 	ID3D10Blob* pixelShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC layoutDescription[3];
+	D3D11_INPUT_ELEMENT_DESC layoutDescription[2];
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDescription;
 	D3D11_SAMPLER_DESC samplerDesc;
@@ -85,19 +85,11 @@ bool D3D11TextureMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	layoutDescription[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	layoutDescription[0].InstanceDataStepRate = 0;
 
-	layoutDescription[1].SemanticName = "COLOR";
-	layoutDescription[1].SemanticIndex = 0;
-	layoutDescription[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	layoutDescription[1].InputSlot = 0;
-	layoutDescription[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	layoutDescription[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	layoutDescription[1].InstanceDataStepRate = 0;
-
 	layoutDescription[1].SemanticName = "TEXCOORD";
 	layoutDescription[1].SemanticIndex = 0;
 	layoutDescription[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	layoutDescription[1].InputSlot = 0;
-	layoutDescription[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	layoutDescription[1].AlignedByteOffset = sizeof(D3DXVECTOR3) + sizeof(D3DXCOLOR);
 	layoutDescription[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	layoutDescription[1].InstanceDataStepRate = 0;
 

@@ -13,6 +13,7 @@
 #include "D3D.h"
 #include "D3D11Window.h"
 #include "D3D11ColorMaterial.h"
+#include "D3D11TextureMaterial.h"
 #include "Util/PackedPool.h"
 
 
@@ -52,6 +53,7 @@ namespace Monsoon {
 
 			Util::PackedPool<Entity, MeshComponent> mMeshComponents;
 			D3D11ColorMaterial mColorMaterial;
+			D3D11TextureMaterial mTextureMaterial;
 
 			Scene::SpatialSystem* mSpatialSystem;
 		};
