@@ -13,10 +13,11 @@
 namespace Monsoon {
 	namespace Renderer {
 
-		struct VertexType
+		struct D3D11VertexType
 		{
 			D3DXVECTOR3 position;
 			D3DXCOLOR color;
+			D3DXVECTOR2 texture;
 		};
 
 		class D3D11VertexBuffer : public VertexBuffer
@@ -25,7 +26,7 @@ namespace Monsoon {
 			D3D11VertexBuffer();
 			~D3D11VertexBuffer();
 
-			void Allocate(ID3D11Device* device, ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount);
+			void Allocate(ID3D11Device* device, VertexType vertices[], int vertexCount, unsigned int indicies[], int indexCount);
 			void Free();
 
 			void Render(ID3D11DeviceContext* deviceContext);

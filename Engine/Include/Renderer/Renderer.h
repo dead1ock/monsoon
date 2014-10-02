@@ -24,10 +24,9 @@ namespace Monsoon {
 		{
 			MeshComponent() {
 				VertexBuffer = -1;
-				Material = -1;
 			}
+
 			VertexBufferHandle VertexBuffer;
-			MaterialHandle Material;
 		};
 
 		struct Camera
@@ -76,7 +75,7 @@ namespace Monsoon {
 			virtual void Shutdown() = 0;
 			virtual bool Update() = 0;
 
-			virtual VertexBufferHandle CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount) = 0;
+			virtual VertexBufferHandle CreateVertexBuffer(VertexType vertices[], int vertexCount, unsigned int indicies[], int indexCount) = 0;
 			virtual void DestroyVertexBuffer(VertexBufferHandle vbHandle) = 0;
 
 			virtual void AttachMeshComponent(Entity entity, MeshComponent& component)=0;

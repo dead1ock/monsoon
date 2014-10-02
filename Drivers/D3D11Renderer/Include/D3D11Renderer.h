@@ -29,7 +29,7 @@ namespace Monsoon {
 			void Shutdown();
 			bool Update();
 
-			VertexBufferHandle CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount);
+			VertexBufferHandle CreateVertexBuffer(VertexType vertices[], int vertexCount, unsigned int indicies[], int indexCount);
 			void DestroyVertexBuffer(VertexBufferHandle vbHandle);
 
 			void AttachMeshComponent(Entity entity, MeshComponent& component);

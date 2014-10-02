@@ -112,7 +112,7 @@ bool D3D11Renderer::Update() {
 
 int nextFreeId = 0;
 
-VertexBufferHandle D3D11Renderer::CreateVertexBuffer(ColorVertex* vertices, int vertexCount, unsigned int* indicies, int indexCount)
+VertexBufferHandle D3D11Renderer::CreateVertexBuffer(VertexType vertices[], int vertexCount, unsigned int indicies[], int indexCount)
 {
 	int vbHandle = 0;
 	if (mFreeIndexList.size()) {
@@ -150,7 +150,7 @@ MeshComponent& D3D11Renderer::GetMeshComponent(Monsoon::Entity entity) {
 }
 
 VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
-	ColorVertex vertices[4];
+	VertexType vertices[4];
 
 	vertices[0].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f) * -1.0f, 0.0f);
 	vertices[0].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
@@ -173,7 +173,7 @@ VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
 }
 
 VertexBufferHandle D3D11Renderer::CreateCube(float length) {
-	ColorVertex vertices[8];
+	VertexType vertices[8];
 
 	float halfLength = length / 2.0f;
 
@@ -227,7 +227,7 @@ VertexBufferHandle D3D11Renderer::CreateCube(float length) {
 
 VertexBufferHandle D3D11Renderer::CreatePyramid(float base, float height)
 {
-	ColorVertex vertices[5];
+	VertexType vertices[5];
 
 	float halfHeight = height / 2.0f;
 	float halfBase = base / 2.0f;
