@@ -24,9 +24,11 @@ namespace Monsoon {
 		{
 			MeshComponent() {
 				VertexBuffer = -1;
+				TextureId = -1;
 			}
 
 			VertexBufferHandle VertexBuffer;
+			U32 TextureId;
 		};
 
 		struct Camera
@@ -86,6 +88,9 @@ namespace Monsoon {
 			virtual VertexBufferHandle CreatePlane(float width, float height) = 0;
 			virtual VertexBufferHandle CreateCube(float length) = 0;
 			virtual VertexBufferHandle CreatePyramid(float base, float height) = 0;
+
+			virtual U32 LoadTexture(std::string filename) = 0;
+			virtual void ReleaseTexture(U32 textureId) = 0;
 
 			// Camera
 			virtual Camera& GetCamera() = 0;

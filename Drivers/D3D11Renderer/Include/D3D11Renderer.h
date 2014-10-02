@@ -42,6 +42,9 @@ namespace Monsoon {
 			VertexBufferHandle CreateCube(float length);
 			VertexBufferHandle CreatePyramid(float base, float height);
 
+			U32 LoadTexture(std::string filename);
+			void ReleaseTexture(U32 textureId);
+
 			Camera& GetCamera() { return defaultCamera; }
 
 		private:
@@ -49,6 +52,7 @@ namespace Monsoon {
 			D3D mD3d;
 			std::vector<D3D11VertexBuffer> mVertexBuffers;
 			std::vector<int> mFreeIndexList;
+			std::vector<ID3D11ShaderResourceView*> mTextures;
 			Camera defaultCamera;
 
 			Util::PackedPool<Entity, MeshComponent> mMeshComponents;

@@ -4,6 +4,7 @@
 */
 
 #include <Windows.h>
+#include <d3dx11tex.h>
 
 #include "D3D11Renderer.h"
 #include "D3D11VertexBuffer.h"
@@ -17,6 +18,7 @@ D3D11Renderer::D3D11Renderer(RendererSettings& settings, Scene::SpatialSystem* s
   mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen)
 {
 	mVertexBuffers.reserve(MONSOON_MAX_ENTITIES);
+	mTextures.reserve(1024);
 }
 
 D3D11Renderer::~D3D11Renderer() {
@@ -38,6 +40,9 @@ bool D3D11Renderer::Initialize() {
 }
 
 void D3D11Renderer::Shutdown() {
+
+	for (std::vector<ID3D11ShaderResourceView*>::iterator i = mTextures.begin(); i < mTextures.end(); i++)
+		(*i)->Release();
 
 	for (std::vector<D3D11VertexBuffer>::iterator i = mVertexBuffers.begin(); i < mVertexBuffers.end(); i++)
 		i->Free();
@@ -104,7 +109,14 @@ bool D3D11Renderer::Update() {
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
 
-			mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
+			// This is BAD BAD BAD, temporary code. We shouldn't be switching
+			// render states for every object, but this will work until a 
+			// proper material system can be put into place.
+			if (mMeshComponents.At(x).TextureId != -1)
+				mTextureMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[mMeshComponents.At(x).TextureId]);
+			else
+				mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
+
 			mVertexBuffers[mMeshComponents.At(x).VertexBuffer].Render(mD3d.GetContext());
 		}
 	}
@@ -158,15 +170,19 @@ VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
 
 	vertices[0].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f) * -1.0f, 0.0f);
 	vertices[0].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+	vertices[0].SetUV(0.0f, 0.0f);
 
 	vertices[1].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f), 0.0f);
 	vertices[1].SetColor(1.0f, 0.0f, 1.0f, 1.0f);
+	vertices[1].SetUV(1.0f, 0.0f);
 
 	vertices[2].SetPosition((width / 2.0f), (height / 2.0f), 0.0f);
 	vertices[2].SetColor(0.0f, 1.0f, 1.0f, 1.0f);
+	vertices[2].SetUV(1.0f, 1.0f);
 
 	vertices[3].SetPosition((width / 2.0f), (height / 2.0f) * -1.0f, 0.0f);
 	vertices[3].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+	vertices[3].SetUV(0.0f, 1.0f);
 
 	unsigned int indices[6] = {
 		0, 1, 2,
@@ -264,4 +280,25 @@ VertexBufferHandle D3D11Renderer::CreatePyramid(float base, float height)
 	};
 
 	return CreateVertexBuffer(vertices, 5, indices, 18);
+}
+
+U32 D3D11Renderer::LoadTexture(std::string filename)
+{
+	HRESULT result;
+	I16 nextIndex = mTextures.size();
+	ID3D11ShaderResourceView* temp = nullptr;
+
+	result = D3DX11CreateShaderResourceViewFromFile(mD3d.GetDevice(), filename.c_str(), NULL, NULL, &temp, NULL);
+
+	if (FAILED(result))
+		return -1;
+	
+	mTextures.push_back(temp);
+	return nextIndex;
+}
+
+void D3D11Renderer::ReleaseTexture(U32 textureId)
+{
+	// Currently not implemented. 1024 textures can be loaded, but not unloaded,
+	// to keep indicies from changing.
 }
