@@ -41,12 +41,15 @@ bool D3D11Renderer::Initialize() {
 
 void D3D11Renderer::Shutdown() {
 
+	mTextureFreeList.clear();
 	for (std::vector<ID3D11ShaderResourceView*>::iterator i = mTextures.begin(); i < mTextures.end(); i++)
 		(*i)->Release();
+	mTextures.clear();
 
+	mFreeIndexList.clear();
 	for (std::vector<D3D11VertexBuffer>::iterator i = mVertexBuffers.begin(); i < mVertexBuffers.end(); i++)
 		i->Free();
-	mVertexBuffers.empty();
+	mVertexBuffers.clear();
 
 	mTextureMaterial.Release();
 	mColorMaterial.Release();
@@ -170,19 +173,19 @@ VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
 
 	vertices[0].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f) * -1.0f, 0.0f);
 	vertices[0].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
-	vertices[0].SetUV(0.0f, 0.0f);
+	vertices[0].SetUV(0.0f, 1.0f);
 
 	vertices[1].SetPosition((width / 2.0f) * -1.0f, (height / 2.0f), 0.0f);
 	vertices[1].SetColor(1.0f, 0.0f, 1.0f, 1.0f);
-	vertices[1].SetUV(1.0f, 0.0f);
+	vertices[1].SetUV(0.0f, 0.0f);
 
 	vertices[2].SetPosition((width / 2.0f), (height / 2.0f), 0.0f);
 	vertices[2].SetColor(0.0f, 1.0f, 1.0f, 1.0f);
-	vertices[2].SetUV(1.0f, 1.0f);
+	vertices[2].SetUV(1.0f, 0.0f);
 
 	vertices[3].SetPosition((width / 2.0f), (height / 2.0f) * -1.0f, 0.0f);
 	vertices[3].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
-	vertices[3].SetUV(0.0f, 1.0f);
+	vertices[3].SetUV(1.0f, 1.0f);
 
 	unsigned int indices[6] = {
 		0, 1, 2,
@@ -292,13 +295,23 @@ U32 D3D11Renderer::LoadTexture(std::string filename)
 
 	if (FAILED(result))
 		return -1;
-	
-	mTextures.push_back(temp);
-	return nextIndex;
+
+	if (mTextureFreeList.size())
+	{
+		U32 index = mTextureFreeList.back();
+		mTextures[index] = temp;
+		mTextureFreeList.pop_back();
+		return index;
+	}
+	else
+	{
+		mTextures.push_back(temp);
+		return nextIndex;
+	}
 }
 
 void D3D11Renderer::ReleaseTexture(U32 textureId)
 {
-	// Currently not implemented. 1024 textures can be loaded, but not unloaded,
-	// to keep indicies from changing.
+	mTextures.erase(mTextures.begin() + textureId);
+	mTextureFreeList.push_back(textureId);
 }

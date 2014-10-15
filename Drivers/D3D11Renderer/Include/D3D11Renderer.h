@@ -52,7 +52,10 @@ namespace Monsoon {
 			D3D mD3d;
 			std::vector<D3D11VertexBuffer> mVertexBuffers;
 			std::vector<int> mFreeIndexList;
+
 			std::vector<ID3D11ShaderResourceView*> mTextures;
+			std::vector<int> mTextureFreeList;
+
 			Camera defaultCamera;
 
 			Util::PackedPool<Entity, MeshComponent> mMeshComponents;
