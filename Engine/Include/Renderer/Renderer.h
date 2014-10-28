@@ -55,6 +55,10 @@ namespace Monsoon {
 
 				nearClip = 0.1f;
 				farClip = 1000.0f;
+
+				lookAtX = 0.0f;
+				lookAtY = 0.0f;
+				lookAtZ = 0.0f;
 			}
 
 			float x, y, z;
@@ -62,6 +66,7 @@ namespace Monsoon {
 			Projection mode;
 			float orthoWidth, orthoHeight;
 			float nearClip, farClip;
+			float lookAtX, lookAtY, lookAtZ;
 		};
 
 		/**
@@ -88,6 +93,7 @@ namespace Monsoon {
 			virtual VertexBufferHandle CreatePlane(float width, float height) = 0;
 			virtual VertexBufferHandle CreateCube(float length) = 0;
 			virtual VertexBufferHandle CreatePyramid(float base, float height) = 0;
+			virtual VertexBufferHandle CreateCylinder(U32 sections) = 0;
 
 			virtual U32 LoadTexture(std::string filename) = 0;
 			virtual void ReleaseTexture(U32 textureId) = 0;

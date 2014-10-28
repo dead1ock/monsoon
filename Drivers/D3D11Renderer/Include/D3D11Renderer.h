@@ -41,6 +41,7 @@ namespace Monsoon {
 			VertexBufferHandle CreatePlane(float width, float height);
 			VertexBufferHandle CreateCube(float length);
 			VertexBufferHandle CreatePyramid(float base, float height);
+			VertexBufferHandle CreateCylinder(U32 sections);
 
 			U32 LoadTexture(std::string filename);
 			void ReleaseTexture(U32 textureId);
