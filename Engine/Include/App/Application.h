@@ -13,6 +13,7 @@
 #include "ECS\EntityManager.h"
 #include "Event\EventManager.h"
 #include "Platform\Clock.h"
+#include "Resource\ResourceManager.h"
 #include <Scene/SpatialSystem.h>
 
 namespace Monsoon {
@@ -46,6 +47,7 @@ namespace Monsoon {
 		Event::EventManager mEventManager;
 		Platform::Clock mGameClock;
 		Scene::SpatialSystem mSpatialSystem;
+		Resource::ResourceManager mResourceManager;
 
 	private:
 		/**

@@ -18,6 +18,7 @@ SET(MODULE_SRC
 	Include/Platform/Platform.h
 	Include/Platform/Predef.h
 	Include/Platform/Types.h
+	Include/Resource/ResourceManager.h
 	Include/Renderer/Renderer.h
 	Include/Renderer/RendererSettings.h
 	Include/Renderer/VertexBuffer.h
@@ -31,6 +32,7 @@ SET(MODULE_SRC
 	Src/Event/EventManager.cpp
 	Src/Math/AABB.cpp
 	Src/Platform/Clock.cpp
+	Src/Resource/ResourceManager.cpp
 	Src/Scene/SpatialSystem.cpp
 	)
 
