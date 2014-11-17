@@ -39,14 +39,28 @@ protected:
 	}
 
 	void OnUpdate() {
+		// Get key states.
+		U16 upKeyState = GetAsyncKeyState(VK_UP);
+		U16 leftKeyState = GetAsyncKeyState(VK_LEFT);
+		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
+		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
 
+		// Get input.
+		if (upKeyState)
+			cameraRadius -= 10.0f * mGameClock.getDeltaTime();
+		else if (downKeyState)
+			cameraRadius += 10.0f * mGameClock.getDeltaTime();
+
+		if (leftKeyState)
+			cameraTheta -= 2.0f * mGameClock.getDeltaTime();
+		else if (rightKeyState)
+			cameraTheta += 2.0f * mGameClock.getDeltaTime();
+
+		// Update Camera
 		Renderer::Camera& camera = mRenderer->GetCamera();
-
 		camera.x = cos(cameraTheta) * cameraRadius;
 		camera.y = 5.0f;
 		camera.z = sin(cameraTheta) * cameraRadius;
-
-		cameraTheta += mGameClock.getDeltaTime();
 	}
 
 	void OnShutdown() {
