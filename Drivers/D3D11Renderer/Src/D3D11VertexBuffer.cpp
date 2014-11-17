@@ -61,6 +61,8 @@ void D3D11VertexBuffer::Allocate(ID3D11Device* device, VertexType vertices[], in
 	indexData.SysMemSlicePitch = 0;
 
 	result = device->CreateBuffer(&indexBufferDesc, &indexData, &mIndexBuffer);
+
+	delete[] d3dVertices;
 }
 
 void D3D11VertexBuffer::Free()

@@ -88,7 +88,7 @@ const ResourceData& ResourceManager::GetResourceData(ResourceId id)
 
 void ResourceManager::LoadFile(std::string filename, ResourceData& dest)
 {
-	std::ifstream iFile(filename);
+	std::ifstream iFile(filename, std::ios::binary);
 	if (iFile.is_open())
 	{
 		// Get file size.
@@ -105,6 +105,7 @@ void ResourceManager::LoadFile(std::string filename, ResourceData& dest)
 		dest.filename = filename;
 		dest.data = fileData;
 		dest.size = fileSize;
+		iFile.close();
 	}
 	else
 	{
