@@ -12,6 +12,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 		Include/D3D11ColorMaterial.h
 		Include/D3D.h
 		Include/D3D11Renderer.h
+		Include/D3D11SpriteMaterial.h
 		Include/D3D11TextureMaterial.h
 		Include/D3D11VertexBuffer.h
 		Include/D3D11Window.h
@@ -19,6 +20,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 		Src/D3D11ColorMaterial.cpp
 		Src/D3D.cpp
 		Src/D3D11Renderer.cpp
+		Src/D3D11SpriteMaterial.cpp
 		Src/D3D11TextureMaterial.cpp
 		Src/D3D11VertexBuffer.cpp
 		Src/D3D11Window.cpp

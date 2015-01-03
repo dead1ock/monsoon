@@ -37,6 +37,11 @@ bool D3D11Renderer::Initialize() {
 
 	if (!mTextureMaterial.Load(mD3d.GetDevice(), mWindow.getHandle()))
 		return false;
+
+	if (!mSpriteMaterial.Load(mD3d.GetDevice(), mWindow.getHandle()))
+		return false;
+
+	mSpritePlane = CreatePlane(1.0f, 1.0f);
 }
 
 void D3D11Renderer::Shutdown() {
@@ -51,6 +56,7 @@ void D3D11Renderer::Shutdown() {
 		i->Free();
 	mVertexBuffers.clear();
 
+	mSpriteMaterial.Release();
 	mTextureMaterial.Release();
 	mColorMaterial.Release();
 	mD3d.Shutdown();
@@ -96,6 +102,7 @@ bool D3D11Renderer::Update() {
 
 	D3DXMATRIX translation, rotation, scale;
 
+	// Render 3d Meshes
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
 		if (auto component = mSpatialSystem->GetComponent(mMeshComponents.IndexToId(x)))
 		{
@@ -121,6 +128,28 @@ bool D3D11Renderer::Update() {
 				mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 
 			mVertexBuffers[mMeshComponents.At(x).VertexBuffer].Render(mD3d.GetContext());
+		}
+	}
+
+	// Render 2d Sprites
+	for (int x = 0; x < mSpriteComponents.Size(); x++) {
+		if (auto component = mSpatialSystem->GetComponent(mSpriteComponents.IndexToId(x)))
+		{
+			auto& spatialComponent = *component;
+			D3DXMatrixIdentity(&worldMatrix);
+			D3DXMatrixIdentity(&translation);
+			D3DXMatrixIdentity(&rotation);
+			D3DXMatrixIdentity(&scale);
+
+			D3DXMatrixTranslation(&translation, spatialComponent.x, spatialComponent.y, spatialComponent.z);
+			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
+			D3DXMatrixScaling(&scale, spatialComponent.scaleX, spatialComponent.scaleY, spatialComponent.scaleZ);
+
+			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
+			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
+
+			mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[mSpriteComponents.At(x).TextureId]);
+			mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
 		}
 	}
 
@@ -162,6 +191,16 @@ void D3D11Renderer::AttachMeshComponent(Monsoon::Entity entity, MeshComponent& c
 void D3D11Renderer::DetachMeshComponent(Monsoon::Entity entity)
 {
 	mMeshComponents.Remove(entity);
+}
+
+void D3D11Renderer::AttachSpriteComponent(Monsoon::Entity entity, SpriteComponent& component)
+{
+	mSpriteComponents.Add(entity, component);
+}
+
+void D3D11Renderer::DetachSpriteComponent(Monsoon::Entity entity)
+{
+	mSpriteComponents.Remove(entity);
 }
 
 MeshComponent& D3D11Renderer::GetMeshComponent(Monsoon::Entity entity) {

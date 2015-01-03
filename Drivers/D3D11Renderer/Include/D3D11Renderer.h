@@ -14,6 +14,7 @@
 #include "D3D11Window.h"
 #include "D3D11ColorMaterial.h"
 #include "D3D11TextureMaterial.h"
+#include "D3D11SpriteMaterial.h"
 #include "Util/PackedPool.h"
 
 
@@ -33,10 +34,14 @@ namespace Monsoon {
 			VertexBufferHandle CreateVertexBuffer(VertexType vertices[], int vertexCount, unsigned int indicies[], int indexCount);
 			void DestroyVertexBuffer(VertexBufferHandle vbHandle);
 
+			// 3D Rendering
 			void AttachMeshComponent(Entity entity, MeshComponent& component);
 			void DetachMeshComponent(Entity entity);
-
 			MeshComponent& GetMeshComponent(Entity entity);
+
+			// 2D Rendering
+			void AttachSpriteComponent(Entity entity, SpriteComponent& component);
+			void DetachSpriteComponent(Entity entity);
 
 			VertexBufferHandle CreatePlane(float width, float height);
 			VertexBufferHandle CreateCube(float length);
@@ -60,8 +65,14 @@ namespace Monsoon {
 			Camera defaultCamera;
 
 			Util::PackedPool<Entity, MeshComponent> mMeshComponents;
+			Util::PackedPool<Entity, SpriteComponent> mSpriteComponents;
+
+			// Materials
 			D3D11ColorMaterial mColorMaterial;
 			D3D11TextureMaterial mTextureMaterial;
+			D3D11SpriteMaterial mSpriteMaterial;
+
+			VertexBufferHandle mSpritePlane;
 
 			Scene::SpatialSystem* mSpatialSystem;
 		};

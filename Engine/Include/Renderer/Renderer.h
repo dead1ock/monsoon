@@ -20,6 +20,9 @@ namespace Monsoon {
 		typedef U32 VertexBufferHandle;
 		typedef U32 MaterialHandle;
 
+		//
+		// 3D Rendering
+		//
 		struct MeshComponent
 		{
 			MeshComponent() {
@@ -29,6 +32,28 @@ namespace Monsoon {
 
 			VertexBufferHandle VertexBuffer;
 			U32 TextureId;
+		};
+
+		//
+		// 2D Rendering
+		//
+		struct SpriteComponent
+		{
+			// Specifies whether to render this sprite from a 
+			// single image source, or a slice from an atlas.
+			enum SpriteMode
+			{
+				SINGLE,
+				ATLAS
+			};
+
+			SpriteComponent() {
+				TextureId = -1;
+				Mode = SINGLE;
+			}
+
+			U32 TextureId;
+			SpriteMode Mode;
 		};
 
 		struct Camera
@@ -85,9 +110,14 @@ namespace Monsoon {
 			virtual VertexBufferHandle CreateVertexBuffer(VertexType vertices[], int vertexCount, unsigned int indicies[], int indexCount) = 0;
 			virtual void DestroyVertexBuffer(VertexBufferHandle vbHandle) = 0;
 
-			virtual void AttachMeshComponent(Entity entity, MeshComponent& component)=0;
-			virtual void DetachMeshComponent(Entity entity)=0;
+			// 3D Rendering
+			virtual void AttachMeshComponent(Entity entity, MeshComponent& component) = 0;
+			virtual void DetachMeshComponent(Entity entity) = 0;
 			virtual MeshComponent& GetMeshComponent(Entity entity) = 0;
+
+			// 2D Rendering
+			virtual void AttachSpriteComponent(Entity entity, SpriteComponent& component) = 0;
+			virtual void DetachSpriteComponent(Entity entity) = 0;
 
 			// Primitives
 			virtual VertexBufferHandle CreatePlane(float width, float height) = 0;
