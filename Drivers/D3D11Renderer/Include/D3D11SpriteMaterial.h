@@ -20,7 +20,8 @@ namespace Monsoon {
 			bool Load(ID3D11Device* device, HWND windowHandle);
 			void Release();
 			void Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
-				D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture);
+				D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, 
+				int atlas, int index, int sliceSizeX, int sliceSizeY, int sheetWidth, int sheetHeight);
 
 		private:
 			struct MatrixBufferType
@@ -28,12 +29,26 @@ namespace Monsoon {
 				D3DXMATRIX world;
 				D3DXMATRIX view;
 				D3DXMATRIX projection;
+				int atlas;
+				long long padding;
+			};
+
+			struct SpriteSheetType
+			{
+				int index;
+				int sliceSizeX;
+				int sliceSizeY;
+				int sheetWidth;
+				int sheetHeight;
+				int padding1;
+				long long padding2;
 			};
 
 			ID3D11VertexShader* mVertexShader;
 			ID3D11PixelShader* mPixelShader;
 			ID3D11InputLayout* mLayout;
 			ID3D11Buffer* mMatrixBuffer;
+			ID3D11Buffer* mSpriteSheetBuffer;
 			ID3D11SamplerState* mSamplerState;
 		};
 	}

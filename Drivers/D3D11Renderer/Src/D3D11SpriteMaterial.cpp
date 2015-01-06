@@ -4,6 +4,8 @@
 */
 
 #include <d3dx11async.h>
+#include <iostream>
+#include <fstream>
 
 #include "D3D11SpriteMaterial.h"
 
@@ -31,6 +33,7 @@ bool D3D11SpriteMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	D3D11_INPUT_ELEMENT_DESC layoutDescription[2];
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDescription;
+	D3D11_BUFFER_DESC spriteSheetBufferDescription;
 	D3D11_SAMPLER_DESC samplerDesc;
 
 	errorMessage = nullptr;
@@ -114,6 +117,17 @@ bool D3D11SpriteMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	if (FAILED(result))
 		return false;
 
+	spriteSheetBufferDescription.Usage = D3D11_USAGE_DYNAMIC;
+	spriteSheetBufferDescription.ByteWidth = sizeof(SpriteSheetType);
+	spriteSheetBufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	spriteSheetBufferDescription.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	spriteSheetBufferDescription.MiscFlags = 0;
+	spriteSheetBufferDescription.StructureByteStride = 0;
+
+	result = device->CreateBuffer(&spriteSheetBufferDescription, NULL, &mSpriteSheetBuffer);
+	if (FAILED(result))
+		return false;
+
 	//
 	// Describe and create sampler.
 	//
@@ -153,6 +167,9 @@ void D3D11SpriteMaterial::Release()
 	if (mSamplerState)
 		mSamplerState->Release();
 
+	if (mSpriteSheetBuffer)
+		mSpriteSheetBuffer->Release();
+
 	if (mMatrixBuffer)
 		mMatrixBuffer->Release();
 
@@ -167,21 +184,22 @@ void D3D11SpriteMaterial::Release()
 }
 
 void D3D11SpriteMaterial::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
-	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture)
+	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, int atlas, int index, int sliceSizeX, int sliceSizeY, int sheetWidth, int sheetHeight)
 {
 	//
 	// Map Material Inputs
 	//
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	D3D11_MAPPED_SUBRESOURCE spriteSheetMappedResource;
 	MatrixBufferType* dataPtr;
-	unsigned int bufferNumber;
+	SpriteSheetType* spriteSheetDataPtr;
 
 	D3DXMatrixTranspose(&worldMatrix, &worldMatrix);
 	D3DXMatrixTranspose(&viewMatrix, &viewMatrix);
 	D3DXMatrixTranspose(&projectionMatrix, &projectionMatrix);
 
-	// Lock cBuffer
+	// Lock Matrix cBuffer
 	deviceContext->Map(mMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 	dataPtr = (MatrixBufferType*)mappedResource.pData;
@@ -189,13 +207,28 @@ void D3D11SpriteMaterial::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX 
 	dataPtr->world = worldMatrix;
 	dataPtr->view = viewMatrix;
 	dataPtr->projection = projectionMatrix;
+	dataPtr->atlas = atlas;
 
-	// Unlock cBuffer
+	// Unlock Matrix cBuffer
 	deviceContext->Unmap(mMatrixBuffer, 0);
 
-	bufferNumber = 0;
+	// Lock SpriteSheet cBuffer
+	deviceContext->Map(mSpriteSheetBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &spriteSheetMappedResource);
 
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &mMatrixBuffer);
+	spriteSheetDataPtr = (SpriteSheetType*)spriteSheetMappedResource.pData;
+
+	spriteSheetDataPtr->index = index;
+	spriteSheetDataPtr->sliceSizeX = sliceSizeX;
+	spriteSheetDataPtr->sliceSizeY = sliceSizeY;
+	spriteSheetDataPtr->sheetWidth = sheetWidth;
+	spriteSheetDataPtr->sheetHeight = sheetHeight;
+
+	// Unload SpriteSheet cBuffer
+	deviceContext->Unmap(mSpriteSheetBuffer, 0);
+
+
+	deviceContext->VSSetConstantBuffers(0, 1, &mMatrixBuffer);
+	deviceContext->VSSetConstantBuffers(1, 1, &mSpriteSheetBuffer);
 	deviceContext->PSSetShaderResources(0, 1, &texture);
 
 	//

@@ -19,6 +19,8 @@ namespace Monsoon {
 
 		typedef U32 VertexBufferHandle;
 		typedef U32 MaterialHandle;
+		typedef U32 SpriteSheetHandle;
+		typedef U32 TextureHandle;
 
 		//
 		// 3D Rendering
@@ -31,12 +33,20 @@ namespace Monsoon {
 			}
 
 			VertexBufferHandle VertexBuffer;
-			U32 TextureId;
+			TextureHandle TextureId;
 		};
 
 		//
 		// 2D Rendering
 		//
+		struct SpriteSheet
+		{
+			int SliceSizeX;
+			int SliceSizeY;
+			int Width;
+			int Height;
+		};
+
 		struct SpriteComponent
 		{
 			// Specifies whether to render this sprite from a 
@@ -44,17 +54,27 @@ namespace Monsoon {
 			enum SpriteMode
 			{
 				SINGLE,
-				ATLAS
+				SHEET
 			};
 
 			SpriteComponent() {
 				TextureId = -1;
 				Mode = SINGLE;
+				Index = 0;
 			}
 
-			U32 TextureId;
+			TextureHandle TextureId;
 			SpriteMode Mode;
+			int SliceSizeX;
+			int SliceSizeY;
+			int SheetWidth;
+			int SheetHeight;
+			int Index;
 		};
+
+		//
+		//
+		//
 
 		struct Camera
 		{
@@ -118,6 +138,7 @@ namespace Monsoon {
 			// 2D Rendering
 			virtual void AttachSpriteComponent(Entity entity, SpriteComponent& component) = 0;
 			virtual void DetachSpriteComponent(Entity entity) = 0;
+			virtual SpriteComponent& GetSpriteComponent(Entity entity) = 0;
 
 			// Primitives
 			virtual VertexBufferHandle CreatePlane(float width, float height) = 0;

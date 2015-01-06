@@ -42,6 +42,7 @@ namespace Monsoon {
 			// 2D Rendering
 			void AttachSpriteComponent(Entity entity, SpriteComponent& component);
 			void DetachSpriteComponent(Entity entity);
+			SpriteComponent& GetSpriteComponent(Entity entity);
 
 			VertexBufferHandle CreatePlane(float width, float height);
 			VertexBufferHandle CreateCube(float length);

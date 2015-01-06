@@ -135,7 +135,9 @@ bool D3D11Renderer::Update() {
 	for (int x = 0; x < mSpriteComponents.Size(); x++) {
 		if (auto component = mSpatialSystem->GetComponent(mSpriteComponents.IndexToId(x)))
 		{
-			auto& spatialComponent = *component;
+			const Scene::SpatialComponent& spatialComponent = *component;
+			const SpriteComponent& spriteComponent = mSpriteComponents[x];
+
 			D3DXMatrixIdentity(&worldMatrix);
 			D3DXMatrixIdentity(&translation);
 			D3DXMatrixIdentity(&rotation);
@@ -148,7 +150,8 @@ bool D3D11Renderer::Update() {
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
 
-			mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[mSpriteComponents.At(x).TextureId]);
+			mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.TextureId],
+				(spriteComponent.Mode == spriteComponent.SHEET) ? 1 : 0, spriteComponent.Index, spriteComponent.SliceSizeX, spriteComponent.SliceSizeY, spriteComponent.SheetWidth, spriteComponent.SheetHeight);
 			mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
 		}
 	}
@@ -201,6 +204,10 @@ void D3D11Renderer::AttachSpriteComponent(Monsoon::Entity entity, SpriteComponen
 void D3D11Renderer::DetachSpriteComponent(Monsoon::Entity entity)
 {
 	mSpriteComponents.Remove(entity);
+}
+
+SpriteComponent& D3D11Renderer::GetSpriteComponent(Monsoon::Entity entity) {
+	return mSpriteComponents[entity];
 }
 
 MeshComponent& D3D11Renderer::GetMeshComponent(Monsoon::Entity entity) {
