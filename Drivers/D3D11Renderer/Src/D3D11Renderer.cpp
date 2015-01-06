@@ -150,8 +150,15 @@ bool D3D11Renderer::Update() {
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
 
-			mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.TextureId],
-				(spriteComponent.Mode == spriteComponent.SHEET) ? 1 : 0, spriteComponent.Index, spriteComponent.SliceSizeX, spriteComponent.SliceSizeY, spriteComponent.SheetWidth, spriteComponent.SheetHeight);
+			if (spriteComponent.Mode == spriteComponent.SHEET) {
+				const SpriteSheet& spriteSheet = mSpriteSheets[spriteComponent.SpriteSheet];
+				mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture],
+					1, spriteComponent.Index, spriteSheet.SliceSizeX, spriteSheet.SliceSizeY, spriteSheet.Width, spriteSheet.Height);
+			}
+			else
+				mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture],
+				0, 0, 0, 0, 0, 0);
+
 			mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
 		}
 	}
@@ -431,4 +438,27 @@ void D3D11Renderer::ReleaseTexture(U32 textureId)
 {
 	mTextures.erase(mTextures.begin() + textureId);
 	mTextureFreeList.push_back(textureId);
+}
+
+SpriteSheetHandle D3D11Renderer::CreateSpriteSheet(SpriteSheet sheet)
+{
+	SpriteSheetHandle index = mSpriteSheets.size();
+	if (mSpriteSheetFreeList.size())
+	{
+		index = mSpriteSheetFreeList.back();
+		mSpriteSheets[index] = sheet;
+		mSpriteSheetFreeList.pop_back();
+	}
+	else
+	{
+		
+		mSpriteSheets.push_back(sheet);
+	}
+	return index;
+}
+
+void D3D11Renderer::ReleaseSpriteSheet(SpriteSheetHandle sheet)
+{
+	mSpriteSheets.erase(mSpriteSheets.begin() + sheet);
+	mSpriteSheetFreeList.push_back(sheet);
 }

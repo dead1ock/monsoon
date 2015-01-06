@@ -50,7 +50,8 @@ namespace Monsoon {
 		struct SpriteComponent
 		{
 			// Specifies whether to render this sprite from a 
-			// single image source, or a slice from an atlas.
+			// single image source, or a slice from a 
+			// grid-algined sheet or atlas.
 			enum SpriteMode
 			{
 				SINGLE,
@@ -58,17 +59,15 @@ namespace Monsoon {
 			};
 
 			SpriteComponent() {
-				TextureId = -1;
+				Texture = -1;
+				SpriteSheet = -1;
 				Mode = SINGLE;
 				Index = 0;
 			}
 
-			TextureHandle TextureId;
 			SpriteMode Mode;
-			int SliceSizeX;
-			int SliceSizeY;
-			int SheetWidth;
-			int SheetHeight;
+			SpriteSheetHandle SpriteSheet;
+			TextureHandle Texture;
 			int Index;
 		};
 
@@ -139,6 +138,9 @@ namespace Monsoon {
 			virtual void AttachSpriteComponent(Entity entity, SpriteComponent& component) = 0;
 			virtual void DetachSpriteComponent(Entity entity) = 0;
 			virtual SpriteComponent& GetSpriteComponent(Entity entity) = 0;
+
+			virtual SpriteSheetHandle CreateSpriteSheet(SpriteSheet sheet) = 0;
+			virtual void ReleaseSpriteSheet(SpriteSheetHandle sheet) = 0;
 
 			// Primitives
 			virtual VertexBufferHandle CreatePlane(float width, float height) = 0;
