@@ -47,8 +47,8 @@ bool D3D11Renderer::Initialize() {
 void D3D11Renderer::Shutdown() {
 
 	mTextureFreeList.clear();
-	for (std::vector<ID3D11ShaderResourceView*>::iterator i = mTextures.begin(); i < mTextures.end(); i++)
-		(*i)->Release();
+	for (std::vector<D3D11Texture>::iterator i = mTextures.begin(); i < mTextures.end(); i++)
+		i->Resource->Release();
 	mTextures.clear();
 
 	mFreeIndexList.clear();
@@ -123,7 +123,7 @@ bool D3D11Renderer::Update() {
 			// render states for every object, but this will work until a 
 			// proper material system can be put into place.
 			if (mMeshComponents.At(x).TextureId != -1)
-				mTextureMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[mMeshComponents.At(x).TextureId]);
+				mTextureMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[mMeshComponents.At(x).TextureId].Resource);
 			else
 				mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 
@@ -152,11 +152,11 @@ bool D3D11Renderer::Update() {
 
 			if (spriteComponent.Mode == spriteComponent.SHEET) {
 				const SpriteSheet& spriteSheet = mSpriteSheets[spriteComponent.SpriteSheet];
-				mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture],
-					1, spriteComponent.Index, spriteSheet.SliceSizeX, spriteSheet.SliceSizeY, spriteSheet.Width, spriteSheet.Height);
+				mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture].Resource,
+					1, spriteComponent.Index, spriteSheet.SliceSizeX, spriteSheet.SliceSizeY, mTextures[spriteComponent.Texture].Width, mTextures[spriteComponent.Texture].Height);
 			}
 			else
-				mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture],
+				mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture].Resource,
 				0, 0, 0, 0, 0, 0);
 
 			mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
@@ -412,26 +412,45 @@ VertexBufferHandle D3D11Renderer::CreatePyramid(float base, float height)
 U32 D3D11Renderer::LoadTexture(std::string filename)
 {
 	HRESULT result;
-	I16 nextIndex = mTextures.size();
-	ID3D11ShaderResourceView* temp = nullptr;
+	TextureHandle index = mTextures.size();
+	D3D11_TEXTURE2D_DESC textureDesc;
+	ID3D11Resource* resource = nullptr;
+	D3D11Texture texture;
+	ID3D11Texture2D* texture2d = nullptr;
 
-	result = D3DX11CreateShaderResourceViewFromFile(mD3d.GetDevice(), filename.c_str(), NULL, NULL, &temp, NULL);
+	result = D3DX11CreateShaderResourceViewFromFile(mD3d.GetDevice(), filename.c_str(), NULL, NULL, &texture.Resource, NULL);
 
 	if (FAILED(result))
 		return -1;
 
+	texture.Resource->GetResource(&resource);
+	result = resource->QueryInterface(&texture2d);
+
+	if (FAILED(result))
+		return -1;
+
+	texture2d->GetDesc(&textureDesc);
+
+
+	texture.Filename = filename;
+	texture.Height = textureDesc.Height;
+	texture.Width = textureDesc.Width;
+
+	texture2d->Release();
+	resource->Release();
+
 	if (mTextureFreeList.size())
 	{
-		U32 index = mTextureFreeList.back();
-		mTextures[index] = temp;
+		index = mTextureFreeList.back();
+		mTextures[index] = texture;
 		mTextureFreeList.pop_back();
-		return index;
 	}
 	else
 	{
-		mTextures.push_back(temp);
-		return nextIndex;
+		mTextures.push_back(texture);
 	}
+
+	return index;
 }
 
 void D3D11Renderer::ReleaseTexture(U32 textureId)

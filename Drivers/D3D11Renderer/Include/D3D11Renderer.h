@@ -21,6 +21,11 @@
 namespace Monsoon {
 	namespace Renderer{
 
+		struct D3D11Texture : Texture
+		{
+			ID3D11ShaderResourceView* Resource;
+		};
+
 		class DRIVER D3D11Renderer : Renderer
 		{
 		public:
@@ -63,7 +68,7 @@ namespace Monsoon {
 			std::vector<D3D11VertexBuffer> mVertexBuffers;
 			std::vector<VertexBufferHandle> mFreeIndexList;
 
-			std::vector<ID3D11ShaderResourceView*> mTextures;
+			std::vector<D3D11Texture> mTextures;
 			std::vector<TextureHandle> mTextureFreeList;
 
 			std::vector<SpriteSheet> mSpriteSheets;

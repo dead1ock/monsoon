@@ -43,8 +43,6 @@ namespace Monsoon {
 		{
 			int SliceSizeX;
 			int SliceSizeY;
-			int Width;
-			int Height;
 		};
 
 		struct SpriteComponent
@@ -74,6 +72,13 @@ namespace Monsoon {
 		//
 		//
 		//
+
+		struct Texture
+		{
+			std::string Filename;
+			int Width;
+			int Height;
+		};
 
 		struct Camera
 		{
@@ -148,8 +153,9 @@ namespace Monsoon {
 			virtual VertexBufferHandle CreatePyramid(float base, float height) = 0;
 			virtual VertexBufferHandle CreateCylinder(U32 sections) = 0;
 
-			virtual U32 LoadTexture(std::string filename) = 0;
-			virtual void ReleaseTexture(U32 textureId) = 0;
+			virtual TextureHandle LoadTexture(std::string filename) = 0;
+			virtual void ReleaseTexture(TextureHandle textureHandle) = 0;
+			//virtual const Texture& GetTexture(TextureHandle textureHandle) = 0;
 
 			// Camera
 			virtual Camera& GetCamera() = 0;
