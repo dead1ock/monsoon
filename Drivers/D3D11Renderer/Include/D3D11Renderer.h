@@ -87,6 +87,7 @@ namespace Monsoon {
 			VertexBufferHandle mSpritePlane;
 
 			Scene::SpatialSystem* mSpatialSystem;
+			RendererSettings mSettings;
 		};
 	}
 }

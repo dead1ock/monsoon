@@ -184,7 +184,7 @@ void D3D11SpriteMaterial::Release()
 }
 
 void D3D11SpriteMaterial::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
-	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, int atlas, int index, int sliceSizeX, int sliceSizeY, int sheetWidth, int sheetHeight)
+	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, int index, int sliceSizeX, int sliceSizeY, int sheetWidth, int sheetHeight)
 {
 	//
 	// Map Material Inputs
@@ -207,7 +207,6 @@ void D3D11SpriteMaterial::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX 
 	dataPtr->world = worldMatrix;
 	dataPtr->view = viewMatrix;
 	dataPtr->projection = projectionMatrix;
-	dataPtr->atlas = atlas;
 
 	// Unlock Matrix cBuffer
 	deviceContext->Unmap(mMatrixBuffer, 0);

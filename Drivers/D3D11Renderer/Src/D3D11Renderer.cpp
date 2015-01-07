@@ -15,7 +15,8 @@ using namespace Monsoon::Renderer;
 D3D11Renderer::D3D11Renderer(RendererSettings& settings, Scene::SpatialSystem* spatialSystem)
 : Renderer(settings, spatialSystem),
   mSpatialSystem(spatialSystem),
-  mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen)
+  mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen),
+  mSettings(settings)
 {
 	mVertexBuffers.reserve(MONSOON_MAX_ENTITIES);
 	mTextures.reserve(1024);
@@ -136,7 +137,20 @@ bool D3D11Renderer::Update() {
 		if (auto component = mSpatialSystem->GetComponent(mSpriteComponents.IndexToId(x)))
 		{
 			const Scene::SpatialComponent& spatialComponent = *component;
-			const SpriteComponent& spriteComponent = mSpriteComponents[x];
+			const SpriteComponent& spriteComponent = mSpriteComponents[mSpriteComponents.IndexToId(x)];
+			const Texture& spriteTexture = mTextures[spriteComponent.Texture];
+			SpriteSheet spriteSheet;
+
+			if (spriteComponent.Mode == spriteComponent.SHEET)
+			{
+				spriteSheet = mSpriteSheets[spriteComponent.SpriteSheet];
+			}
+			else
+			{
+				spriteSheet = SpriteSheet();
+				spriteSheet.SliceSizeX = spriteTexture.Width;
+				spriteSheet.SliceSizeY = spriteTexture.Height;
+			}
 
 			D3DXMatrixIdentity(&worldMatrix);
 			D3DXMatrixIdentity(&translation);
@@ -145,19 +159,12 @@ bool D3D11Renderer::Update() {
 
 			D3DXMatrixTranslation(&translation, spatialComponent.x, spatialComponent.y, spatialComponent.z);
 			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
-			D3DXMatrixScaling(&scale, spatialComponent.scaleX, spatialComponent.scaleY, spatialComponent.scaleZ);
+			D3DXMatrixScaling(&scale, (spatialComponent.scaleX * spriteSheet.SliceSizeX), (spatialComponent.scaleY * spriteSheet.SliceSizeY), spatialComponent.scaleZ);
 
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
-
-			if (spriteComponent.Mode == spriteComponent.SHEET) {
-				const SpriteSheet& spriteSheet = mSpriteSheets[spriteComponent.SpriteSheet];
-				mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture].Resource,
-					1, spriteComponent.Index, spriteSheet.SliceSizeX, spriteSheet.SliceSizeY, mTextures[spriteComponent.Texture].Width, mTextures[spriteComponent.Texture].Height);
-			}
-			else
-				mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture].Resource,
-				0, 0, 0, 0, 0, 0);
+			
+			mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture].Resource, spriteComponent.Index, spriteSheet.SliceSizeX, spriteSheet.SliceSizeY, mTextures[spriteComponent.Texture].Width, mTextures[spriteComponent.Texture].Height);
 
 			mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
 		}

@@ -21,7 +21,7 @@ namespace Monsoon {
 			void Release();
 			void Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
 				D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, 
-				int atlas, int index, int sliceSizeX, int sliceSizeY, int sheetWidth, int sheetHeight);
+				int index, int sliceSizeX, int sliceSizeY, int sheetWidth, int sheetHeight);
 
 		private:
 			struct MatrixBufferType
@@ -29,8 +29,6 @@ namespace Monsoon {
 				D3DXMATRIX world;
 				D3DXMATRIX view;
 				D3DXMATRIX projection;
-				int atlas;
-				long long padding;
 			};
 
 			struct SpriteSheetType
