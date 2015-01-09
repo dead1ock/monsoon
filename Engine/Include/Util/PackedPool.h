@@ -7,6 +7,7 @@
 #define _MONSOON_PACKED_POOL_H_
 
 #include <vector>
+#include <functional>
 
 #define DEFAULT_MAX_POOL_SIZE 4096
 
@@ -78,6 +79,20 @@ namespace Monsoon {
 
 			inline Id IndexToId(Index index) {
 				return (mPackedObjects[index].second);
+			}
+
+			inline void Sort(std::function<bool (const Object&, const Object&)> func)
+			{
+				// Sort packed objects.
+				std::sort(mPackedObjects.begin(), mPackedObjects.end(), [&func](std::pair<Object, Id> a, std::pair <Object, Id> b) -> bool {
+					return func(a.first, b.first);
+				});
+
+				// Rebuild index table.
+				int x = 0;
+				std::for_each(mPackedObjects.begin(), mPackedObjects.end(), [&x, this](const std::pair<Object, Id>& item) {
+					mIndexTable[item.second] = x++;
+				});
 			}
 
 		private:

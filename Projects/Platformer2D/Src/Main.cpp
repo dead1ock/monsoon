@@ -90,6 +90,13 @@ protected:
 		// Spawn Objects
 		//
 
+		// Background
+		SpriteComponent backgroundSprite;
+		backgroundSprite.Texture = mBackgroundTexture;
+		backgroundSprite.ZOrder = 2;
+		mRenderer->AttachSpriteComponent(mBackground, backgroundSprite);
+		mSpatialSystem.AttachComponent(mBackground, SpatialComponent());
+
 		// Forground Tiles
 		SpriteComponent tiles[3];
 		tiles[0].Texture = mTileTextures[13];
@@ -177,11 +184,6 @@ protected:
 		mSpatialSystem.AttachComponent(mTrees[0], treePositions[0]);
 		mSpatialSystem.AttachComponent(mTrees[1], treePositions[1]);
 	
-		// Background
-		SpriteComponent backgroundSprite;
-		backgroundSprite.Texture = mBackgroundTexture;
-		mRenderer->AttachSpriteComponent(mBackground, backgroundSprite);
-		mSpatialSystem.AttachComponent(mBackground, SpatialComponent());
 	}
 
 	void OnUpdate() {
