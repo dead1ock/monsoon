@@ -14,6 +14,7 @@
 #include "Event\EventManager.h"
 #include "Platform\Clock.h"
 #include "Resource\ResourceManager.h"
+#include <Platform/Log.h>
 #include <Scene/SpatialSystem.h>
 
 namespace Monsoon {
@@ -48,6 +49,7 @@ namespace Monsoon {
 		Platform::Clock mGameClock;
 		Scene::SpatialSystem mSpatialSystem;
 		Resource::ResourceManager mResourceManager;
+		Platform::Log mLog;
 
 	private:
 		/**

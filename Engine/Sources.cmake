@@ -15,6 +15,7 @@ SET(MODULE_SRC
 	Include/Platform/DynLib.h
 	Include/Platform/Endianness.h
 	Include/Platform/Export.h
+	Include/Platform/Log.h
 	Include/Platform/Platform.h
 	Include/Platform/Predef.h
 	Include/Platform/Types.h
@@ -32,6 +33,7 @@ SET(MODULE_SRC
 	Src/Event/EventManager.cpp
 	Src/Math/AABB.cpp
 	Src/Platform/Clock.cpp
+	Src/Platform/Log.cpp
 	Src/Resource/ResourceManager.cpp
 	Src/Scene/SpatialSystem.cpp
 	)
@@ -62,6 +64,7 @@ SOURCE_GROUP(Renderer "Renderer/*")
 SOURCE_GROUP(Scene "Scene/*")
 SOURCE_GROUP(Util "Util/*")
 SOURCE_GROUP(ECS "ECS/*")
+SOURCE_GROUP(Log "Log/*")
 SOURCE_GROUP(Math "Math/*")
 SOURCE_GROUP(Event "Event/*")
 SOURCE_GROUP(Resource "Resource/*")

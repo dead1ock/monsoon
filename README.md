@@ -13,7 +13,9 @@ An open source real-time simulation framework (game engine).
 * DirectX 11
 
 ##Samples
-* Primitives: Renders a cube, pyramid, and sphere, on a plane, with the camera rotating around the center.
+* Primitives
 
-##Demos
-* Asteroids: Yet another Asteroids clone.
+##Demo Projects
+* Asteroids
+* InsectContainerOpt
+* Platformer2D
