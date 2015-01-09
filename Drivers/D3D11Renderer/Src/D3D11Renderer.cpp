@@ -133,6 +133,7 @@ bool D3D11Renderer::Update() {
 	}
 
 	// Render 2d Sprites
+	TextureHandle currentTexture = -1;
 	for (int x = 0; x < mSpriteComponents.Size(); x++) {
 		if (auto component = mSpatialSystem->GetComponent(mSpriteComponents.IndexToId(x)))
 		{
@@ -163,8 +164,15 @@ bool D3D11Renderer::Update() {
 
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
+
+			// Check for texture change.
+			if (currentTexture != spriteComponent.Texture)
+			{
+				currentTexture = spriteComponent.Texture;
+				mSpriteMaterial.SetTexture(mD3d.GetContext(), mTextures[spriteComponent.Texture].Resource);
+			}
 			
-			mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mTextures[spriteComponent.Texture].Resource, spriteComponent.Index, spriteSheet.SliceSizeX, spriteSheet.SliceSizeY, mTextures[spriteComponent.Texture].Width, mTextures[spriteComponent.Texture].Height);
+			mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, spriteComponent.Index, spriteSheet.SliceSizeX, spriteSheet.SliceSizeY, mTextures[spriteComponent.Texture].Width, mTextures[spriteComponent.Texture].Height);
 
 			mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
 		}
@@ -213,6 +221,12 @@ void D3D11Renderer::DetachMeshComponent(Monsoon::Entity entity)
 void D3D11Renderer::AttachSpriteComponent(Monsoon::Entity entity, SpriteComponent& component)
 {
 	mSpriteComponents.Add(entity, component);
+	mSpriteComponents.Sort([](SpriteComponent a, SpriteComponent b) -> bool {
+		if (a.ZOrder == b.ZOrder)
+			return (a.Texture < b.Texture);
+		else
+			return (a.ZOrder < b.ZOrder);
+	});
 }
 
 void D3D11Renderer::DetachSpriteComponent(Monsoon::Entity entity)
@@ -462,6 +476,7 @@ U32 D3D11Renderer::LoadTexture(std::string filename)
 
 void D3D11Renderer::ReleaseTexture(U32 textureId)
 {
+	mTextures[textureId].Resource->Release();
 	mTextures.erase(mTextures.begin() + textureId);
 	mTextureFreeList.push_back(textureId);
 }

@@ -183,8 +183,13 @@ void D3D11SpriteMaterial::Release()
 		mVertexShader->Release();
 }
 
+void D3D11SpriteMaterial::SetTexture(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* texture)
+{
+	deviceContext->PSSetShaderResources(0, 1, &texture);
+}
+
 void D3D11SpriteMaterial::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
-	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, int index, int sliceSizeX, int sliceSizeY, int sheetWidth, int sheetHeight)
+	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, int index, int sliceSizeX, int sliceSizeY, int sheetWidth, int sheetHeight)
 {
 	//
 	// Map Material Inputs
@@ -228,7 +233,6 @@ void D3D11SpriteMaterial::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX 
 
 	deviceContext->VSSetConstantBuffers(0, 1, &mMatrixBuffer);
 	deviceContext->VSSetConstantBuffers(1, 1, &mSpriteSheetBuffer);
-	deviceContext->PSSetShaderResources(0, 1, &texture);
 
 	//
 	// Render the material.

@@ -19,8 +19,9 @@ namespace Monsoon {
 
 			bool Load(ID3D11Device* device, HWND windowHandle);
 			void Release();
+			void SetTexture(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* texture);
 			void Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
-				D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, 
+				D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,  
 				int index, int sliceSizeX, int sliceSizeY, int sheetWidth, int sheetHeight);
 
 		private:
