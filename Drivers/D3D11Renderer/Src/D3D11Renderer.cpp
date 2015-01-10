@@ -270,12 +270,14 @@ VertexBufferHandle D3D11Renderer::CreatePlane(float width, float height) {
 	vertices[3].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 	vertices[3].SetUV(1.0f, 1.0f);
 
-	unsigned int indices[6] = {
+	unsigned int indices[12] = {
 		0, 1, 2,
-		0, 2, 3
+		0, 2, 3,
+		2, 1, 0,
+		3, 2, 0
 	};
 
-	return CreateVertexBuffer(vertices, 4, indices, 6);
+	return CreateVertexBuffer(vertices, 4, indices, 12);
 }
 
 VertexBufferHandle D3D11Renderer::CreateCylinder(U32 sections) {
