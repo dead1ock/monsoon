@@ -26,7 +26,7 @@ class Platformer2DApp : public Application
 public:
 	Platformer2DApp()
 		: Application((Monsoon::Renderer::Renderer*)(new D3D11Renderer(RendererSettings(), &mSpatialSystem))) {
-
+		mLastFrameChange = 0.0f;
 	}
 
 	~Platformer2DApp() {
@@ -60,6 +60,7 @@ protected:
 		mCrate = mEntityManager.CreateEntity();
 		mStone = mEntityManager.CreateEntity();
 		mTileset = mEntityManager.CreateEntity();
+		mCharacter = mEntityManager.CreateEntity();
 
 		//
 		// Load Textures
@@ -90,19 +91,23 @@ protected:
 		mStoneTexture = mRenderer->LoadTexture("Textures/Object/Stone.dds");
 		mCrateTexture = mRenderer->LoadTexture("Textures/Object/Crate.dds");
 		mTilesetTexture = mRenderer->LoadTexture("Textures/Tiles/Tileset.dds");
+		mCharacterTexture = mRenderer->LoadTexture("Character/character.dds");
 
 		//
 		// Create Atlas Sheets
 		//
-		AtlasSheet groundTileAtlas;
-		AtlasSprite groundTileAtlasSprite;
-		groundTileAtlasSprite.spriteWidth = 192.0f/3;
-		groundTileAtlasSprite.spriteHeight = 192.0f/3;
-		groundTileAtlasSprite.uOffset = 0.0f;
-		groundTileAtlasSprite.vOffset = 0.67f;
-		groundTileAtlas.SrcRects.push_back(groundTileAtlasSprite);
+		AtlasSheet characterAtlasSheet;
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(2.0f / 2660.0f, 2.0f / 1553.0f, 440.0f, 730.0f)); // Run (frame 1)
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(444.0f / 2660.0f, 2.0f / 1553.0f, 440.0f, 716.0f)); // Run (frame 2)
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(886.0f / 2660.0f, 2.0f / 1553.0f, 440.0f, 726.0f)); // Run (frame 3)
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(1328.0f / 2660.0f, 2.0f / 1553.0f, 440.0f, 744.0f)); // Run (frame 4)
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(1770.0f / 2660.0f, 2.0f / 1553.0f, 446.0f, 747.0f)); // Run (frame 5)
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(2218.0f / 2660.0f, 2.0f / 1553.0f, 440.0f, 735.0f)); // Run (frame 6)
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(510.0f / 2660.0f, 751.0f / 1553.0f, 462.0f, 684.0f)); // Idle 1
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(974.0f / 2660.0f, 751.0f/ 1553.0f, 468.0f, 674.0f)); // Idle 2
 
-		mTilesetAtlas = mRenderer->CreateAtlasSheet(groundTileAtlas);
+		mCharacterAtlas = mRenderer->CreateAtlasSheet(characterAtlasSheet);
+
 
 		//
 		// Spawn Objects
@@ -134,21 +139,7 @@ protected:
 		mSpatialSystem.AttachComponent(mTiles[2], tilePositions[2]);
 
 		// Ground Tiles
-		//
-		//
-		//
-		SpriteComponent tilesetSprite;
-		SpatialComponent tilesetPosition;
-		tilesetSprite.Mode = tilesetSprite.ATLAS;
-		tilesetSprite.Texture = mTilesetTexture;
-		tilesetSprite.AtlasSheet = mTilesetAtlas;
-		tilesetPosition.y -= 300.0f;
-
-		mRenderer->AttachSpriteComponent(mTileset, tilesetSprite);
-		mSpatialSystem.AttachComponent(mTileset, tilesetPosition);
-		//
-		//
-		//
+		
 		SpriteComponent groundTileSprites[12];
 		for (int x = 0; x < 12; x++)
 			groundTileSprites[x].Texture = mTileTextures[1];
@@ -206,6 +197,7 @@ protected:
 		treeComponents[0].Texture = mTreeTextures[0];
 		treeComponents[1].Texture = mTreeTextures[1];
 		treeComponents[1].ZOrder = 1;
+		treeComponents[0].ZOrder = 1;
 
 		SpatialComponent treePositions[2];
 		treePositions[0].y = 180.0f;
@@ -217,6 +209,23 @@ protected:
 
 		mSpatialSystem.AttachComponent(mTrees[0], treePositions[0]);
 		mSpatialSystem.AttachComponent(mTrees[1], treePositions[1]);
+
+		// Character
+		SpriteComponent characterComponent;
+		characterComponent.Mode = characterComponent.ATLAS;
+		characterComponent.Texture = mCharacterTexture;
+		characterComponent.AtlasSheet = mCharacterAtlas;
+		characterComponent.AtlasIndex = 6;
+		characterComponent.ZOrder = -1;
+
+		SpatialComponent characterPosition;
+		characterPosition.x -= 800.0f;
+		characterPosition.y -= 305.0f;
+		characterPosition.scaleX = 0.10f;
+		characterPosition.scaleY = 0.10f;
+
+		mRenderer->AttachSpriteComponent(mCharacter, characterComponent);
+		mSpatialSystem.AttachComponent(mCharacter, characterPosition);
 	
 		mLog.Debug("Done.");
 	}
@@ -226,6 +235,53 @@ protected:
 		U16 leftKeyState = GetAsyncKeyState(VK_LEFT);
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
+
+		auto& characterSprite = mRenderer->GetSpriteComponent(mCharacter);
+		auto& characterPosition = *mSpatialSystem.GetComponent(mCharacter);
+
+		if (rightKeyState) {
+			if (characterPosition.scaleX < 0.0f)
+				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
+
+			if ((mGameClock.getTime() - mLastFrameChange) > 0.1f) {
+				characterSprite.AtlasIndex++;
+				mLastFrameChange = mGameClock.getTime();
+			}
+
+			if (characterSprite.AtlasIndex > 5)
+				characterSprite.AtlasIndex = 0;
+
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.x + (200.0f * mGameClock.getDeltaTime()), -305.0f, 0.0f);
+		}
+
+		if (leftKeyState) {
+			if (characterPosition.scaleX > 0.0f)
+				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
+
+			if ((mGameClock.getTime() - mLastFrameChange) > 0.1f) {
+				characterSprite.AtlasIndex--;
+				mLastFrameChange = mGameClock.getTime();
+			}
+
+			if (characterSprite.AtlasIndex < 0)
+				characterSprite.AtlasIndex = 5;
+
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.x - (200.0f * mGameClock.getDeltaTime()), -305.0f, 0.0f);
+		}
+
+		if (!leftKeyState && !rightKeyState) {
+			if (characterSprite.AtlasIndex < 6)
+				characterSprite.AtlasIndex = 6;
+
+			if ((mGameClock.getTime() - mLastFrameChange) > 0.7f) {
+				mLastFrameChange = mGameClock.getTime();
+
+				if (characterSprite.AtlasIndex == 6)
+					characterSprite.AtlasIndex = 7;
+				else
+					characterSprite.AtlasIndex = 6;
+			}
+		}
 
 	}
 
@@ -306,8 +362,12 @@ private:
 	Entity mCrystal;
 	Entity mStone;
 	Entity mTileset;
+	Entity mCharacter;
+
+	double mLastFrameChange;
 
 	AtlasSheetHandle mTilesetAtlas;
+	AtlasSheetHandle mCharacterAtlas;
 
 	TextureHandle mBackgroundTexture;
 	TextureHandle mTileTextures[18];
@@ -316,6 +376,7 @@ private:
 	TextureHandle mStoneTexture;
 	TextureHandle mCrateTexture;
 	TextureHandle mTilesetTexture;
+	TextureHandle mCharacterTexture;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow) {
