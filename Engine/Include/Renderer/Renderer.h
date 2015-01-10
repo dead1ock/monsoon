@@ -48,6 +48,15 @@ namespace Monsoon {
 				spriteWidth = 0.0f;
 				spriteHeight = 0.0f;
 			}
+
+			AtlasSprite(float u, float v, float width, float height)
+			{
+				uOffset = u;
+				vOffset = v;
+				spriteWidth = width;
+				spriteHeight = height;
+			}
+
 			float uOffset;
 			float vOffset;
 			float spriteWidth;
