@@ -36,6 +36,7 @@ public:
 protected:
 
 	void OnInitialize() {
+		mLog.Debug("Initializing Renderer...");
 		mRenderer->GetCamera().z = -1.0f;
 		mRenderer->GetCamera().mode = mRenderer->GetCamera().ORTHOGRAPHIC;
 		mRenderer->GetCamera().orthoWidth = 1800;
@@ -44,6 +45,7 @@ protected:
 		//
 		// Create Scene Entities
 		//
+		mLog.Debug("Creating Entities...");
 		mBackground = mEntityManager.CreateEntity();
 		mTiles[0] = mEntityManager.CreateEntity();
 		mTiles[1] = mEntityManager.CreateEntity();
@@ -57,10 +59,12 @@ protected:
 		mCrystal = mEntityManager.CreateEntity();
 		mCrate = mEntityManager.CreateEntity();
 		mStone = mEntityManager.CreateEntity();
+		mTileset = mEntityManager.CreateEntity();
 
 		//
 		// Load Textures
 		//
+		mLog.Debug("Loading Textures...");
 		mBackgroundTexture = mRenderer->LoadTexture("Textures/BG/BG.dds");
 		mTileTextures[0] = mRenderer->LoadTexture("Textures/Tiles/1.dds");
 		mTileTextures[1] = mRenderer->LoadTexture("Textures/Tiles/2.dds");
@@ -85,11 +89,25 @@ protected:
 		mCrystalTexture = mRenderer->LoadTexture("Textures/Object/Crystal.dds");
 		mStoneTexture = mRenderer->LoadTexture("Textures/Object/Stone.dds");
 		mCrateTexture = mRenderer->LoadTexture("Textures/Object/Crate.dds");
+		mTilesetTexture = mRenderer->LoadTexture("Textures/Tiles/Tileset.dds");
+
+		//
+		// Create Atlas Sheets
+		//
+		AtlasSheet groundTileAtlas;
+		AtlasSprite groundTileAtlasSprite;
+		groundTileAtlasSprite.spriteWidth = 192.0f/3;
+		groundTileAtlasSprite.spriteHeight = 192.0f/3;
+		groundTileAtlasSprite.uOffset = 0.0f;
+		groundTileAtlasSprite.vOffset = 0.67f;
+		groundTileAtlas.SrcRects.push_back(groundTileAtlasSprite);
+
+		mTilesetAtlas = mRenderer->CreateAtlasSheet(groundTileAtlas);
 
 		//
 		// Spawn Objects
 		//
-
+		mLog.Debug("Creating Sprites...");
 		// Background
 		SpriteComponent backgroundSprite;
 		backgroundSprite.Texture = mBackgroundTexture;
@@ -116,6 +134,21 @@ protected:
 		mSpatialSystem.AttachComponent(mTiles[2], tilePositions[2]);
 
 		// Ground Tiles
+		//
+		//
+		//
+		SpriteComponent tilesetSprite;
+		SpatialComponent tilesetPosition;
+		tilesetSprite.Mode = tilesetSprite.ATLAS;
+		tilesetSprite.Texture = mTilesetTexture;
+		tilesetSprite.AtlasSheet = mTilesetAtlas;
+		tilesetPosition.y -= 300.0f;
+
+		mRenderer->AttachSpriteComponent(mTileset, tilesetSprite);
+		mSpatialSystem.AttachComponent(mTileset, tilesetPosition);
+		//
+		//
+		//
 		SpriteComponent groundTileSprites[12];
 		for (int x = 0; x < 12; x++)
 			groundTileSprites[x].Texture = mTileTextures[1];
@@ -162,7 +195,7 @@ protected:
 		stoneSprite.Texture = mStoneTexture;
 
 		SpatialComponent stonePosition;
-		stonePosition.x = -800.0f;
+		stonePosition.x = -550.0f;
 		stonePosition.y = -300.0f;
 
 		mRenderer->AttachSpriteComponent(mStone, stoneSprite);
@@ -172,6 +205,7 @@ protected:
 		SpriteComponent treeComponents[2];
 		treeComponents[0].Texture = mTreeTextures[0];
 		treeComponents[1].Texture = mTreeTextures[1];
+		treeComponents[1].ZOrder = 1;
 
 		SpatialComponent treePositions[2];
 		treePositions[0].y = 180.0f;
@@ -184,6 +218,7 @@ protected:
 		mSpatialSystem.AttachComponent(mTrees[0], treePositions[0]);
 		mSpatialSystem.AttachComponent(mTrees[1], treePositions[1]);
 	
+		mLog.Debug("Done.");
 	}
 
 	void OnUpdate() {
@@ -270,6 +305,9 @@ private:
 	Entity mCrate;
 	Entity mCrystal;
 	Entity mStone;
+	Entity mTileset;
+
+	AtlasSheetHandle mTilesetAtlas;
 
 	TextureHandle mBackgroundTexture;
 	TextureHandle mTileTextures[18];
@@ -277,6 +315,7 @@ private:
 	TextureHandle mCrystalTexture;
 	TextureHandle mStoneTexture;
 	TextureHandle mCrateTexture;
+	TextureHandle mTilesetTexture;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow) {

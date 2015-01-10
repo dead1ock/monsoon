@@ -50,8 +50,8 @@ namespace Monsoon {
 			}
 			float uOffset;
 			float vOffset;
-			int spriteWidth;
-			int spriteHeight;
+			float spriteWidth;
+			float spriteHeight;
 		};
 
 		struct AtlasSheet

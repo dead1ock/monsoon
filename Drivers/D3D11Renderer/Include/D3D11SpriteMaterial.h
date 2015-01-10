@@ -34,8 +34,8 @@ namespace Monsoon {
 
 			struct AtlasBuffer
 			{
-				int srcWidth;
-				int srcHeight;
+				float srcWidth;
+				float srcHeight;
 				float srcU;
 				float srcV;
 			};
