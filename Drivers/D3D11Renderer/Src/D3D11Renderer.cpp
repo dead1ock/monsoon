@@ -134,23 +134,30 @@ bool D3D11Renderer::Update() {
 
 	// Render 2d Sprites
 	TextureHandle currentTexture = -1;
+	float uOffset, vOffset = 0.0f;
+	float spriteWidth, spriteHeight = 0.0f;
+
 	for (int x = 0; x < mSpriteComponents.Size(); x++) {
 		if (auto component = mSpatialSystem->GetComponent(mSpriteComponents.IndexToId(x)))
 		{
 			const Scene::SpatialComponent& spatialComponent = *component;
 			const SpriteComponent& spriteComponent = mSpriteComponents[mSpriteComponents.IndexToId(x)];
 			const Texture& spriteTexture = mTextures[spriteComponent.Texture];
-			SpriteSheet spriteSheet;
 
-			if (spriteComponent.Mode == spriteComponent.SHEET)
+			if (spriteComponent.Mode == spriteComponent.ATLAS)
 			{
-				spriteSheet = mSpriteSheets[spriteComponent.SpriteSheet];
+				AtlasSprite atlasSprite = mAtlasSheets[spriteComponent.AtlasSheet].SrcRects[spriteComponent.AtlasIndex];
+				spriteWidth = atlasSprite.spriteWidth;
+				spriteHeight = atlasSprite.spriteHeight;
+				uOffset = atlasSprite.uOffset;
+				vOffset = atlasSprite.vOffset;
 			}
 			else
 			{
-				spriteSheet = SpriteSheet();
-				spriteSheet.SliceSizeX = spriteTexture.Width;
-				spriteSheet.SliceSizeY = spriteTexture.Height;
+				uOffset = 0.0f;
+				vOffset = 0.0f;
+				spriteWidth = spriteTexture.Width;
+				spriteHeight = spriteTexture.Height;
 			}
 
 			D3DXMatrixIdentity(&worldMatrix);
@@ -160,8 +167,8 @@ bool D3D11Renderer::Update() {
 
 			D3DXMatrixTranslation(&translation, spatialComponent.x, spatialComponent.y, spatialComponent.z);
 			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
-			D3DXMatrixScaling(&scale, (spatialComponent.scaleX * spriteSheet.SliceSizeX), (spatialComponent.scaleY * spriteSheet.SliceSizeY), spatialComponent.scaleZ);
 
+			D3DXMatrixScaling(&scale, spatialComponent.scaleX * spriteWidth, spatialComponent.scaleY * spriteHeight, spatialComponent.scaleZ);
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
 
@@ -172,8 +179,10 @@ bool D3D11Renderer::Update() {
 				mSpriteMaterial.SetTexture(mD3d.GetContext(), mTextures[spriteComponent.Texture].Resource);
 			}
 			
-			mSpriteMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, spriteComponent.Index, spriteSheet.SliceSizeX, spriteSheet.SliceSizeY, mTextures[spriteComponent.Texture].Width, mTextures[spriteComponent.Texture].Height);
+			mSpriteMaterial.SetAtlasBuffer(mD3d.GetContext(), spriteWidth, spriteHeight, vOffset, vOffset);
+			mSpriteMaterial.SetMatrixBuffer(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 
+			mSpriteMaterial.Render(mD3d.GetContext());
 			mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
 		}
 	}
@@ -481,25 +490,25 @@ void D3D11Renderer::ReleaseTexture(U32 textureId)
 	mTextureFreeList.push_back(textureId);
 }
 
-SpriteSheetHandle D3D11Renderer::CreateSpriteSheet(SpriteSheet sheet)
+AtlasSheetHandle D3D11Renderer::CreateAtlasSheet(AtlasSheet sheet)
 {
-	SpriteSheetHandle index = mSpriteSheets.size();
-	if (mSpriteSheetFreeList.size())
+	AtlasSheetHandle index = mAtlasSheets.size();
+	if (mAtlasSheetFreeList.size())
 	{
-		index = mSpriteSheetFreeList.back();
-		mSpriteSheets[index] = sheet;
-		mSpriteSheetFreeList.pop_back();
+		index = mAtlasSheetFreeList.back();
+		mAtlasSheets[index] = sheet;
+		mAtlasSheetFreeList.pop_back();
 	}
 	else
 	{
 		
-		mSpriteSheets.push_back(sheet);
+		mAtlasSheets.push_back(sheet);
 	}
 	return index;
 }
 
-void D3D11Renderer::ReleaseSpriteSheet(SpriteSheetHandle sheet)
+void D3D11Renderer::ReleaseAtlasSheet(AtlasSheetHandle sheet)
 {
-	mSpriteSheets.erase(mSpriteSheets.begin() + sheet);
-	mSpriteSheetFreeList.push_back(sheet);
+	mAtlasSheets.erase(mAtlasSheets.begin() + sheet);
+	mAtlasSheetFreeList.push_back(sheet);
 }

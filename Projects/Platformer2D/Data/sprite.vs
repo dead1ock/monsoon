@@ -13,15 +13,6 @@ cbuffer MatrixBuffer
     matrix projectionMatrix;
 };
 
-cbuffer SpriteSheetBuffer
-{
-	int index;
-	int sliceSizeX;
-	int sliceSizeY;
-	int sheetWidth;
-	int sheetHeight;
-};
-
 //////////////
 // TYPEDEFS //
 //////////////
@@ -43,7 +34,7 @@ struct PixelInputType
 PixelInputType SpriteVertexShader(VertexInputType input)
 {
     PixelInputType output;
-
+	
     // Change the position vector to be 4 units for proper matrix calculations.
     input.position.w = 1.0f;
 
@@ -52,11 +43,8 @@ PixelInputType SpriteVertexShader(VertexInputType input)
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
 
-	 // Store the texture coordinates for the pixel shader.
-	int slicesX = sheetWidth / sliceSizeX;
-	int slicesY = sheetHeight / sliceSizeY;
-		
-	output.tex = float2((input.tex.x / slicesX) + (((sheetWidth/slicesX) * float(index))/sheetWidth), (input.tex.y / slicesY) + (((sheetHeight/slicesY) * 0.0f)/sheetHeight));
-    
+	// Store the texture coordinates for the pixel shader.
+    output.tex = input.tex;
+	
     return output;
 }

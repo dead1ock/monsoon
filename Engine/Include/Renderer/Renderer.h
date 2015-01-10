@@ -19,7 +19,7 @@ namespace Monsoon {
 
 		typedef U32 VertexBufferHandle;
 		typedef U32 MaterialHandle;
-		typedef U32 SpriteSheetHandle;
+		typedef U32 AtlasSheetHandle;
 		typedef U32 TextureHandle;
 
 		//
@@ -39,34 +39,49 @@ namespace Monsoon {
 		//
 		// 2D Rendering
 		//
-		struct SpriteSheet
+		struct AtlasSprite
 		{
-			int SliceSizeX;
-			int SliceSizeY;
+			AtlasSprite()
+			{
+				uOffset = 0.0f;
+				vOffset = 0.0f;
+				spriteWidth = 0.0f;
+				spriteHeight = 0.0f;
+			}
+			float uOffset;
+			float vOffset;
+			int spriteWidth;
+			int spriteHeight;
+		};
+
+		struct AtlasSheet
+		{
+			std::vector<AtlasSprite> SrcRects;
 		};
 
 		struct SpriteComponent
 		{
 			// Specifies whether to render this sprite from a 
-			// single image source, or a slice from a 
-			// grid-algined sheet or atlas.
+			// single image source, or a slice from an atlas.
 			enum SpriteMode
 			{
 				SINGLE,
-				SHEET
+				ATLAS
 			};
 
 			SpriteComponent() {
 				Texture = -1;
-				SpriteSheet = -1;
+				AtlasSheet = -1;
 				Mode = SINGLE;
-				Index = 0;
+				AtlasIndex = 0;
+				ZOrder = 0;
 			}
 
 			SpriteMode Mode;
-			SpriteSheetHandle SpriteSheet;
+			AtlasSheetHandle AtlasSheet;
 			TextureHandle Texture;
-			int Index;
+			int AtlasIndex;
+			int ZOrder;
 		};
 
 		//
@@ -144,8 +159,8 @@ namespace Monsoon {
 			virtual void DetachSpriteComponent(Entity entity) = 0;
 			virtual SpriteComponent& GetSpriteComponent(Entity entity) = 0;
 
-			virtual SpriteSheetHandle CreateSpriteSheet(SpriteSheet sheet) = 0;
-			virtual void ReleaseSpriteSheet(SpriteSheetHandle sheet) = 0;
+			virtual AtlasSheetHandle CreateAtlasSheet(AtlasSheet sheet) = 0;
+			virtual void ReleaseAtlasSheet(AtlasSheetHandle sheet) = 0;
 
 			// Primitives
 			virtual VertexBufferHandle CreatePlane(float width, float height) = 0;

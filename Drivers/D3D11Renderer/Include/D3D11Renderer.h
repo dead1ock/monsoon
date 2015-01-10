@@ -57,8 +57,9 @@ namespace Monsoon {
 			U32 LoadTexture(std::string filename);
 			void ReleaseTexture(U32 textureId);
 
-			SpriteSheetHandle CreateSpriteSheet(SpriteSheet sheet);
-			void ReleaseSpriteSheet(SpriteSheetHandle sheet);
+			AtlasSheetHandle CreateAtlasSheet(AtlasSheet sheet);
+			AtlasSheetHandle CreateGridAtlasSheet(float slicesWidth, float slicesHeight, float srcWidth, float srcHeight);
+			void ReleaseAtlasSheet(AtlasSheetHandle sheet);
 
 			Camera& GetCamera() { return defaultCamera; }
 
@@ -71,8 +72,8 @@ namespace Monsoon {
 			std::vector<D3D11Texture> mTextures;
 			std::vector<TextureHandle> mTextureFreeList;
 
-			std::vector<SpriteSheet> mSpriteSheets;
-			std::vector<SpriteSheetHandle> mSpriteSheetFreeList;
+			std::vector<AtlasSheet> mAtlasSheets;
+			std::vector<AtlasSheetHandle> mAtlasSheetFreeList;
 
 			Camera defaultCamera;
 

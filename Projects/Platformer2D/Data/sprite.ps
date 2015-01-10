@@ -8,6 +8,14 @@
 Texture2D shaderTexture;
 SamplerState SampleType;
 
+cbuffer SpriteAtlasBuffer
+{
+	int srcWidth;
+	int srcHeight;
+	float srcU;
+	float srcV;
+}
+
 //////////////
 // TYPEDEFS //
 //////////////
@@ -22,13 +30,19 @@ struct PixelInputType
 ////////////////////////////////////////////////////////////////////////////////
 float4 SpritePixelShader(PixelInputType input) : SV_TARGET
 {
-    float4 textureColor;
+    float4 textureColor;	
+	uint textureWidth;
+	uint textureHeight;
+	
+	shaderTexture.GetDimensions(textureWidth, textureHeight);
+	
+	input.tex = float2((input.tex.x * (srcWidth/textureWidth)) + srcU, (input.tex.y * (srcHeight/textureHeight)) + srcV);
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
     textureColor = shaderTexture.Sample(SampleType, input.tex);
 	
 	clip(textureColor.a - 0.1f);
-
+	
     return textureColor;
 }
 
