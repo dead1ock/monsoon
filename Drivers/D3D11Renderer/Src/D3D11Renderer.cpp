@@ -179,7 +179,7 @@ bool D3D11Renderer::Update() {
 				mSpriteMaterial.SetTexture(mD3d.GetContext(), mTextures[spriteComponent.Texture].Resource);
 			}
 			
-			mSpriteMaterial.SetAtlasBuffer(mD3d.GetContext(), spriteWidth, spriteHeight, vOffset, vOffset);
+			mSpriteMaterial.SetAtlasBuffer(mD3d.GetContext(), spriteWidth, spriteHeight, uOffset, vOffset);
 			mSpriteMaterial.SetMatrixBuffer(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 
 			mSpriteMaterial.Render(mD3d.GetContext());
