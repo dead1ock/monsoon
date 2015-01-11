@@ -105,6 +105,8 @@ protected:
 		characterAtlasSheet.SrcRects.push_back(AtlasSprite(2218.0f / 2660.0f, 2.0f / 1553.0f, 440.0f, 735.0f)); // Run (frame 6)
 		characterAtlasSheet.SrcRects.push_back(AtlasSprite(510.0f / 2660.0f, 751.0f / 1553.0f, 462.0f, 684.0f)); // Idle 1
 		characterAtlasSheet.SrcRects.push_back(AtlasSprite(974.0f / 2660.0f, 751.0f/ 1553.0f, 468.0f, 674.0f)); // Idle 2
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(1981.0f / 2660.0f, 751.0f / 1553.0f, 451.0f, 759.0f)); // Jump Up
+		characterAtlasSheet.SrcRects.push_back(AtlasSprite(1444.0f / 2660.0f, 751.0f / 1553.0f, 535.0f, 727.0f)); // Jump Down
 
 		mCharacterAtlas = mRenderer->CreateAtlasSheet(characterAtlasSheet);
 
@@ -251,7 +253,7 @@ protected:
 			if (characterSprite.AtlasIndex > 5)
 				characterSprite.AtlasIndex = 0;
 
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.x + (200.0f * mGameClock.getDeltaTime()), -305.0f, 0.0f);
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.x + (200.0f * mGameClock.getDeltaTime()), characterPosition.y, 0.0f);
 		}
 
 		if (leftKeyState) {
@@ -266,22 +268,35 @@ protected:
 			if (characterSprite.AtlasIndex < 0)
 				characterSprite.AtlasIndex = 5;
 
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.x - (200.0f * mGameClock.getDeltaTime()), -305.0f, 0.0f);
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.x - (200.0f * mGameClock.getDeltaTime()), characterPosition.y, 0.0f);
 		}
 
-		if (!leftKeyState && !rightKeyState) {
-			if (characterSprite.AtlasIndex < 6)
+		if (upKeyState)
+		{
+			characterSprite.AtlasIndex = 8;
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.x, characterPosition.y + (400.0f * mGameClock.getDeltaTime()), 0.0f);
+		}
+		else if (characterPosition.y > -305.0f && !upKeyState) {
+			characterSprite.AtlasIndex = 9;
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.x, characterPosition.y - (500.0f * mGameClock.getDeltaTime()), 0.0f);
+		}
+		else if (characterPosition.y < -305.0f)
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.x, -305.0f, 0.0f);
+
+		if (!leftKeyState && !rightKeyState && !upKeyState && characterPosition.y == -305.0f) {
+			if (characterSprite.AtlasIndex != 6 && characterSprite.AtlasIndex != 7)
 				characterSprite.AtlasIndex = 6;
 
 			if ((mGameClock.getTime() - mLastFrameChange) > 0.7f) {
 				mLastFrameChange = mGameClock.getTime();
 
-				if (characterSprite.AtlasIndex == 6)
-					characterSprite.AtlasIndex = 7;
-				else
+				if (characterSprite.AtlasIndex != 6)
 					characterSprite.AtlasIndex = 6;
+				else
+					characterSprite.AtlasIndex = 7;
 			}
 		}
+
 
 	}
 
