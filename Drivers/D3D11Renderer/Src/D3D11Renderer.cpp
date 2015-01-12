@@ -165,7 +165,7 @@ bool D3D11Renderer::Update() {
 			D3DXMatrixIdentity(&rotation);
 			D3DXMatrixIdentity(&scale);
 
-			D3DXMatrixTranslation(&translation, spatialComponent.x, spatialComponent.y, spatialComponent.z);
+			D3DXMatrixTranslation(&translation, spatialComponent.x, spatialComponent.y, spriteComponent.ZOrder);
 			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
 
 			D3DXMatrixScaling(&scale, spatialComponent.scaleX * spriteWidth, spatialComponent.scaleY * spriteHeight, spatialComponent.scaleZ);
