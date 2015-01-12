@@ -119,7 +119,7 @@ protected:
 		// Background
 		SpriteComponent backgroundSprite;
 		backgroundSprite.Texture = mBackgroundTexture;
-		backgroundSprite.ZOrder = 2;
+		backgroundSprite.ZOrder = 4;
 		mRenderer->AttachSpriteComponent(mBackground, backgroundSprite);
 		mSpatialSystem.AttachComponent(mBackground, SpatialComponent());
 
@@ -219,7 +219,7 @@ protected:
 		characterComponent.Texture = mCharacterTexture;
 		characterComponent.AtlasSheet = mCharacterAtlas;
 		characterComponent.AtlasIndex = 6;
-		characterComponent.ZOrder = -1;
+		characterComponent.ZOrder = 0;
 
 		SpatialComponent characterPosition;
 		characterPosition.x -= 800.0f;
@@ -304,6 +304,10 @@ protected:
 					characterSprite.AtlasIndex = 7;
 			}
 		}
+
+		mRenderer->GetCamera().x = characterPosition.x + 400.0f;
+		mRenderer->GetCamera().lookAtX = characterPosition.x + 400.0f;
+		mSpatialSystem.SetPosition(mBackground, characterPosition.x + 400.0f, 0.0f, 0.0f);
 
 
 	}

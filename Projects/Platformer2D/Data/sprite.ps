@@ -31,8 +31,8 @@ struct PixelInputType
 float4 SpritePixelShader(PixelInputType input) : SV_TARGET
 {
     float4 textureColor;	
-	uint textureWidth;
-	uint textureHeight;
+	float textureWidth;
+	float textureHeight;
 	
 	shaderTexture.GetDimensions(textureWidth, textureHeight);
 	
