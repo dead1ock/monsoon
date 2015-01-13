@@ -113,6 +113,34 @@ protected:
 
 
 		//
+		// Create Sprite Animations
+		//
+		mLog.Debug("Creating Animations...");
+		std::vector<SpriteAnimationFrame> idleFrames;
+		idleFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 6));
+		idleFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 7));
+
+		std::vector<SpriteAnimationFrame> runFrames;
+		runFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 0));
+		runFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 1));
+		runFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 2));
+		runFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 3));
+		runFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 4));
+		runFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 5));
+
+		std::vector<SpriteAnimationFrame> jumpUpFrames;
+		jumpUpFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 8));
+
+		std::vector<SpriteAnimationFrame> jumpDownFrames;
+		jumpDownFrames.push_back(SpriteAnimationFrame(mCharacterTexture, mCharacterAtlas, 9));
+
+		mIdleAnimation = mAnimationSystem.CreateAnimation2d(SpriteAnimation("characterIdle", 1.5f, idleFrames));
+		mRunAnimation = mAnimationSystem.CreateAnimation2d(SpriteAnimation("characterRun", 8.0f, runFrames));
+		mJumpUpAnimation = mAnimationSystem.CreateAnimation2d(SpriteAnimation("characterJumpUp", 1.0f, jumpUpFrames));
+		mJumpDownAnimation = mAnimationSystem.CreateAnimation2d(SpriteAnimation("characterJumpDown", 1.0f, jumpDownFrames));
+
+
+		//
 		// Spawn Objects
 		//
 		mLog.Debug("Creating Sprites...");
@@ -246,14 +274,7 @@ protected:
 			if (characterPosition.scaleX < 0.0f)
 				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
 
-			if ((mGameClock.getTime() - mLastFrameChange) > 0.1f) {
-				characterSprite.AtlasIndex++;
-				mLastFrameChange = mGameClock.getTime();
-			}
-
-			if (characterSprite.AtlasIndex > 5)
-				characterSprite.AtlasIndex = 0;
-
+			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
 			mSpatialSystem.SetPosition(mCharacter, characterPosition.x + (200.0f * mGameClock.getDeltaTime()), characterPosition.y, 0.0f);
 		}
 
@@ -261,14 +282,7 @@ protected:
 			if (characterPosition.scaleX > 0.0f)
 				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
 
-			if ((mGameClock.getTime() - mLastFrameChange) > 0.1f) {
-				characterSprite.AtlasIndex--;
-				mLastFrameChange = mGameClock.getTime();
-			}
-
-			if (characterSprite.AtlasIndex < 0)
-				characterSprite.AtlasIndex = 5;
-
+			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
 			mSpatialSystem.SetPosition(mCharacter, characterPosition.x - (200.0f * mGameClock.getDeltaTime()), characterPosition.y, 0.0f);
 		}
 
@@ -279,12 +293,12 @@ protected:
 			}
 
 			if ((mGameClock.getTime() - mLastJump) < 0.25f) {
-				characterSprite.AtlasIndex = 8;
+				mAnimationSystem.Play2d(mCharacter, mJumpUpAnimation);
 				mSpatialSystem.SetPosition(mCharacter, characterPosition.x, characterPosition.y + (400.0f * mGameClock.getDeltaTime()), 0.0f);
 			}
 		}
 		if (characterPosition.y > -305.0f && (mGameClock.getTime() - mLastJump) > 0.25f) {
-			characterSprite.AtlasIndex = 9;
+			mAnimationSystem.Play2d(mCharacter, mJumpDownAnimation);
 			mSpatialSystem.SetPosition(mCharacter, characterPosition.x, characterPosition.y - (450.0f * mGameClock.getDeltaTime()), 0.0f);
 		}
 		else if (characterPosition.y < -305.0f) {
@@ -292,17 +306,7 @@ protected:
 		}
 
 		if (!leftKeyState && !rightKeyState && !upKeyState && characterPosition.y == -305.0f) {
-			if (characterSprite.AtlasIndex != 6 && characterSprite.AtlasIndex != 7)
-				characterSprite.AtlasIndex = 6;
-
-			if ((mGameClock.getTime() - mLastFrameChange) > 0.7f) {
-				mLastFrameChange = mGameClock.getTime();
-
-				if (characterSprite.AtlasIndex != 6)
-					characterSprite.AtlasIndex = 6;
-				else
-					characterSprite.AtlasIndex = 7;
-			}
+			mAnimationSystem.Play2d(mCharacter, mIdleAnimation);
 		}
 
 		mRenderer->GetCamera().x = characterPosition.x + 400.0f;
@@ -393,6 +397,11 @@ private:
 
 	double mLastFrameChange;
 	double mLastJump;
+
+	SpriteAnimationHandle mIdleAnimation;
+	SpriteAnimationHandle mRunAnimation;
+	SpriteAnimationHandle mJumpUpAnimation;
+	SpriteAnimationHandle mJumpDownAnimation;
 
 	AtlasSheetHandle mTilesetAtlas;
 	AtlasSheetHandle mCharacterAtlas;

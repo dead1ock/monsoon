@@ -20,6 +20,7 @@ SET(MODULE_SRC
 	Include/Platform/Predef.h
 	Include/Platform/Types.h
 	Include/Resource/ResourceManager.h
+	Include/Renderer/AnimationSystem.h
 	Include/Renderer/Renderer.h
 	Include/Renderer/RendererSettings.h
 	Include/Renderer/VertexBuffer.h
@@ -34,6 +35,7 @@ SET(MODULE_SRC
 	Src/Math/AABB.cpp
 	Src/Platform/Clock.cpp
 	Src/Platform/Log.cpp
+	Src/Renderer/AnimationSystem.cpp
 	Src/Resource/ResourceManager.cpp
 	Src/Scene/SpatialSystem.cpp
 	)
