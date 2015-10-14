@@ -28,6 +28,8 @@ namespace Monsoon {
 
 			void Allocate(ID3D11Device* device, VertexType vertices[], int vertexCount, unsigned int indicies[], int indexCount);
 			void Free();
+			int GetVertexCount() { return mVertexCount; }
+			int GetIndexCount() { return mIndexCount; }
 
 			void Render(ID3D11DeviceContext* deviceContext);
 

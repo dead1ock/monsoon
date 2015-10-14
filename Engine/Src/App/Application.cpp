@@ -20,6 +20,7 @@ namespace Monsoon {
 		, mEventManager()
 		, mEntityManager(&mEventManager)
 		, mSpatialSystem(&mEventManager)
+		, mAnimationSystem(&mGameClock, mRenderer)
 	{
 
 	}
@@ -56,6 +57,7 @@ namespace Monsoon {
 			// Update Sub-Systems.
 			mGameClock.Update();
 			quit = !mRenderer->Update();
+			mAnimationSystem.Update();
 			OnUpdate();
 		}
 		

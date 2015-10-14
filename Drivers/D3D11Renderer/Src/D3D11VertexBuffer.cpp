@@ -90,6 +90,4 @@ void D3D11VertexBuffer::Render(ID3D11DeviceContext* context) {
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	context->IASetVertexBuffers(0, 1, &mVertexBuffer, &stride, &offset);
 	context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	context->DrawIndexed(mIndexCount, 0, 0);
-	
 }

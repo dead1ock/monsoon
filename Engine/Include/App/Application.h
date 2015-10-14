@@ -10,6 +10,7 @@
 
 #include "Platform\DynLib.h"
 #include "Renderer\Renderer.h"
+#include <Renderer/AnimationSystem.h>
 #include "ECS\EntityManager.h"
 #include "Event\EventManager.h"
 #include "Platform\Clock.h"
@@ -50,6 +51,7 @@ namespace Monsoon {
 		Scene::SpatialSystem mSpatialSystem;
 		Resource::ResourceManager mResourceManager;
 		Platform::Log mLog;
+		Renderer::AnimationSystem mAnimationSystem;
 
 	private:
 		/**

@@ -120,6 +120,8 @@ bool D3D11Renderer::Update() {
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
 
+			mVertexBuffers[mMeshComponents.At(x).VertexBuffer].Render(mD3d.GetContext());
+			
 			// This is BAD BAD BAD, temporary code. We shouldn't be switching
 			// render states for every object, but this will work until a 
 			// proper material system can be put into place.
@@ -128,7 +130,7 @@ bool D3D11Renderer::Update() {
 			else
 				mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 
-			mVertexBuffers[mMeshComponents.At(x).VertexBuffer].Render(mD3d.GetContext());
+			mD3d.GetContext()->DrawIndexed(mVertexBuffers[mMeshComponents.At(x).VertexBuffer].GetIndexCount() , 0, 0);
 		}
 	}
 
@@ -136,6 +138,9 @@ bool D3D11Renderer::Update() {
 	TextureHandle currentTexture = -1;
 	float uOffset, vOffset = 0.0f;
 	float spriteWidth, spriteHeight = 0.0f;
+
+	mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
+	mSpriteMaterial.Render(mD3d.GetContext());
 
 	for (int x = 0; x < mSpriteComponents.Size(); x++) {
 		if (auto component = mSpatialSystem->GetComponent(mSpriteComponents.IndexToId(x)))
@@ -182,8 +187,7 @@ bool D3D11Renderer::Update() {
 			mSpriteMaterial.SetAtlasBuffer(mD3d.GetContext(), spriteWidth, spriteHeight, uOffset, vOffset);
 			mSpriteMaterial.SetMatrixBuffer(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 
-			mSpriteMaterial.Render(mD3d.GetContext());
-			mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
+			mD3d.GetContext()->DrawIndexed(12, 0, 0);
 		}
 	}
 
