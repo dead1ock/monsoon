@@ -68,8 +68,7 @@ protected:
 		playerLiveMesh.VertexBuffer = playerVB;
 
 		Scene::SpatialComponent playerLiveTransform;
-		playerLiveTransform.y = 14.0f;
-		playerLiveTransform.x = -19.0f;
+		playerLiveTransform.position += Math::Vector3(14.0f, -19.0f, 0.0f);
 		playerLiveTransform.scaleX = 0.7f;
 		playerLiveTransform.scaleY = 0.7f;
 		playerLiveTransform.scaleZ = 0.7f;
@@ -77,17 +76,17 @@ protected:
 		playerLives[0] = mEntityManager.CreateEntity();
 		mRenderer->AttachMeshComponent(playerLives[0], playerLiveMesh);
 		mSpatialSystem.AttachComponent(playerLives[0], playerLiveTransform);
-		playerLiveTransform.x += 0.75f;
+		playerLiveTransform.position += Math::Vector3(0.75f, 0.0f, 0.0f);
 
 		playerLives[1] = mEntityManager.CreateEntity();
 		mRenderer->AttachMeshComponent(playerLives[1], playerLiveMesh);
 		mSpatialSystem.AttachComponent(playerLives[1], playerLiveTransform);
-		playerLiveTransform.x += 0.75f;
+		playerLiveTransform.position += Math::Vector3(0.75f, 0.0f, 0.0f);
 
 		playerLives[2] = mEntityManager.CreateEntity();
 		mRenderer->AttachMeshComponent(playerLives[2], playerLiveMesh);
 		mSpatialSystem.AttachComponent(playerLives[2], playerLiveTransform);
-		playerLiveTransform.x += 0.75f;
+		playerLiveTransform.position += Math::Vector3(0.75f, 0.0f, 0.0f);
 
 		GenerateAsteroids();
 
@@ -148,15 +147,14 @@ protected:
 			asteroidMesh.VertexBuffer = astroidVB;
 
 			Scene::SpatialComponent asteroidPosition;
-			asteroidPosition.x = rand_FloatRange(-10.0f, 10.0f);
-			asteroidPosition.y = rand_FloatRange(-10.0f, 10.0f);
+			asteroidPosition.position += Math::Vector3(rand_FloatRange(-10.0f, 10.0f), rand_FloatRange(-10.0f, 10.0f), 0.0f);
 			asteroidPosition.pitch = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
 			asteroidPosition.yaw = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
 			asteroidPosition.roll = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
 
 			mRenderer->AttachMeshComponent(mAstroids[x], asteroidMesh);
 			mSpatialSystem.AttachComponent(mAstroids[x], asteroidPosition);
-			mAsteroidAABBs.push_back(Math::AABB(asteroidPosition.x, asteroidPosition.y, 0.75f, 0.75f));
+			mAsteroidAABBs.push_back(Math::AABB(asteroidPosition.position.mX, asteroidPosition.position.mY, 0.75f, 0.75f));
 		}
 
 	}
@@ -175,12 +173,11 @@ protected:
 		Scene::SpatialComponent bulletSpatialComponent = *mSpatialSystem.GetComponent(player); // Copy player position.
 		bullet.VertexBuffer = bulletVB;
 
-		bulletSpatialComponent.x += cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
-		bulletSpatialComponent.y += sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f));
+		bulletSpatialComponent.position += Math::Vector3(cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f)), sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f)), 0.0f);
 
 		auto id = mEntityManager.CreateEntity();
 		mBullets.push_back(id);
-		mBulletAABBs.push_back(Math::AABB(bulletSpatialComponent.x, bulletSpatialComponent.y, 0.25f, 0.5f));
+		mBulletAABBs.push_back(Math::AABB(bulletSpatialComponent.position.mX, bulletSpatialComponent.position.mY, 0.25f, 0.5f));
 		mRenderer->AttachMeshComponent(id, bullet);
 		mSpatialSystem.AttachComponent(id, bulletSpatialComponent);
 		mActiveBullets++;
@@ -221,22 +218,22 @@ protected:
 
 		// Move player in the direction it is rotated.
 		mSpatialSystem.SetPosition(player,
-			playerSpatialComponent.x + (playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
-			playerSpatialComponent.y + (playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
+			playerSpatialComponent.position.mX + (playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
+			playerSpatialComponent.position.mY + (playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
 			0.0f);
 
-		playerAABB = Math::AABB(playerSpatialComponent.x, playerSpatialComponent.y, 0.8f, 1.0f);
+		playerAABB = Math::AABB(playerSpatialComponent.position.mX, playerSpatialComponent.position.mY, 0.8f, 1.0f);
 
 		// Wrap coordinates around when the player leaves the screen.
-		if (playerSpatialComponent.x > 23.0f)
-			mSpatialSystem.SetPosition(player, -23.0f, playerSpatialComponent.y, 0.0f);
-		else if (playerSpatialComponent.x < -23.0f)
-			mSpatialSystem.SetPosition(player, 23.0f, playerSpatialComponent.y, 0.0f);
+		if (playerSpatialComponent.position.mX > 23.0f)
+			mSpatialSystem.SetPosition(player, -23.0f, playerSpatialComponent.position.mY, 0.0f);
+		else if (playerSpatialComponent.position.mX < -23.0f)
+			mSpatialSystem.SetPosition(player, 23.0f, playerSpatialComponent.position.mY, 0.0f);
 
-		if (playerSpatialComponent.y > 16.0f)
-			mSpatialSystem.SetPosition(player, playerSpatialComponent.x, -16.0f, 0.0f);
-		else if (playerSpatialComponent.y < -16.0f)
-			mSpatialSystem.SetPosition(player, playerSpatialComponent.x, 16.0f, 0.0f);
+		if (playerSpatialComponent.position.mY > 16.0f)
+			mSpatialSystem.SetPosition(player, playerSpatialComponent.position.mX, -16.0f, 0.0f);
+		else if (playerSpatialComponent.position.mY < -16.0f)
+			mSpatialSystem.SetPosition(player, playerSpatialComponent.position.mX, 16.0f, 0.0f);
 	}
 
 	void UpdateAsteroidPositions() {
@@ -246,22 +243,22 @@ protected:
 			const auto& asteroidSpatialComponent = *mSpatialSystem.GetComponent(mAstroids[x]);
 
 			mSpatialSystem.SetPosition(mAstroids[x],
-				asteroidSpatialComponent.x + (ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
-				asteroidSpatialComponent.y + (ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				asteroidSpatialComponent.position.mX + (ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				asteroidSpatialComponent.position.mY + (ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
 				0.0f);
 
-			mAsteroidAABBs[x].mX = asteroidSpatialComponent.x;
-			mAsteroidAABBs[x].mY = asteroidSpatialComponent.y;
+			mAsteroidAABBs[x].mX = asteroidSpatialComponent.position.mX;
+			mAsteroidAABBs[x].mY = asteroidSpatialComponent.position.mY;
 
-			if (asteroidSpatialComponent.x > 23.0f)
-				mSpatialSystem.SetPosition(mAstroids[x], -23.0f, asteroidSpatialComponent.y, 0.0f);
-			else if (asteroidSpatialComponent.x < -23.0f)
-				mSpatialSystem.SetPosition(mAstroids[x], 23.0f, asteroidSpatialComponent.y, 0.0f);
+			if (asteroidSpatialComponent.position.mX > 23.0f)
+				mSpatialSystem.SetPosition(mAstroids[x], -23.0f, asteroidSpatialComponent.position.mY, 0.0f);
+			else if (asteroidSpatialComponent.position.mX < -23.0f)
+				mSpatialSystem.SetPosition(mAstroids[x], 23.0f, asteroidSpatialComponent.position.mY, 0.0f);
 
-			if (asteroidSpatialComponent.y > 16.0f)
-				mSpatialSystem.SetPosition(mAstroids[x], asteroidSpatialComponent.x, -16.0f, 0.0f);
-			else if (asteroidSpatialComponent.y < -16.0f)
-				mSpatialSystem.SetPosition(mAstroids[x], asteroidSpatialComponent.x, 16.0f, 0.0f);
+			if (asteroidSpatialComponent.position.mY > 16.0f)
+				mSpatialSystem.SetPosition(mAstroids[x], asteroidSpatialComponent.position.mX, -16.0f, 0.0f);
+			else if (asteroidSpatialComponent.position.mY < -16.0f)
+				mSpatialSystem.SetPosition(mAstroids[x], asteroidSpatialComponent.position.mX, 16.0f, 0.0f);
 		}
 	}
 
@@ -271,37 +268,37 @@ protected:
 		{
 			auto& bulletSpatialComponent = *mSpatialSystem.GetComponent(mBullets[x]);
 			mSpatialSystem.SetPosition(mBullets[x],
-				bulletSpatialComponent.x + (BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
-				bulletSpatialComponent.y + (BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				bulletSpatialComponent.position.mX + (BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				bulletSpatialComponent.position.mY + (BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
 				0.0f);
 
 			// Update AABB
-			mBulletAABBs[x].mX = bulletSpatialComponent.x;
-			mBulletAABBs[x].mY = bulletSpatialComponent.y;
+			mBulletAABBs[x].mX = bulletSpatialComponent.position.mX;
+			mBulletAABBs[x].mY = bulletSpatialComponent.position.mY;
 
 			//
-			if (bulletSpatialComponent.x > 23.0f)
+			if (bulletSpatialComponent.position.mX > 23.0f)
 			{
 				mEntityManager.DestroyEntity(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else if (bulletSpatialComponent.x < -23.0f)
+			else if (bulletSpatialComponent.position.mX < -23.0f)
 			{
 				mEntityManager.DestroyEntity(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else if (bulletSpatialComponent.y > 16.0f)
+			else if (bulletSpatialComponent.position.mY > 16.0f)
 			{
 				mEntityManager.DestroyEntity(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else if (bulletSpatialComponent.y < -16.0f)
+			else if (bulletSpatialComponent.position.mY < -16.0f)
 			{
 				mEntityManager.DestroyEntity(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);

@@ -25,9 +25,9 @@ void SpatialSystem::SetPosition(Entity entity, float x, float y, float z)
 		return;
 
 	auto& component = mComponents[entity];
-	component.x = x;
-	component.y = y;
-	component.z = z;
+	component.position.mX = x;
+	component.position.mY = y;
+	component.position.mZ = z; 
 }
 
 void SpatialSystem::SetOrientation(Entity entity, float yaw, float pitch, float roll)

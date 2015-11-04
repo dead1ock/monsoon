@@ -35,6 +35,12 @@ Vector2 Vector2::operator+(Vector2& other)
 	return Vector2(mX + other.mX, mY + other.mY);
 }
 
+void Vector2::operator+=(Vector2& other)
+{
+	mX += other.mX;
+	mY += other.mY;
+}
+
 //----------------------------------------------------
 //
 //----------------------------------------------------
@@ -70,4 +76,11 @@ Vector3 Vector3::Cross(Vector3& other)
 Vector3 Vector3::operator+(Vector3& other)
 {
 	return Vector3(mX + other.mX, mY + other.mY, mZ + other.mZ);
+}
+
+void Vector3::operator+=(Vector3& other)
+{
+	mX += other.mX;
+	mY += other.mY;
+	mZ += other.mZ;
 }

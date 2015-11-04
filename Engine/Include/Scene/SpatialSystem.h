@@ -12,6 +12,7 @@
 #include <Util/PackedPool.h>
 #include <Platform/Export.h>
 #include <ECS/System.h>
+#include <Math/Vector.h>
 
 namespace Monsoon
 {
@@ -20,10 +21,8 @@ namespace Monsoon
 		struct SpatialComponent
 		{
 			SpatialComponent()
+				: position(Math::Vector3(0.0f, 0.0f, 0.0f))
 			{
-				x = 0.0f;
-				y = 0.0f;
-				z = 0.0f;
 				yaw = 0.0f;
 				pitch = 0.0f;
 				roll = 0.0f;
@@ -32,7 +31,7 @@ namespace Monsoon
 				scaleZ = 1.0f;
 			}
 
-			float x, y, z;
+			Math::Vector3 position;
 			float yaw, pitch, roll;
 			float scaleX, scaleY, scaleZ;
 		};
