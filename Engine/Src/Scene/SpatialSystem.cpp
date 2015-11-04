@@ -51,3 +51,12 @@ void SpatialSystem::SetScale(Entity entity, float scaleX, float scaleY, float sc
 	component.scaleY = scaleY;
 	component.scaleZ = scaleZ;
 }
+
+void SpatialSystem::Translate(Entity entity, Math::Vector3 delta)
+{
+	if (!mComponents.Exists(entity))
+		return;
+
+	auto& component = mComponents[entity];
+	component.position += delta;
+}

@@ -48,6 +48,7 @@ namespace Monsoon
 			void SetPosition(Entity entity, float x, float y, float z);
 			void SetOrientation(Entity entity, float yaw, float pitch, float roll);
 			void SetScale(Entity entity, float scaleX, float scaleY, float scaleZ);
+			void Translate(Entity entity, Math::Vector3 delta);
 		};
 	}
 }

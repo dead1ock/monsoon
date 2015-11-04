@@ -217,10 +217,10 @@ protected:
 		}
 
 		// Move player in the direction it is rotated.
-		mSpatialSystem.SetPosition(player,
-			playerSpatialComponent.position.mX + (playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
-			playerSpatialComponent.position.mY + (playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
-			0.0f);
+		mSpatialSystem.Translate(player,
+			Math::Vector3((playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
+			(playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
+			0.0f));
 
 		playerAABB = Math::AABB(playerSpatialComponent.position.mX, playerSpatialComponent.position.mY, 0.8f, 1.0f);
 
@@ -242,10 +242,10 @@ protected:
 		{
 			const auto& asteroidSpatialComponent = *mSpatialSystem.GetComponent(mAstroids[x]);
 
-			mSpatialSystem.SetPosition(mAstroids[x],
-				asteroidSpatialComponent.position.mX + (ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
-				asteroidSpatialComponent.position.mY + (ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
-				0.0f);
+			mSpatialSystem.Translate(mAstroids[x],
+				Math::Vector3((ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				(ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				0.0f));
 
 			mAsteroidAABBs[x].mX = asteroidSpatialComponent.position.mX;
 			mAsteroidAABBs[x].mY = asteroidSpatialComponent.position.mY;
@@ -267,10 +267,10 @@ protected:
 		for (int x = (mBullets.size() - 1); x >= 0; x--)
 		{
 			auto& bulletSpatialComponent = *mSpatialSystem.GetComponent(mBullets[x]);
-			mSpatialSystem.SetPosition(mBullets[x],
-				bulletSpatialComponent.position.mX + (BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
-				bulletSpatialComponent.position.mY + (BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
-				0.0f);
+			mSpatialSystem.Translate(mBullets[x],
+				Math::Vector3((BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				(BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				0.0f));
 
 			// Update AABB
 			mBulletAABBs[x].mX = bulletSpatialComponent.position.mX;
