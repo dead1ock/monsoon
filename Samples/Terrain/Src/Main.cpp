@@ -11,6 +11,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#include <sstream>
+
 #include <App/Application.h>
 #include <D3D11Renderer.h>
 
@@ -18,11 +20,26 @@
 
 using namespace Monsoon;
 
+/*
+ *
+ */
+const U32 size = 76;
+const U32 numChunks = 16; // The number of chunks to render as a square. (Must be greater than 2).
+const float chunkXScale = 65.0f;
+const float chunkYScale = 50.0f;
+const int chunkXOffset = 0;
+const int chunkYOffset = 0;
+
+/**
+ * 
+ */
 class HGTReader
 {
 public:
 	HGTReader(const char* filename)
-		: mFile(filename, std::ios::binary) {
+		: mFile(filename, std::ios::binary)
+		, mMaxHeight(0.0f)
+		, mMinHeight(50000.0f) {
 		mHeightMap = new float*[1201];
 		for (int i = 0; i < 1201; i++)
 			mHeightMap[i] = new float[1201];
@@ -32,9 +49,12 @@ public:
 			for (int y = 0; y < 1201; y++)
 				{
 					float elevation = ((int) mFile.get() * 256) + mFile.get();
-					if (elevation < 0)
-						int holdup = 1;
-						mHeightMap[x][y] = elevation;
+					mHeightMap[x][y] = elevation;
+
+					if (elevation > mMaxHeight)
+						mMaxHeight = elevation;
+					if (elevation < mMinHeight)
+						mMinHeight = elevation;
 				}
 		}
 
@@ -48,6 +68,7 @@ public:
 
 public:
 	float** mHeightMap;
+	float mMaxHeight, mMinHeight;
 	std::ifstream mFile;
 };
 
@@ -56,7 +77,7 @@ class TerrainApplication : public Application
 public:
 	TerrainApplication()
 		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mSpatialSystem))) 
-		, mFileReader("N45W122.hgt") {
+		, mFileReader("N39W107.hgt") {
 	}
 
 	~TerrainApplication() {
@@ -67,14 +88,40 @@ protected:
 	float cameraTheta;
 	HGTReader mFileReader;
 
-	void OnInitialize() {
-		Renderer::VertexBufferHandle planeVB = generateTerrain();
+	Renderer::VertexBufferHandle* chunkVertexBuffers;
+	Renderer::MeshComponent* chunkMeshes;
+	Scene::SpatialComponent* chunkPositions;
+	Renderer::TextureHandle* chunkTextures;
+	std::stringstream*	textureFiles;
 
-		Renderer::MeshComponent plane;
-		Scene::SpatialComponent planeOnePosition;
-		plane.VertexBuffer = planeVB;
-		mRenderer->AttachMeshComponent(0, plane);
-		mSpatialSystem.AttachComponent(0, planeOnePosition);
+	void OnInitialize() {
+		chunkVertexBuffers = new Renderer::VertexBufferHandle[numChunks * numChunks]();
+		chunkMeshes = new Renderer::MeshComponent[numChunks * numChunks]();
+		chunkPositions = new Scene::SpatialComponent[numChunks * numChunks]();
+		chunkTextures = new Renderer::TextureHandle[numChunks * numChunks]();
+		textureFiles = new std::stringstream[numChunks * numChunks]();
+
+		for (int x = 0; x < numChunks; x++)
+		{
+			for (int y = 0; y < numChunks; y++)
+			{
+				int index = y + (x * numChunks);
+
+				textureFiles[index] << "Textures/N39W107/" << x + chunkXOffset << "_" << y + chunkYOffset << ".dds" << '\0';
+
+				chunkVertexBuffers[index] = generateTerrain(x + chunkXOffset, y + chunkYOffset);
+				chunkTextures[index] = mRenderer->LoadTexture(textureFiles[index].str());
+
+				chunkMeshes[index].TextureId = chunkTextures[index];
+				chunkMeshes[index].VertexBuffer = chunkVertexBuffers[index];
+
+				chunkPositions[index].position += Math::Vector3((y * chunkXScale * (size - 1)), 0.0f, (x * chunkYScale * (size - 1)));
+				chunkPositions[index].position += Math::Vector3(-(chunkXScale * (float)size * (float)numChunks / 2.0f), 0.0f, -(chunkYScale * (float)size * (float)numChunks / 2.0f));
+
+				mRenderer->AttachMeshComponent(index, chunkMeshes[index]);
+				mSpatialSystem.AttachComponent(index, chunkPositions[index]);
+			}
+		}
 		
 		cameraTheta = 0.0f;
 	}
@@ -82,51 +129,56 @@ protected:
 	void OnUpdate() {
 		Renderer::Camera& camera = mRenderer->GetCamera();
 		
-		camera.lookAtX = (1201.0f * 43.0f) / 2;
-		camera.lookAtZ = (1201.0f * 35.0f) / 2;
-		camera.x = camera.lookAtX + cos(cameraTheta) * (1201.0f * 43.0f / 1.35f);
-		camera.z = camera.lookAtZ + sin(cameraTheta) * (1201.0f * 35.0f / 1.35f);
-		camera.farClip = 100000.0f;
+		camera.lookAtX = 0;
+		camera.lookAtZ = 0;
+		camera.x = cos(cameraTheta) * ((float)size * (numChunks / 2) * chunkYScale * 1.35f);
+		camera.z = sin(cameraTheta) * ((float)size * (numChunks / 2) * chunkYScale * 1.35f);
+		camera.farClip = 1000000.0f;
 
-		camera.y = 5000;
-		camera.lookAtY = 1000;
+		camera.y = mFileReader.mMaxHeight + 5000.0f;
+		camera.lookAtY = mFileReader.mMinHeight;
 
 		cameraTheta += mGameClock.getDeltaTime()/8.0f;
 	}
 
 	void OnShutdown() {
 
-		mSpatialSystem.DetachComponent(0);
-		mSpatialSystem.DetachComponent(1);
+		for (int x = 0; x < numChunks / 2.0f; x++)
+		{
+			for (int y = 0; y < numChunks / 2.0f; y++)
+			{
+				int index = (x * size) + y;
 
-		mRenderer->DetachMeshComponent(0);
-		mRenderer->DetachMeshComponent(1);
+				mSpatialSystem.DetachComponent(index);
+				mRenderer->DetachMeshComponent(index);
+				mRenderer->ReleaseTexture(index);
+			}
+		}
 
-		mRenderer->ReleaseTexture(0);
+		delete textureFiles;
+		delete chunkTextures;
+		delete chunkPositions;
+		delete chunkMeshes;
+		delete chunkVertexBuffers;
 	}
 
-	Renderer::VertexBufferHandle generateTerrain() {
-		const U32 size = 1201;
+	Renderer::VertexBufferHandle generateTerrain(U32 chunkX, U32 chunkY) {
 		Renderer::VertexType* vertices = new Renderer::VertexType[size * size];
 		unsigned int* indicies = new unsigned int[6 * ((size-1) * (size-1))];
 
-		float maxElevation = 0;
-		for (int f = 0; f < size; f++)
-		{
-			for (int x = 0; x < size; x++)
-			{
-				if (mFileReader.mHeightMap[f][x] > maxElevation);
-					maxElevation = mFileReader.mHeightMap[f][x];
-			}
-		}
+		int yOffset = chunkX * 75.0f;
+		int xOffset = chunkY * 75.0f;
 
 		// Generate Vertices
 		for (int x = 0; x < size; x++)
 		{
 			for (int y = 0; y < size; y++)
 			{
-				vertices[(x * size) + y].SetPosition(x*43, mFileReader.mHeightMap[x][y] - maxElevation, y*35);
-				vertices[(x * size) + y].SetColor(mFileReader.mHeightMap[x][y] / (maxElevation + 3000.0f), mFileReader.mHeightMap[x][y] / (maxElevation + 2500.0f), mFileReader.mHeightMap[x][y] / (maxElevation + 2500.0f), 1.0f);
+				float height = mFileReader.mHeightMap[x + xOffset][y + yOffset];
+				float color = (mFileReader.mHeightMap[x + xOffset][y + yOffset] - mFileReader.mMinHeight) / (mFileReader.mMaxHeight - mFileReader.mMinHeight);
+				vertices[(x * size) + y].SetPosition((x * chunkXScale) - ((chunkXScale * size) / 2.0f), (mFileReader.mHeightMap[x + xOffset][y + yOffset]), (y * chunkYScale) - ((chunkYScale * size) / 2.0f));
+				vertices[(x * size) + y].SetColor(color, color, color, 1.0f);
+				vertices[(x * size) + y].SetUV((float)(y) / (float)size, (float)(x) / (float)size );
 			}
 		}
 
