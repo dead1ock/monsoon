@@ -24,11 +24,12 @@ using namespace Monsoon;
  *
  */
 const U32 size = 76;
-const U32 numChunks = 16; // The number of chunks to render as a square. (Must be greater than 2).
+const U32 numChunks = 5; // The number of chunks to render as a square. (Must be greater than 2).
 const float chunkXScale = 65.0f;
 const float chunkYScale = 50.0f;
-const int chunkXOffset = 0;
-const int chunkYOffset = 0;
+const int chunkXOffset = 9;
+const int chunkYOffset = 7;
+const std::string filename = "N34W112";
 
 /**
  * 
@@ -77,7 +78,7 @@ class TerrainApplication : public Application
 public:
 	TerrainApplication()
 		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mSpatialSystem))) 
-		, mFileReader("N39W107.hgt") {
+		, mFileReader((filename + ".hgt").c_str()) {
 	}
 
 	~TerrainApplication() {
@@ -86,6 +87,7 @@ public:
 
 protected:
 	float cameraTheta;
+	float cameraZoom;
 	HGTReader mFileReader;
 
 	Renderer::VertexBufferHandle* chunkVertexBuffers;
@@ -101,13 +103,36 @@ protected:
 		chunkTextures = new Renderer::TextureHandle[numChunks * numChunks]();
 		textureFiles = new std::stringstream[numChunks * numChunks]();
 
+		//
+		// Generate Texture Map
+		//
+		int textureMap[16][16];
+		int x = 0;
+		int y = 0;
+		int index = 0;
+		for (int i = 0; i < (256/4); i++)
+		{
+			textureMap[x][y] = index + 1;
+			textureMap[1+x][y] = index;
+			textureMap[x][1+y] = index + 3;
+			textureMap[1+x][1+y] = index + 2;
+			x += 2;
+
+			if (x >= 16) {
+				x = 0;
+				y += 2;
+			}
+
+			index += 4;
+		}
+
 		for (int x = 0; x < numChunks; x++)
 		{
 			for (int y = 0; y < numChunks; y++)
 			{
 				int index = y + (x * numChunks);
 
-				textureFiles[index] << "Textures/N39W107/" << x + chunkXOffset << "_" << y + chunkYOffset << ".dds" << '\0';
+				textureFiles[index] << "I:/terrain/" << filename << "/" << textureMap[x + chunkXOffset][y + chunkYOffset] << ".tif" << '\0';
 
 				chunkVertexBuffers[index] = generateTerrain(x + chunkXOffset, y + chunkYOffset);
 				chunkTextures[index] = mRenderer->LoadTexture(textureFiles[index].str());
@@ -116,7 +141,7 @@ protected:
 				chunkMeshes[index].VertexBuffer = chunkVertexBuffers[index];
 
 				chunkPositions[index].position += Math::Vector3((y * chunkXScale * (size - 1)), 0.0f, (x * chunkYScale * (size - 1)));
-				chunkPositions[index].position += Math::Vector3(-(chunkXScale * (float)size * (float)numChunks / 2.0f), 0.0f, -(chunkYScale * (float)size * (float)numChunks / 2.0f));
+				chunkPositions[index].position += Math::Vector3(-(chunkXScale * (float)(size - 1) * (float)numChunks) / 2.0f, 0.0f, -(chunkYScale * (float)(size - 1) * (float)numChunks) / 2.0f);
 
 				mRenderer->AttachMeshComponent(index, chunkMeshes[index]);
 				mSpatialSystem.AttachComponent(index, chunkPositions[index]);
@@ -124,6 +149,11 @@ protected:
 		}
 		
 		cameraTheta = 0.0f;
+		cameraZoom = 1.0f;
+
+		Renderer::Camera& camera = mRenderer->GetCamera();
+		camera.y = mFileReader.mMaxHeight + 3000.0f;
+		camera.lookAtY = mFileReader.mMinHeight;
 	}
 
 	void OnUpdate() {
@@ -131,14 +161,32 @@ protected:
 		
 		camera.lookAtX = 0;
 		camera.lookAtZ = 0;
-		camera.x = cos(cameraTheta) * ((float)size * (numChunks / 2) * chunkYScale * 1.35f);
-		camera.z = sin(cameraTheta) * ((float)size * (numChunks / 2) * chunkYScale * 1.35f);
+		camera.x = cos(cameraTheta) * ((float)size * (float)numChunks / 2.0f * chunkXScale) * cameraZoom;
+		camera.z = sin(cameraTheta) * ((float)size * (float)numChunks/2.0f * chunkXScale) * cameraZoom;
 		camera.farClip = 1000000.0f;
 
-		camera.y = mFileReader.mMaxHeight + 5000.0f;
-		camera.lookAtY = mFileReader.mMinHeight;
+		U16 leftKeyState = GetAsyncKeyState(VK_LEFT);
+		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
+		U16 upKeyState = GetAsyncKeyState(VK_UP);
+		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
+		U16 sKeyState = GetAsyncKeyState(VK_SPACE);
+		U16 altKeyState = GetAsyncKeyState(VK_RETURN);
 
-		cameraTheta += mGameClock.getDeltaTime()/8.0f;
+		if (leftKeyState)
+			cameraTheta += mGameClock.getDeltaTime()/4.0f;
+		if (rightKeyState)
+			cameraTheta -= mGameClock.getDeltaTime() / 4.0f;
+		if (upKeyState)
+			cameraZoom -= mGameClock.getDeltaTime() / 4.0f;
+		if (downKeyState)
+			cameraZoom += mGameClock.getDeltaTime() / 4.0f;
+		if (sKeyState)
+			camera.y -= 100.0f;
+		if (altKeyState)
+			camera.y += 100.0f;
+
+		if (cameraZoom <= 0.0f)
+			cameraZoom = 0.001f;
 	}
 
 	void OnShutdown() {
