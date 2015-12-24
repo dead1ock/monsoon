@@ -27,9 +27,9 @@ const U32 size = 76;
 const U32 numChunks = 5; // The number of chunks to render as a square. (Must be greater than 2).
 const float chunkXScale = 65.0f;
 const float chunkYScale = 50.0f;
-const int chunkXOffset = 9;
-const int chunkYOffset = 7;
-const std::string filename = "N34W112";
+const int chunkXOffset = 10;
+const int chunkYOffset = 6;
+const std::string filename = "N35W112";
 
 /**
  * 
@@ -153,7 +153,7 @@ protected:
 
 		Renderer::Camera& camera = mRenderer->GetCamera();
 		camera.y = mFileReader.mMaxHeight + 3000.0f;
-		camera.lookAtY = mFileReader.mMinHeight;
+		camera.lookAtY = mFileReader.mMinHeight + 1700.0f;
 	}
 
 	void OnUpdate() {
