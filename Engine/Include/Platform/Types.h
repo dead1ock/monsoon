@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 Sonora Games
+ * Copyright (c) 2014-2015 Dallin Wellington
  *
  */
 
@@ -34,6 +34,15 @@
 #else
 	 typedef U32 MEM_ADDRESS;
 #endif // MONSOON_64
+
+	 typedef float Float32;
+	 typedef float Float64;
+
+#ifdef MONSOON_DOUBLE_PRECISION
+	 typedef double Float;
+#else
+	 typedef float Float;
+#endif
 
  } // namespace Monsoon
 

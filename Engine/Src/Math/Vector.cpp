@@ -6,6 +6,7 @@
 #include <Math/Vector.h>
 #include <math.h>
 
+using namespace Monsoon;
 using namespace Monsoon::Math;
 		
 Vector2::Vector2(float x, float y)
@@ -20,12 +21,12 @@ Vector2::~Vector2()
 
 }
 
-float Vector2::Magnitude()
+Float Vector2::Magnitude()
 {
 	return sqrt((mX*mX) + (mY*mY));
 }
 
-float Vector2::Dot(Vector2& other)
+Float Vector2::Dot(Vector2& other)
 {
 	return ((mX * other.mX) + (mY * other.mY));
 }
@@ -58,12 +59,12 @@ Vector3::~Vector3()
 
 }
 
-float Vector3::Magnitude()
+Float Vector3::Magnitude()
 {
 	return sqrt((mX*mX) + (mY*mY) + (mZ*mZ));
 }
 
-float Vector3::Dot(Vector3& other)
+Float Vector3::Dot(Vector3& other)
 {
 	return ((mX * other.mX) + (mY * other.mY) + (mZ * other.mZ));
 }
