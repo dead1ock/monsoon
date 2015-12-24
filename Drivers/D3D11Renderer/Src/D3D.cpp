@@ -104,7 +104,7 @@ bool D3D::CreateDeviceAndSwapChain(D3D11Window& renderWindow) {
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
 
 #ifdef _DEBUG
-	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	//createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, &featureLevel, 1,
@@ -112,7 +112,10 @@ bool D3D::CreateDeviceAndSwapChain(D3D11Window& renderWindow) {
 
 	if (FAILED(result))
 	{
-		MessageBox(0, "Unable to create D3D Device or Context.", 0, 0);
+		std::string errorMessage = "Unable to create D3D Device or Context. Error code: ";
+		
+		errorMessage.append(std::to_string(result));
+		MessageBox(0, errorMessage.c_str(), 0, 0);
 		return false;
 	}
 
