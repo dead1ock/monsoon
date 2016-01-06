@@ -19,6 +19,7 @@
 using namespace Monsoon;
 using namespace Monsoon::Renderer;
 using namespace Monsoon::Scene;
+using namespace Monsoon::Math;
 
 
 class Platformer2DApp : public Application
@@ -275,7 +276,7 @@ protected:
 				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
 
 			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX + (200.0f * mGameClock.getDeltaTime()), characterPosition.position.mY, 0.0f);
+			mSpatialSystem.Translate(mCharacter, Vector3(200.0f * mGameClock.getDeltaTime(), 0.0f, 0.0f));
 		}
 
 		if (leftKeyState) {
@@ -283,7 +284,7 @@ protected:
 				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
 
 			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX - (200.0f * mGameClock.getDeltaTime()), characterPosition.position.mY, 0.0f);
+			mSpatialSystem.Translate(mCharacter, Vector3(-200.0f * mGameClock.getDeltaTime(), 0.0f, 0.0f));
 		}
 
 		if (upKeyState)
@@ -294,12 +295,12 @@ protected:
 
 			if ((mGameClock.getTime() - mLastJump) < 0.25f) {
 				mAnimationSystem.Play2d(mCharacter, mJumpUpAnimation);
-				mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX, characterPosition.position.mY + (400.0f * mGameClock.getDeltaTime()), 0.0f);
+				mSpatialSystem.Translate(mCharacter, Vector3(0.0f, 400.0f * mGameClock.getDeltaTime(), 0.0f));
 			}
 		}
 		if (characterPosition.position.mY > -305.0f && (mGameClock.getTime() - mLastJump) > 0.25f) {
 			mAnimationSystem.Play2d(mCharacter, mJumpDownAnimation);
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX, characterPosition.position.mY - (450.0f * mGameClock.getDeltaTime()), 0.0f);
+			mSpatialSystem.Translate(mCharacter, Vector3(0.0f, -450.0f * mGameClock.getDeltaTime(), 0.0f));
 		}
 		else if (characterPosition.position.mY < -305.0f) {
 			mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX, -305.0f, 0.0f);
