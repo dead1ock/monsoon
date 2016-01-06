@@ -158,8 +158,8 @@ protected:
 		tiles[2].Texture = mTileTextures[15];
 
 		SpatialComponent tilePositions[3];
-		tilePositions[0].x = -128.0f;
-		tilePositions[2].x = 128.0f;
+		tilePositions[0].position.mX = -128.0f;
+		tilePositions[2].position.mX = 128.0f;
 
 		mRenderer->AttachSpriteComponent(mTiles[0], tiles[0]);
 		mRenderer->AttachSpriteComponent(mTiles[1], tiles[1]);
@@ -177,13 +177,13 @@ protected:
 
 		SpatialComponent groundTilePositions[12];
 		for (int x = 0; x < 6; x++) {
-			groundTilePositions[x].x = (x * 128) - (1800.0f / 2);
-			groundTilePositions[x].y = -400.0f;
+			groundTilePositions[x].position.mX = (x * 128) - (1800.0f / 2);
+			groundTilePositions[x].position.mY = -400.0f;
 		}
 
 		for (int x = 6; x < 12; x++) {
-			groundTilePositions[x].x = ((x + 3) * 128) - (1800.0f / 2);
-			groundTilePositions[x].y = -400.0f;
+			groundTilePositions[x].position.mX = ((x + 3) * 128) - (1800.0f / 2);
+			groundTilePositions[x].position.mY = -400.0f;
 		}
 
 		for (int x = 0; x < 12; x++)
@@ -197,8 +197,8 @@ protected:
 		crystalSprite.Texture = mCrystalTexture;
 
 		SpatialComponent crystalPosition;
-		crystalPosition.x = 400.0f;
-		crystalPosition.y = -300.0f;
+		crystalPosition.position.mX = 400.0f;
+		crystalPosition.position.mY = -300.0f;
 
 		mRenderer->AttachSpriteComponent(mCrystal, crystalSprite);
 		mSpatialSystem.AttachComponent(mCrystal, crystalPosition);
@@ -207,8 +207,8 @@ protected:
 		crateSprite.Texture = mCrateTexture;
 
 		SpatialComponent cratePosition;
-		cratePosition.y += 95.0f;
-		cratePosition.x += 100.0f;
+		cratePosition.position.mY += 95.0f;
+		cratePosition.position.mX += 100.0f;
 
 		mRenderer->AttachSpriteComponent(mCrate, crateSprite);
 		mSpatialSystem.AttachComponent(mCrate, cratePosition);
@@ -217,8 +217,8 @@ protected:
 		stoneSprite.Texture = mStoneTexture;
 
 		SpatialComponent stonePosition;
-		stonePosition.x = -550.0f;
-		stonePosition.y = -300.0f;
+		stonePosition.position.mX = -550.0f;
+		stonePosition.position.mY = -300.0f;
 
 		mRenderer->AttachSpriteComponent(mStone, stoneSprite);
 		mSpatialSystem.AttachComponent(mStone, stonePosition);
@@ -231,9 +231,9 @@ protected:
 		treeComponents[0].ZOrder = 1;
 
 		SpatialComponent treePositions[2];
-		treePositions[0].y = 180.0f;
-		treePositions[1].x = -500.0f;
-		treePositions[1].y = -200.0f;
+		treePositions[0].position.mY = 180.0f;
+		treePositions[1].position.mX = -500.0f;
+		treePositions[1].position.mY = -200.0f;
 
 		mRenderer->AttachSpriteComponent(mTrees[0], treeComponents[0]);
 		mRenderer->AttachSpriteComponent(mTrees[1], treeComponents[1]);
@@ -250,8 +250,8 @@ protected:
 		characterComponent.ZOrder = 0;
 
 		SpatialComponent characterPosition;
-		characterPosition.x -= 800.0f;
-		characterPosition.y -= 305.0f;
+		characterPosition.position.mX -= 800.0f;
+		characterPosition.position.mY -= 305.0f;
 		characterPosition.scaleX = 0.10f;
 		characterPosition.scaleY = 0.10f;
 
@@ -275,7 +275,7 @@ protected:
 				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
 
 			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.x + (200.0f * mGameClock.getDeltaTime()), characterPosition.y, 0.0f);
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX + (200.0f * mGameClock.getDeltaTime()), characterPosition.position.mY, 0.0f);
 		}
 
 		if (leftKeyState) {
@@ -283,7 +283,7 @@ protected:
 				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
 
 			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.x - (200.0f * mGameClock.getDeltaTime()), characterPosition.y, 0.0f);
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX - (200.0f * mGameClock.getDeltaTime()), characterPosition.position.mY, 0.0f);
 		}
 
 		if (upKeyState)
@@ -294,24 +294,24 @@ protected:
 
 			if ((mGameClock.getTime() - mLastJump) < 0.25f) {
 				mAnimationSystem.Play2d(mCharacter, mJumpUpAnimation);
-				mSpatialSystem.SetPosition(mCharacter, characterPosition.x, characterPosition.y + (400.0f * mGameClock.getDeltaTime()), 0.0f);
+				mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX, characterPosition.position.mY + (400.0f * mGameClock.getDeltaTime()), 0.0f);
 			}
 		}
-		if (characterPosition.y > -305.0f && (mGameClock.getTime() - mLastJump) > 0.25f) {
+		if (characterPosition.position.mY > -305.0f && (mGameClock.getTime() - mLastJump) > 0.25f) {
 			mAnimationSystem.Play2d(mCharacter, mJumpDownAnimation);
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.x, characterPosition.y - (450.0f * mGameClock.getDeltaTime()), 0.0f);
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX, characterPosition.position.mY - (450.0f * mGameClock.getDeltaTime()), 0.0f);
 		}
-		else if (characterPosition.y < -305.0f) {
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.x, -305.0f, 0.0f);
+		else if (characterPosition.position.mY < -305.0f) {
+			mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX, -305.0f, 0.0f);
 		}
 
-		if (!leftKeyState && !rightKeyState && !upKeyState && characterPosition.y == -305.0f) {
+		if (!leftKeyState && !rightKeyState && !upKeyState && characterPosition.position.mY == -305.0f) {
 			mAnimationSystem.Play2d(mCharacter, mIdleAnimation);
 		}
 
-		mRenderer->GetCamera().x = characterPosition.x + 400.0f;
-		mRenderer->GetCamera().lookAtX = characterPosition.x + 400.0f;
-		mSpatialSystem.SetPosition(mBackground, characterPosition.x + 400.0f, 0.0f, 0.0f);
+		mRenderer->GetCamera().x = characterPosition.position.mX + 400.0f;
+		mRenderer->GetCamera().lookAtX = characterPosition.position.mX + 400.0f;
+		mSpatialSystem.SetPosition(mBackground, characterPosition.position.mX + 400.0f, 0.0f, 0.0f);
 
 
 	}
