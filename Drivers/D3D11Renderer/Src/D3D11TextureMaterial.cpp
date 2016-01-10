@@ -40,7 +40,7 @@ bool D3D11TextureMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	//
 	// Compile Vertex Shader
 	//
-	result = D3DX11CompileFromFile("texture.vs", NULL, NULL, "TextureVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
+	result = D3DX11CompileFromFile("shaders/texture.vs", NULL, NULL, "TextureVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
 		&vertexShaderBuffer, &errorMessage, NULL);
 
 	if (FAILED(result))
@@ -52,7 +52,7 @@ bool D3D11TextureMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	//
 	// Compile Pixel Shader
 	//
-	result = D3DX11CompileFromFile("texture.ps", NULL, NULL, "TexturePixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
+	result = D3DX11CompileFromFile("shaders/texture.ps", NULL, NULL, "TexturePixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
 		&pixelShaderBuffer, &errorMessage, NULL);
 
 	if (FAILED(result))

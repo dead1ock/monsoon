@@ -39,7 +39,7 @@ bool D3D11ColorMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	//
 	// Compile Vertex Shader
 	//
-	result = D3DX11CompileFromFile("color.vs", NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
+	result = D3DX11CompileFromFile("shaders/color.vs", NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
 		&vertexShaderBuffer, &errorMessage, NULL);
 
 	if (FAILED(result))
@@ -51,7 +51,7 @@ bool D3D11ColorMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	//
 	// Compile Pixel Shader
 	//
-	result = D3DX11CompileFromFile("color.ps", NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
+	result = D3DX11CompileFromFile("shaders/color.ps", NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
 		&pixelShaderBuffer, &errorMessage, NULL);
 
 	if (FAILED(result))

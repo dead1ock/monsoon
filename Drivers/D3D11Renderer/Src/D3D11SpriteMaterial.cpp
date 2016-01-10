@@ -45,7 +45,7 @@ bool D3D11SpriteMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	//
 	// Compile Vertex Shader
 	//
-	result = D3DX11CompileFromFile("sprite.vs", NULL, NULL, "SpriteVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
+	result = D3DX11CompileFromFile("shaders/sprite.vs", NULL, NULL, "SpriteVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
 		&vertexShaderBuffer, &errorMessage, NULL);
 
 	if (FAILED(result))
@@ -57,7 +57,7 @@ bool D3D11SpriteMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	//
 	// Compile Pixel Shader
 	//
-	result = D3DX11CompileFromFile("sprite.ps", NULL, NULL, "SpritePixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
+	result = D3DX11CompileFromFile("shaders/sprite.ps", NULL, NULL, "SpritePixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
 		&pixelShaderBuffer, &errorMessage, NULL);
 
 	if (FAILED(result))
