@@ -34,6 +34,8 @@ namespace Monsoon {
 			Vector2 operator-(Vector2& other); // Vector Subtration
 			void operator-=(Vector2& other);
 
+			Float operator*(Vector2& other); // Dot
+
 			Vector2 operator*(Float scalar); // Scalar Multiplication
 			void operator*=(Float scalar);
 

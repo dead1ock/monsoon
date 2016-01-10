@@ -72,6 +72,11 @@ void Vector2::operator-=(Vector2& other)
 	mY -= other.mY;
 }
 
+Float Vector2::operator*(Vector2& other)
+{
+	return Dot(other);
+}
+
 Vector2 Vector2::operator* (Float scalar)
 {
 	return Vector2(mX * scalar, mY * scalar);
