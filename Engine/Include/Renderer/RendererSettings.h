@@ -24,6 +24,14 @@ namespace Monsoon {
 				windowName = "Monsoon Game Engine";
 			}
 
+			RendererSettings(U16 scrWidth, U16 scrHeight, std::string windName, bool scrFull = false, bool showCur = false) {
+				screenWidth = scrWidth;
+				screenHeight = scrHeight;
+				windowName = windName;
+				fullscreen = scrFull;
+				showCursor = showCur;
+			}
+
 			U16 screenWidth;
 			U16 screenHeight;
 			bool fullscreen;
