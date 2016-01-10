@@ -84,6 +84,78 @@ TEST(Vector2, ScalarDivision) {
 // Vector3 Tests
 // --------------------------------------
 
+TEST(Vector3, Magnitude) {
+	Vector3 vec = Vector3(10.0f, 5.0f, 0.0f);
+	EXPECT_EQ(sqrt((10.0f * 10.0f) + (5.0f * 5.0f)), vec.Magnitude());
+}
+
+TEST(Vector3, Dot) {
+	Vector3 vec1 = Vector3(10.0f, 5.0f, 0.0f);
+	Vector3 vec2 = Vector3(2.0f, 7.0f, 0.0f);
+
+	EXPECT_EQ((10.0f * 2.0f) + (5.0f * 7.0f), vec1 * vec2);
+}
+
+TEST(Vector3, Projection) {
+	Vector3 vec1 = Vector3(1.0f, 100.0f, 0.0f);
+	Vector3 vec2 = Vector3(100.0f, 0.0f, 0.0f);
+
+	EXPECT_EQ(1.0f, vec1.Proj(vec2).Magnitude());
+}
+
+TEST(Vector3, Perpendicular) {
+	Vector3 vec1 = Vector3(1.0f, 100.0f, 0.0f);
+	Vector3 vec2 = Vector3(100.0f, 0.0f, 0.0f);
+
+	EXPECT_EQ(100.0f, vec1.Perp(vec2).Magnitude());
+}
+
+TEST(Vector3, Unit) {
+	Vector3 vec = Vector3(10.0f, 5.0f, 2.0f);
+
+	//
+	// Unit Vector Definition:
+	//
+	// Let v = <x, y>
+	// |<x, y>| = <x/|v|,y/|v|>
+	//
+	EXPECT_EQ((10.0f / vec.Magnitude()), vec.Unit().mX);
+	EXPECT_EQ((5.0f / vec.Magnitude()), vec.Unit().mY);
+	EXPECT_EQ((2.0f / vec.Magnitude()), vec.Unit().mZ);
+}
+
+TEST(Vector3, VestorAddition) {
+	Vector3 vec = Vector3(10.0f, 5.0f, 2.0f) + Vector3(2.0f, 7.0f, -1.0f);
+
+	EXPECT_EQ(12.0f, vec.mX);
+	EXPECT_EQ(12.0f, vec.mY);
+	EXPECT_EQ(1.0f, vec.mZ);
+}
+
+TEST(Vector3, VectorSubtraction) {
+	Vector3 vec = Vector3(10.0f, 5.0f, 2.0f) - Vector3(2.0f, 7.0f, -1.0f);
+
+	EXPECT_EQ(8.0f, vec.mX);
+	EXPECT_EQ(-2.0f, vec.mY);
+	EXPECT_EQ(3.0f, vec.mZ);
+}
+
+TEST(Vector3, ScalarMultiplication) {
+	Vector3 vec = Vector3(10.0f, 5.0f, 2.0f) * 2.0f;
+
+	EXPECT_EQ(20.0f, vec.mX);
+	EXPECT_EQ(10.0f, vec.mY);
+	EXPECT_EQ(4.0f, vec.mZ);
+}
+
+TEST(Vector3, ScalarDivision) {
+	Vector3 vec = Vector3(10.0f, 5.0f, 2.0f) / 2.0f;
+
+	EXPECT_EQ(5.0f, vec.mX);
+	EXPECT_EQ((5.0f / 2.0f), vec.mY);
+	EXPECT_EQ(1.0f, vec.mZ);
+}
+
 // --------------------------------------
 // Vector4 Tests
 // --------------------------------------

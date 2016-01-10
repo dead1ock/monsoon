@@ -170,6 +170,11 @@ void Vector3::operator-=(Vector3& other)
 	mZ -= other.mZ;
 }
 
+Float Vector3::operator*(Vector3& other)
+{
+	return Dot(other);
+}
+
 Vector3 Vector3::operator* (Float scalar)
 {
 	return Vector3(mX * scalar, mY * scalar, mZ * scalar);

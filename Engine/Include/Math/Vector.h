@@ -69,6 +69,8 @@ namespace Monsoon {
 			Vector3 operator*(Float scalar); // Scalar Multiplication
 			void operator*=(Float scalar);
 
+			Float operator*(Vector3& other); // Dot
+
 			Vector3 operator/(Float scalar); // Scalar Division
 			void operator/=(Float scalar);
 
