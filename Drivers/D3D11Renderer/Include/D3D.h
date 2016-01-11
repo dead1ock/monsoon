@@ -40,6 +40,9 @@ namespace Monsoon {
 			void BeginScene();
 			void EndScene();
 
+			void EnableAlphaBlending();
+			void DisableAlphaBlending();
+
 			ID3D11Device* GetDevice() { return mDevice; }
 			ID3D11DeviceContext* GetContext() { return mContext; }
 
@@ -58,6 +61,7 @@ namespace Monsoon {
 			ID3D11DepthStencilView* mDepthStencilView;
 			ID3D11DepthStencilState* mDepthStencilState;
 			ID3D11RasterizerState* mRasterState;
+			ID3D11BlendState* mBlendState;
 		};
 
 	} // namespace renderer

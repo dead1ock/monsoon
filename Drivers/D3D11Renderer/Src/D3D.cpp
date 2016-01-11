@@ -48,10 +48,37 @@ bool D3D::Initialize(D3D11Window& renderWindow) {
 	if (!CreateViewport(renderWindow))
 		return false;
 
+	//
+	// Describe BlendState
+	//
+	D3D11_BLEND_DESC blendDesc;
+	ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
+
+	blendDesc.AlphaToCoverageEnable = false;
+	blendDesc.IndependentBlendEnable = false;
+	for (int i = 0; i < 8; i++)
+	{
+		blendDesc.RenderTarget[i].BlendEnable = true;
+		blendDesc.RenderTarget[i].BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[i].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[i].DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+		blendDesc.RenderTarget[i].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
+		blendDesc.RenderTarget[i].SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[i].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	}
+
+	HRESULT result = mDevice->CreateBlendState(&blendDesc, &mBlendState);
+	if (FAILED(result))
+		return false;
+
 	return true;
 }
 
 void D3D::Shutdown() {
+
+	if (mBlendState != nullptr)
+		mBlendState->Release();
 
 	if (mDepthStencilView != nullptr)
 		mDepthStencilView->Release();
@@ -183,7 +210,7 @@ bool D3D::CreateDepthStencilBuffer(D3D11Window& renderWindow) {
 
 	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 	depthStencilDesc.StencilEnable = true;
 	depthStencilDesc.StencilReadMask = 0xFF;
 	depthStencilDesc.StencilWriteMask = 0xFF;
@@ -265,9 +292,17 @@ void D3D::BeginScene() {
 	color[3] = 1.0f;
 
 	mContext->ClearRenderTargetView(mRenderTargetView, color);
-	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0xFF);
+	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
 void D3D::EndScene() {
 	mSwapChain->Present(1, 0);
+}
+
+void D3D::EnableAlphaBlending() {
+	mContext->OMSetBlendState(mBlendState, NULL, 0xffffffff);
+}
+
+void D3D::DisableAlphaBlending() {
+	mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
 }

@@ -139,10 +139,12 @@ bool D3D11Renderer::Update() {
 	float uOffset, vOffset = 0.0f;
 	float spriteWidth, spriteHeight = 0.0f;
 
+	mD3d.EnableAlphaBlending();
 	mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
 	mSpriteMaterial.Render(mD3d.GetContext());
 
-	for (int x = 0; x < mSpriteComponents.Size(); x++) {
+	// Render sprites from back to front.
+	for (int x = mSpriteComponents.Size() - 1; x >= 0; x--) {
 		if (auto component = mSpatialSystem->GetComponent(mSpriteComponents.IndexToId(x)))
 		{
 			const Scene::SpatialComponent& spatialComponent = *component;
@@ -191,6 +193,7 @@ bool D3D11Renderer::Update() {
 		}
 	}
 
+	mD3d.DisableAlphaBlending();
 	mD3d.EndScene();
 
 	return true;
