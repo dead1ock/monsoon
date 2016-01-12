@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2014 Sonora Games
+* Copyright (c) 2014-2016 Dallin Wellington
 *
 */
 
@@ -65,7 +65,7 @@ bool D3D::Initialize(D3D11Window& renderWindow) {
 		blendDesc.RenderTarget[i].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
 		blendDesc.RenderTarget[i].SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
 		blendDesc.RenderTarget[i].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
-		blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		blendDesc.RenderTarget[i].RenderTargetWriteMask = 0x0f;
 	}
 
 	HRESULT result = mDevice->CreateBlendState(&blendDesc, &mBlendState);
@@ -292,7 +292,7 @@ void D3D::BeginScene() {
 	color[3] = 1.0f;
 
 	mContext->ClearRenderTargetView(mRenderTargetView, color);
-	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void D3D::EndScene() {

@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2014 Sonora Games
+* Copyright (c) 2014-2016 Dallin Wellington
 *
 */
 
@@ -37,8 +37,9 @@ protected:
 		mRenderer->GetCamera().lookAtX = 25.0f;
 		mRenderer->GetCamera().lookAtY = 50.0f;
 		mRenderer->GetCamera().lookAtZ = 15.0f;
+		mRenderer->GetCamera().mode = mRenderer->GetCamera().PERSPECTIVE;
 
-		U32 texture = mRenderer->LoadTexture("all_metal_streaked_b.dds");
+		U32 texture = -1; // mRenderer->LoadTexture("all_metal_streaked_b.dds");
 
 		Entity rightPlane = mEntityManager.CreateEntity();
 		Renderer::MeshComponent rightPlaneMesh;
@@ -96,11 +97,10 @@ protected:
 
 		numContainers = 0;
 		boxes = nullptr;
-		containerTexture = mRenderer->LoadTexture("all_concrete_c_fallback.dds");
+		//containerTexture = mRenderer->LoadTexture("all_concrete_c_fallback.dds");
 	}
 
 	void OnUpdate() {
-
 		Renderer::Camera& camera = mRenderer->GetCamera();
 
 		camera.x = cos(cameraTheta) * 250.0f;

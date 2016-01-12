@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2014 Sonora Games
+* Copyright (c) 2014-2016 Dallin Wellington
 *
 */
 
@@ -148,7 +148,6 @@ bool D3D11SpriteMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	result = device->CreateSamplerState(&samplerDesc, &mSamplerState);
 	if (FAILED(result))
 		return false;
-
 
 	//
 	// Clean Up

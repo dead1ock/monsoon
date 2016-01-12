@@ -1,11 +1,11 @@
 /**
-* Copyright (c) 2014 Sonora Games
+* Copyright (c) 2014-2016 Dallin Wellington
 *
 */
 
 #ifndef _MONSOON_RESOURCEMANAGER_H_
 /**
-* Copyright (c) 2014 Sonora Games
+* Copyright (c) 2014-2016 Dallin Wellington
 *
 */
 

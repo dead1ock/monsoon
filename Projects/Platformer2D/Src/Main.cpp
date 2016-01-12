@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2014 Sonora Games
+* Copyright (c) 2014-2016 Dallin Wellington
 *
 */
 
@@ -206,6 +206,7 @@ protected:
 
 		SpriteComponent crateSprite;
 		crateSprite.Texture = mCrateTexture;
+		crateSprite.ZOrder = 1;
 
 		SpatialComponent cratePosition;
 		cratePosition.position.mY += 95.0f;
@@ -216,6 +217,7 @@ protected:
 
 		SpriteComponent stoneSprite;
 		stoneSprite.Texture = mStoneTexture;
+		stoneSprite.ZOrder = 1;
 
 		SpatialComponent stonePosition;
 		stonePosition.position.mX = -550.0f;

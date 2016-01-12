@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2014 Sonora Games
+* Copyright (c) 2014-2016 Dallin Wellington
 *
 */
 
@@ -36,6 +36,7 @@ protected:
 		Renderer::VertexBufferHandle cubeVB = mRenderer->CreateCube(1.0f);
 		Renderer::VertexBufferHandle planeVB = mRenderer->CreatePlane(10.0f, 7.0f);
 
+
 		Renderer::MeshComponent triangle_one;
 		Scene::SpatialComponent triangleOnePosition;
 		triangle_one.VertexBuffer = pyramidVB;
@@ -53,8 +54,9 @@ protected:
 		Renderer::MeshComponent plane;
 		Scene::SpatialComponent planeOnePosition;
 		plane.VertexBuffer = planeVB;
-		planeOnePosition.pitch = 1.57f;
 		planeOnePosition.y = -1.0f;
+		planeOnePosition.pitch = 1.57f;
+		plane.TextureId = -1; // mRenderer->LoadTexture("dirt_dath_desertcanyonfloor_a3.dds");
 		mRenderer->AttachMeshComponent(2, plane);
 		mSpatialSystem.AttachComponent(2, planeOnePosition);
 
@@ -68,9 +70,9 @@ protected:
 		mSpatialSystem.SetOrientation(0, pyramidTransform.yaw + (mGameClock.getDeltaTime() * 2.0f), pyramidTransform.pitch, pyramidTransform.roll);
 		mSpatialSystem.SetPosition(0, pyramidTransform.x, (cos(cameraTheta) + 1.0f), pyramidTransform.z);
 
-		camera.x = cos(cameraTheta) * 8.0f;
-		camera.y = 5.0f;
-		camera.z = sin(cameraTheta) * 8.0f;
+		camera.x = cos(cameraTheta) * 15.0f;
+		camera.y = 8.0f;
+		camera.z = sin(cameraTheta) * 15.0f;
 
 		cameraTheta += mGameClock.getDeltaTime();
 	}
@@ -84,6 +86,8 @@ protected:
 
 		mSpatialSystem.DetachComponent(0);
 		mRenderer->DetachMeshComponent(0);
+
+		mRenderer->ReleaseTexture(0);
 	}
 
 };
