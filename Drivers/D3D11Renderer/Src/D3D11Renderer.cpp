@@ -495,7 +495,7 @@ U32 D3D11Renderer::LoadTexture(std::string filename)
 void D3D11Renderer::ReleaseTexture(U32 textureId)
 {
 	mTextures[textureId].Resource->Release();
-	mTextures.erase(mTextures.begin() + textureId);
+	//mTextures.erase(mTextures.begin() + textureId);
 	mTextureFreeList.push_back(textureId);
 }
 
