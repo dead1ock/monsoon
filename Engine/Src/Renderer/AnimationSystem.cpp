@@ -22,7 +22,7 @@ AnimationSystem::~AnimationSystem()
 
 SpriteAnimationHandle AnimationSystem::CreateAnimation2d(SpriteAnimation animation)
 {
-	SpriteAnimationHandle handle = mSpriteAnimations.size();
+	SpriteAnimationHandle handle = (SpriteAnimationHandle)mSpriteAnimations.size();
 	if (mSpriteAnimationsFreelist.size())
 	{
 		handle = mSpriteAnimationsFreelist.back();

@@ -38,7 +38,7 @@ namespace Monsoon {
 			}
 
 			inline void Add(Id id, Object& object) {
-				mIndexTable[id] = mPackedObjects.size();
+				mIndexTable[id] = (U16)mPackedObjects.size();
 				mPackedObjects.push_back(std::pair<Object, Id>(object, id));
 			}
 
@@ -71,7 +71,7 @@ namespace Monsoon {
 				mPackedObjects.pop_back();
 			}
 
-			inline int Size() { return mPackedObjects.size(); }
+			inline U16 Size() { return (U16) mPackedObjects.size(); }
 
 			inline bool Exists(Id id) {
 				return (mIndexTable[id] != USHRT_MAX);

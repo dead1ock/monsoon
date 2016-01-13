@@ -14,7 +14,8 @@ using namespace Monsoon::Resource;
 ResourceManager::ResourceManager()
 	: mNextResourceId(0)
 {
-
+	nullResourceData.filename = "null";
+	nullResourceData.size = 0;
 }
 
 ResourceManager::~ResourceManager()
@@ -83,7 +84,7 @@ const ResourceData& ResourceManager::GetResourceData(ResourceId id)
 	if (resourceIter != mResources.end())
 		return resourceIter->second;
 	else
-		return ResourceData();
+		return nullResourceData;
 }
 
 void ResourceManager::LoadFile(std::string filename, ResourceData& dest)
@@ -104,7 +105,7 @@ void ResourceManager::LoadFile(std::string filename, ResourceData& dest)
 
 		dest.filename = filename;
 		dest.data = fileData;
-		dest.size = fileSize;
+		dest.size = (U16) fileSize;
 		iFile.close();
 	}
 	else

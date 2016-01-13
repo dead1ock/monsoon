@@ -29,7 +29,7 @@ namespace Monsoon
 		{
 			std::string filename;
 			char* data;
-			U32 size;
+			U16 size;
 		};
 
 		/**
@@ -56,6 +56,7 @@ namespace Monsoon
 			std::unordered_map<ResourceId, ResourceData> mResources;
 			std::unordered_map<std::string, ResourceId> mResourceIds;
 			ResourceId mNextResourceId;
+			ResourceData nullResourceData;
 		};
 	}
 }

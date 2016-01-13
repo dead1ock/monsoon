@@ -16,7 +16,7 @@ namespace Monsoon
 {
 	namespace Renderer
 	{
-		typedef U32 SpriteAnimationHandle;
+		typedef U16 SpriteAnimationHandle;
 
 		struct SpriteAnimationFrame
 		{
