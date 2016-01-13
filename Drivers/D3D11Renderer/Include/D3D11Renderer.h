@@ -17,7 +17,6 @@
 #include "D3D11SpriteMaterial.h"
 #include "Util/PackedPool.h"
 
-
 namespace Monsoon {
 	namespace Renderer{
 

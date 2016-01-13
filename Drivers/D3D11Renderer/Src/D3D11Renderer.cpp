@@ -4,10 +4,11 @@
 */
 
 #include <Windows.h>
-#include <d3dx11tex.h>
 
 #include "D3D11Renderer.h"
 #include "D3D11VertexBuffer.h"
+
+#include <d3dx11tex.h>
 
 using namespace Monsoon;
 using namespace Monsoon::Renderer;

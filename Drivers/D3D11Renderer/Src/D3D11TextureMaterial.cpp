@@ -3,9 +3,9 @@
 *
 */
 
-#include <d3dx11async.h>
-
 #include "D3D11TextureMaterial.h"
+
+#include <d3dx11async.h>
 
 using namespace Monsoon::Renderer;
 

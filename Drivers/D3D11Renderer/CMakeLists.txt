@@ -32,12 +32,6 @@ IF(MSVC)
 	# private, we can disable this warning. A possible fix in the future is to
 	# create classes which encapsulate the stl functionality and which are exported.
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4251")
-
-	# Disables warning about macro redefinitions. There is a conflict between the old DX SDK
-	# and the new version of DX which resides in the Windows Platform libraries. This can be
-	# safely ignored but it means the program will run off of depreciated macro definitions.
-	# Read more here: https://msdn.microsoft.com/en-us/library/windows/desktop/ee663275.aspx
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4005")
 ENDIF(MSVC)
 
 ADD_DEFINITIONS(-DMONSOON_DYNLIB_EXPORT)

@@ -6,11 +6,20 @@
 #ifndef _MONSOON_D3D_H_
 #define _MONSOON_D3D_H_
 
+/**
+# Disables a warning about macro redefinitions. There exists a conflict between the old DXSDK
+# and the new version of the DXSDK which resides in the Windows Platform libraries.This can be
+# safely ignored for now, but it means the program will run off of depreciated macro definitions.
+# Read more here : https ://msdn.microsoft.com/en-us/library/windows/desktop/ee663275.aspx
+*/
+#pragma warning( push )
+#pragma warning( disable : 4005 )
 #include <d3d11.h>
 #include <DXGI.h>
 #include <D3DX10math.h>
 
 #include "D3D11Window.h"
+
 
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
@@ -65,5 +74,7 @@ namespace Monsoon {
 
 	} // namespace renderer
 } // namespace monsoon
+
+#pragma warning( pop )
 
 #endif // _MONSOON_D3D11_H_

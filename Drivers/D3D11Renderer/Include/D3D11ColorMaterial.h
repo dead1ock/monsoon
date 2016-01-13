@@ -6,9 +6,9 @@
 #ifndef _MONSOON_COLOR_MATERIAL_H_
 #define _MONSOON_COLOR_MATERIAL_H_
 
-#include <d3dx11async.h>
-
 #include "D3D11VertexBuffer.h"
+
+#include <d3dx11async.h>
 
 namespace Monsoon {
 	namespace Renderer {
