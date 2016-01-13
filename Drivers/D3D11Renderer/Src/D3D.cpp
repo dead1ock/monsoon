@@ -101,7 +101,7 @@ void D3D::Shutdown() {
 
 bool D3D::CreateDeviceAndSwapChain(D3D11Window& renderWindow) {
 	HRESULT result;
-	U32 error, createDeviceFlags = 0;
+	U32 createDeviceFlags = 0;
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	D3D_FEATURE_LEVEL featureLevel;
 
@@ -182,7 +182,6 @@ bool D3D::CreateDepthStencilBuffer(D3D11Window& renderWindow) {
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-	D3D11_RASTERIZER_DESC rasterDesc;
 	HRESULT result;
 
 
@@ -282,6 +281,7 @@ bool D3D::SetRasterState() {
 	}
 
 	mContext->RSSetState(mRasterState);
+	return true;
 }
 
 void D3D::BeginScene() {

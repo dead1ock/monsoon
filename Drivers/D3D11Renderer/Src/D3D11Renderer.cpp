@@ -43,6 +43,7 @@ bool D3D11Renderer::Initialize() {
 		return false;
 
 	mSpritePlane = CreatePlane(1.0f, 1.0f);
+	return true;
 }
 
 void D3D11Renderer::Shutdown() {
@@ -136,8 +137,8 @@ bool D3D11Renderer::Update() {
 
 	// Render 2d Sprites
 	TextureHandle currentTexture = -1;
-	float uOffset, vOffset = 0.0f;
-	float spriteWidth, spriteHeight = 0.0f;
+	Float uOffset, vOffset = 0.0f;
+	Float spriteWidth, spriteHeight = 0.0f;
 
 	mD3d.EnableAlphaBlending();
 	mVertexBuffers[mSpritePlane].Render(mD3d.GetContext());
@@ -163,8 +164,8 @@ bool D3D11Renderer::Update() {
 			{
 				uOffset = 0.0f;
 				vOffset = 0.0f;
-				spriteWidth = spriteTexture.Width;
-				spriteHeight = spriteTexture.Height;
+				spriteWidth = (Float)spriteTexture.Width;
+				spriteHeight = (Float)spriteTexture.Height;
 			}
 
 			D3DXMatrixIdentity(&worldMatrix);
@@ -172,7 +173,7 @@ bool D3D11Renderer::Update() {
 			D3DXMatrixIdentity(&rotation);
 			D3DXMatrixIdentity(&scale);
 
-			D3DXMatrixTranslation(&translation, spatialComponent.position.mX, spatialComponent.position.mY, spriteComponent.ZOrder);
+			D3DXMatrixTranslation(&translation, spatialComponent.position.mX, spatialComponent.position.mY, (Float)spriteComponent.ZOrder);
 			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
 
 			D3DXMatrixScaling(&scale, spatialComponent.scaleX * spriteWidth, spatialComponent.scaleY * spriteHeight, spatialComponent.scaleZ);
@@ -203,14 +204,14 @@ int nextFreeId = 0;
 
 VertexBufferHandle D3D11Renderer::CreateVertexBuffer(VertexType vertices[], int vertexCount, unsigned int indicies[], int indexCount)
 {
-	int vbHandle = 0;
+	U32 vbHandle = 0;
 	if (mFreeIndexList.size()) {
 		vbHandle = mFreeIndexList.back();
 		mFreeIndexList.pop_back();
 	}
 	else
 	{
-		vbHandle = mVertexBuffers.size();
+		vbHandle = (U32)mVertexBuffers.size();
 		mVertexBuffers.push_back(D3D11VertexBuffer());
 	}
 
@@ -297,9 +298,9 @@ VertexBufferHandle D3D11Renderer::CreateCylinder(U32 sections) {
 	vertices[0].SetPosition(0.0f, 0.5f, 0.0f);
 	vertices[0].SetColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	for (int x = 0; x < sections; x++)
+	for (U32 x = 0; x < sections; x++)
 	{
-		vertices[x+1].SetPosition(0.5f * cos(x * ((2 * D3DX_PI) / sections)), 0.5f, 0.5f * sin(x * ((2 * D3DX_PI) / sections)));
+		vertices[x+1].SetPosition(0.5f * (Float)cos(x * ((2 * D3DX_PI) / sections)), 0.5f, 0.5f * (Float)sin(x * ((2 * D3DX_PI) / sections)));
 		vertices[x+1].SetColor(0.2f, 0.2f, 1.0f, 1.0f);
 	}
 	
@@ -307,21 +308,21 @@ VertexBufferHandle D3D11Renderer::CreateCylinder(U32 sections) {
 	vertices[sections + 1].SetPosition(0.0f, -0.5f, 0.0f);
 	vertices[sections + 1].SetColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	for (int x = 0; x < sections; x++)
+	for (U32 x = 0; x < sections; x++)
 	{
-		vertices[(x + sections) + 2].SetPosition(0.5f * cos(x * ((2 * D3DX_PI) / sections)), -0.5f, 0.5f * sin(x * ((2 * D3DX_PI) / sections)));
+		vertices[(x + sections) + 2].SetPosition(0.5f * (Float)cos(x * ((2 * D3DX_PI) / sections)), -0.5f, 0.5f * (Float)sin(x * ((2 * D3DX_PI) / sections)));
 		vertices[(x + sections) + 2].SetColor(0.20f, 0.70f, 0.20f, 1.0f);
 	}
 
 	//
 	// Generate Indices
 	//
-	int size = 3 * ((sections * 2) + (sections * 2)); // 
+	U32 size = 3 * ((sections * 2) + (sections * 2)); // 
 	unsigned int* indices = new unsigned int[size];
 
 	// Top Section
 	unsigned int index = 0;
-	for (int x = 1; x <= sections; x++)
+	for (U32 x = 1; x <= sections; x++)
 	{
 		indices[index++] = 0;
 		indices[index++] = (x == sections) ? 1 : (x + 1);
@@ -329,7 +330,7 @@ VertexBufferHandle D3D11Renderer::CreateCylinder(U32 sections) {
 	}
 
 	// Mid Section
-	for (int x = 1; x <= sections; x++)
+	for (U32 x = 1; x <= sections; x++)
 	{
 		indices[index++] = x;
 		indices[index++] = (x == sections) ? 1: (x + 1);
@@ -340,7 +341,7 @@ VertexBufferHandle D3D11Renderer::CreateCylinder(U32 sections) {
 	}
 
 	// Bottom Section
-	for (int x = (sections + 1); x <= (sections * 2); x++)
+	for (U32 x = (sections + 1); x <= (sections * 2); x++)
 	{
 		indices[index++] = sections + 1;
 		indices[index++] = (x == (sections * 2)) ? (1 + sections) : (x + 1);
@@ -451,7 +452,7 @@ VertexBufferHandle D3D11Renderer::CreatePyramid(float base, float height)
 U32 D3D11Renderer::LoadTexture(std::string filename)
 {
 	HRESULT result;
-	TextureHandle index = mTextures.size();
+	TextureHandle index = (TextureHandle)mTextures.size();
 	D3D11_TEXTURE2D_DESC textureDesc;
 	ID3D11Resource* resource = nullptr;
 	D3D11Texture texture;
@@ -501,7 +502,7 @@ void D3D11Renderer::ReleaseTexture(U32 textureId)
 
 AtlasSheetHandle D3D11Renderer::CreateAtlasSheet(AtlasSheet sheet)
 {
-	AtlasSheetHandle index = mAtlasSheets.size();
+	AtlasSheetHandle index = (TextureHandle)mAtlasSheets.size();
 	if (mAtlasSheetFreeList.size())
 	{
 		index = mAtlasSheetFreeList.back();

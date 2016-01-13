@@ -20,7 +20,7 @@ namespace Monsoon {
 			bool Load(ID3D11Device* device, HWND windowHandle);
 			void Release();
 			void SetTexture(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* texture);
-			void SetAtlasBuffer(ID3D11DeviceContext* deviceContext, int srcWidth, int srcHeight, float srcU, float srcV);
+			void SetAtlasBuffer(ID3D11DeviceContext* deviceContext, float srcWidth, float srcHeight, float srcU, float srcV);
 			void SetMatrixBuffer(ID3D11DeviceContext* deviceContext, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX projection);
 			void Render(ID3D11DeviceContext* deviceContext);
 

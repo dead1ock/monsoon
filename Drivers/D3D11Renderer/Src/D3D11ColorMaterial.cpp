@@ -3,8 +3,6 @@
 *
 */
 
-#include <d3dx11async.h>
-
 #include "D3D11ColorMaterial.h"
 
 using namespace Monsoon::Renderer;
@@ -147,7 +145,6 @@ void D3D11ColorMaterial::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX w
 	//
 	// Map Material Inputs
 	//
-	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;

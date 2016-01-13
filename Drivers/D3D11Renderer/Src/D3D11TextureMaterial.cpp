@@ -172,7 +172,6 @@ void D3D11TextureMaterial::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX
 	//
 	// Map Material Inputs
 	//
-	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;

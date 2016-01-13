@@ -3,11 +3,11 @@
 *
 */
 
+#include "D3D11SpriteMaterial.h"
+
 #include <d3dx11async.h>
 #include <iostream>
 #include <fstream>
-
-#include "D3D11SpriteMaterial.h"
 
 using namespace Monsoon::Renderer;
 
@@ -34,7 +34,6 @@ bool D3D11SpriteMaterial::Load(ID3D11Device* device, HWND windowHandle)
 	D3D11_INPUT_ELEMENT_DESC layoutDescription[2];
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDescription;
-	D3D11_BUFFER_DESC spriteSheetBufferDescription;
 	D3D11_BUFFER_DESC atlasBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
 
@@ -187,7 +186,7 @@ void D3D11SpriteMaterial::SetTexture(ID3D11DeviceContext* deviceContext, ID3D11S
 	deviceContext->PSSetShaderResources(0, 1, &texture);
 }
 
-void D3D11SpriteMaterial::SetAtlasBuffer(ID3D11DeviceContext* deviceContext, int srcWidth, int srcHeight, float srcU, float srcV)
+void D3D11SpriteMaterial::SetAtlasBuffer(ID3D11DeviceContext* deviceContext, float srcWidth, float srcHeight, float srcU, float srcV)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	AtlasBuffer* dataPtr;
