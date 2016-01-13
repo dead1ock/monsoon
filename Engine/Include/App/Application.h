@@ -52,6 +52,7 @@ namespace Monsoon {
 		Resource::ResourceManager mResourceManager;
 		Platform::Log mLog;
 		Renderer::AnimationSystem mAnimationSystem;
+		bool mQuit;
 
 	private:
 		/**
