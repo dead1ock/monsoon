@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <Math/Vector.h>
+#include <Math/Matrix4x4.h>
 
 using namespace Monsoon::Math;
 
@@ -159,3 +160,17 @@ TEST(Vector3, ScalarDivision) {
 // --------------------------------------
 // Vector4 Tests
 // --------------------------------------
+
+// --------------------------------------
+// Matrix4x4 Tests
+// --------------------------------------
+
+TEST(Matrix4x4, IdentitySquaredIsIdentity) {
+	Matrix4x4 m1, m2;
+	Matrix4x4 m3 = m1 * m2;
+
+	EXPECT_EQ(1.0f, m3.m[0][0]);
+	EXPECT_EQ(1.0f, m3.m[1][1]);
+	EXPECT_EQ(1.0f, m3.m[2][2]);
+	EXPECT_EQ(1.0f, m3.m[3][3]);
+}

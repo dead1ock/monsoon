@@ -12,6 +12,7 @@ SET(MODULE_SRC
 	Include/Event/EventManager.h
 	Include/Math/AABB.h
 	Include/Math/Vector.h
+	Include/Math/Matrix4x4.h
 	Include/Platform/Clock.h
 	Include/Platform/DynLib.h
 	Include/Platform/Endianness.h
@@ -34,6 +35,7 @@ SET(MODULE_SRC
 	Src/ECS/System.cpp
 	Src/Event/EventManager.cpp
 	Src/Math/AABB.cpp
+	Src/Math/Matrix4x4.cpp
 	Src/Math/Vector.cpp
 	Src/Platform/Clock.cpp
 	Src/Platform/Log.cpp
