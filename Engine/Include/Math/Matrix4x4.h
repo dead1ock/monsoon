@@ -31,7 +31,10 @@ namespace Monsoon {
 
 			bool operator==(Matrix4x4& other); // Matrix Equality
 
-			float* row(U8 i);
+			void Transpose();
+			Matrix4x4 GetTranspose();
+
+			float* GetRow(U8 i);
 
 			float& operator()(U8 i, U8 j);
 

@@ -197,3 +197,40 @@ TEST(Matrix4x4, IdentityMultiplicationProperty) {
 	EXPECT_EQ(true, m1 == left);
 	EXPECT_EQ(true, m1 == right);
 }
+
+/*
+* Test transpose functionality.
+*/
+TEST(Matrix4x4, Transpose) {
+	float matrix[4][4] = {
+		{ 1.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f, 0.0f },
+		{ 10.0f, -30.0f, 50.0f, 1.0f }
+	};
+
+	float matrixT[4][4] = {
+		{ 1.0f, 0.0f, 0.0f, 10.0f },
+		{ 0.0f, 1.0f, 0.0f, -30.0f },
+		{ 0.0f, 0.0f, 1.0f, 50.0f },
+		{ 0.0f, 0.0f, 0.0f, 1.0f }
+	};
+
+	Matrix4x4 m1(matrix);
+	Matrix4x4 m2(matrixT);
+
+	EXPECT_EQ(true, m2 == m1.GetTranspose());
+	m1.Transpose();
+	EXPECT_EQ(true, m2 == m1);
+}
+
+/*
+ * [I]^T = [I]
+ */
+TEST(Matrix4x4, IdentityTransposeProperty)
+{
+	Matrix4x4 m1;
+	EXPECT_EQ(true, m1 == m1.GetTranspose());
+	m1.Transpose();
+	EXPECT_EQ(true, Matrix4x4() == m1);
+}

@@ -68,6 +68,32 @@ float& Matrix4x4::operator()(U8 i, U8 j)  {
 	return m[i][j];
 }
 
-float* Matrix4x4::row(U8 i)  {
+float* Matrix4x4::GetRow(U8 i)  {
 	return m[i];
+}
+
+void Matrix4x4::Transpose() {
+	float trans[4][4];
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			trans[i][j] = m[j][i];
+		}
+	}
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			m[i][j] = trans[i][j];
+		}
+	}
+}
+
+Matrix4x4 Matrix4x4::GetTranspose() {
+	float trans[4][4];
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			trans[i][j] = m[j][i];
+		}
+	}
+
+	return Matrix4x4(trans);
 }
