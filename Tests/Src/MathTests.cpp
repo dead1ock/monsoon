@@ -165,12 +165,35 @@ TEST(Vector3, ScalarDivision) {
 // Matrix4x4 Tests
 // --------------------------------------
 
-TEST(Matrix4x4, IdentitySquaredIsIdentity) {
+/*
+ * [I] * [I] = [I]
+ */
+TEST(Matrix4x4, IdentitySquared) {
 	Matrix4x4 m1, m2;
 	Matrix4x4 m3 = m1 * m2;
 
-	EXPECT_EQ(1.0f, m3.m[0][0]);
-	EXPECT_EQ(1.0f, m3.m[1][1]);
-	EXPECT_EQ(1.0f, m3.m[2][2]);
-	EXPECT_EQ(1.0f, m3.m[3][3]);
+	EXPECT_EQ(1.0f, m3(0,0));
+	EXPECT_EQ(1.0f, m3(1,1));
+	EXPECT_EQ(1.0f, m3(2,2));
+	EXPECT_EQ(1.0f, m3(3,3));
+}
+
+/*
+ * [A] * [I] = [I] * [A] = [A]
+ */
+TEST(Matrix4x4, IdentityMultiplicationProperty) {
+	float matrix[4][4] = {
+		{ 1.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f, 0.0f },
+		{ 10.0f, -30.0f, 50.0f, 1.0f }
+	};
+
+	Matrix4x4 m1(matrix);
+	Matrix4x4 i;
+	Matrix4x4 left = m1 * i;
+	Matrix4x4 right = i * m1;
+
+	EXPECT_EQ(true, m1 == left);
+	EXPECT_EQ(true, m1 == right);
 }

@@ -5,6 +5,7 @@
 
 #include "Math/Matrix4x4.h"
 
+using namespace Monsoon;
 using namespace Monsoon::Math;
 
 Matrix4x4::Matrix4x4() {
@@ -12,6 +13,16 @@ Matrix4x4::Matrix4x4() {
 	m[1][0] = 0;	m[1][1] = 1;	m[1][2] = 0;	m[1][3] = 0;
 	m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 1;	m[2][3] = 0;
 	m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
+}
+
+Matrix4x4::Matrix4x4(float matrix[4][4]) {
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m[i][j] = matrix[i][j];
+		}
+	}
 }
 
 Matrix4x4::~Matrix4x4() {
@@ -32,4 +43,31 @@ Matrix4x4 Matrix4x4::operator*(Matrix4x4& other) {
 
 void Matrix4x4::operator*=(Matrix4x4& other) {
 
+}
+
+bool Matrix4x4::operator==(Matrix4x4& other) {
+	bool equal = true;
+	for (int i = 0; i < 4; i++)
+	{
+		if (equal == false)
+			break;
+
+		for (int j = 0; j < 4; j++)
+		{
+			if (m[i][j] != other.m[i][j]) {
+				equal = false;
+				break;
+			}
+		}
+	}
+
+	return equal;
+}
+
+float& Matrix4x4::operator()(U8 i, U8 j)  {
+	return m[i][j];
+}
+
+float* Matrix4x4::row(U8 i)  {
+	return m[i];
 }

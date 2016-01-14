@@ -6,6 +6,7 @@
 #ifndef _MONSOON_MATH_MATRIX4X4_
 #define _MONSOON_MATH_MATRIX4X4_
 
+#include <Platform\Types.h>
 #include <Platform\DynLib.h>
 
 namespace Monsoon {
@@ -17,12 +18,24 @@ namespace Monsoon {
 		class DYNLIB Matrix4x4
 		{
 		public:
+			/*
+			 * Identity matrix constructor.
+			 */
 			Matrix4x4();
+
+			Matrix4x4(float matrix[4][4]);
 			~Matrix4x4();
 
 			void operator*=(Matrix4x4& other); // Matrix Multiplication
 			Matrix4x4 operator*(Matrix4x4& other);
 
+			bool operator==(Matrix4x4& other); // Matrix Equality
+
+			float* row(U8 i);
+
+			float& operator()(U8 i, U8 j);
+
+		protected:
 			float m[4][4];
 		};
 
