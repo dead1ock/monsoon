@@ -234,3 +234,36 @@ TEST(Matrix4x4, IdentityTransposeProperty)
 	m1.Transpose();
 	EXPECT_EQ(true, Matrix4x4() == m1);
 }
+
+/*
+ * [A]^T*[B]^T*[C]^T = (ABC)^T
+ */
+TEST(Matrix4x4, TransposeMultiplicationProperty)
+{
+	float matrix[4][4] = {
+		{ 1.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f, 0.0f },
+		{ 10.0f, -30.0f, 50.0f, 1.0f }
+	};
+
+	float matrix2[4][4] = {
+		{ 1.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f, 0.0f },
+		{ 40.0f, 30.0f, 150.0f, 1.0f }
+	};
+
+	float matrix3[4][4] = {
+		{ 1.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f, 0.0f },
+		{ -310.0f, 90.0f, 45.0f, 1.0f }
+	};
+
+	Matrix4x4 m1(matrix), m2(matrix2), m3(matrix3);
+	Matrix4x4 m4 = (m1 * m2 * m3).GetTranspose(); // ABC^T
+	Matrix4x4 m5 = m1.GetTranspose() * m2.GetTranspose() * m3.GetTranspose();
+
+	EXPECT_EQ(true, m4 == m5);
+}
