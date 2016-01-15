@@ -65,7 +65,7 @@ bool D3D::Initialize(D3D11Window& renderWindow) {
 		blendDesc.RenderTarget[i].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
 		blendDesc.RenderTarget[i].SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
 		blendDesc.RenderTarget[i].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
-		blendDesc.RenderTarget[i].RenderTargetWriteMask = 0x0f;
+		blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	}
 
 	HRESULT result = mDevice->CreateBlendState(&blendDesc, &mBlendState);

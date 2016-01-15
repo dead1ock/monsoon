@@ -250,6 +250,12 @@ void D3D11Renderer::AttachSpriteComponent(Monsoon::Entity entity, SpriteComponen
 void D3D11Renderer::DetachSpriteComponent(Monsoon::Entity entity)
 {
 	mSpriteComponents.Remove(entity);
+	mSpriteComponents.Sort([](SpriteComponent a, SpriteComponent b) -> bool {
+		if (a.ZOrder == b.ZOrder)
+			return (a.Texture < b.Texture);
+		else
+			return (a.ZOrder < b.ZOrder);
+	});
 }
 
 SpriteComponent& D3D11Renderer::GetSpriteComponent(Monsoon::Entity entity) {
