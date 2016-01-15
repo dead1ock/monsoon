@@ -125,6 +125,15 @@ TEST(Vector3, Unit) {
 	EXPECT_EQ((2.0f / vec.Magnitude()), vec.Unit().mZ);
 }
 
+TEST(Vector3, Cross) {
+	Vector3 vec1(1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f, 0.0f);
+	Vector3 vec3 = vec1.Cross(vec2);
+
+	EXPECT_EQ(0.0f, vec3.mX);
+	EXPECT_EQ(0.0f, vec3.mY);
+	EXPECT_EQ(1.0f, vec3.mZ);
+}
+
 TEST(Vector3, VestorAddition) {
 	Vector3 vec = Vector3(10.0f, 5.0f, 2.0f) + Vector3(2.0f, 7.0f, -1.0f);
 
