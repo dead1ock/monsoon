@@ -31,10 +31,11 @@ D3D11Renderer::~D3D11Renderer() {
 bool D3D11Renderer::Initialize() {
 	mEventManager->Subscribe("Entity::Destroyed", [this](void* arg) {
 
-		if (mMeshComponents.Exists((Monsoon::Entity)arg))
-			this->DetachMeshComponent((Monsoon::Entity)arg);
-		if (mSpriteComponents.Exists((Monsoon::Entity)arg))
-			this->DetachSpriteComponent((Monsoon::Entity)arg);
+	if (mMeshComponents.Exists((Monsoon::Entity)arg))
+		this->DetachMeshComponent((Monsoon::Entity)arg);
+	if (mSpriteComponents.Exists((Monsoon::Entity)arg))
+		this->DetachSpriteComponent((Monsoon::Entity)arg);
+
 		return 0;
 	});
 
