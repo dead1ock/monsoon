@@ -13,11 +13,12 @@
 using namespace Monsoon;
 using namespace Monsoon::Renderer;
 
-D3D11Renderer::D3D11Renderer(RendererSettings& settings, Scene::SpatialSystem* spatialSystem)
-: Renderer(settings, spatialSystem),
-  mSpatialSystem(spatialSystem),
-  mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen),
-  mSettings(settings)
+D3D11Renderer::D3D11Renderer(RendererSettings& settings, Event::EventManager* eventManager, Scene::SpatialSystem* spatialSystem)
+	: Renderer(settings, eventManager, spatialSystem),
+	mSpatialSystem(spatialSystem),
+	mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen),
+	mSettings(settings),
+	mEventManager(eventManager)
 {
 	mVertexBuffers.reserve(MONSOON_MAX_ENTITIES);
 	mTextures.reserve(1024);
@@ -28,6 +29,12 @@ D3D11Renderer::~D3D11Renderer() {
 }
 
 bool D3D11Renderer::Initialize() {
+	mEventManager->Subscribe("Entity::Destroyed", [this](void* arg) {
+		this->DetachMeshComponent((Monsoon::Entity)arg);
+		this->DetachSpriteComponent((Monsoon::Entity)arg);
+		return 0;
+	});
+
 	if (!mWindow.Initialize())
 		return false;
 

@@ -148,7 +148,7 @@ namespace Monsoon {
 		class DRIVER Renderer
 		{
 		public:
-			Renderer(RendererSettings& settings, Scene::SpatialSystem* spatialSystem) { };
+			Renderer(RendererSettings& settings, Event::EventManager* eventManager, Scene::SpatialSystem* spatialSystem) { };
 			virtual ~Renderer() { };
 
 			virtual bool Initialize() = 0;

@@ -57,6 +57,9 @@ namespace Monsoon {
 			}
 
 			inline void Remove(Id id) {
+				if (!Exists(id))
+					return;
+
 				Index removeIndex = mIndexTable[id];
 				std::pair<Object, Id>& removeObject = mPackedObjects[removeIndex];
 				 
