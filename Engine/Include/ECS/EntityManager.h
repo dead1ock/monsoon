@@ -3,6 +3,9 @@
 *
 */
 
+#ifndef _MONSOON_ENTITYMANAGER_H_
+#define _MONSOON_ENTITYMANAGER_H_
+
 #include <string>
 #include <unordered_map>
 #include <list>
@@ -56,3 +59,5 @@ namespace Monsoon {
 		};
 	}
 }
+
+#endif
