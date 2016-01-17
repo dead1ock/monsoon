@@ -11,7 +11,11 @@
 using namespace Monsoon;
 using namespace Monsoon::Platform;
 
+const char VerbosityLevel = 0; // 0 = all. This should eventually be moved into
+								// engine configuration and passed to the Log class.
+
 Log::Log(const char* filename)
+	: mVerbosityLevel(0)
 {
 	mLogFile.open(filename, std::ios_base::out);
 
@@ -51,12 +55,8 @@ void Log::Fatal(const char* message)
 	assert(false && "A fatal error has occured, see the log file.");
 }
 
-void Log::Info(const char* message)
+void Log::VerboseDebug(U8 verbosity, const char* message)
 {
-#ifdef _DEBUG
-	std::cout << message << std::endl;
-#endif
-
-	mLogFile << "[Info] " << message << std::endl;
+	if (mVerbosityLevel <= verbosity)
+		Debug(message);
 }
-

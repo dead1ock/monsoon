@@ -30,11 +30,13 @@ namespace Monsoon {
 			virtual ~Log();
 
 			void Debug(const char* message);
+			void VerboseDebug(U8 verbosity, const char* message);
+
 			void Fatal(const char* message);
-			void Info(const char* message);
 
 		private:
 			std::fstream mLogFile;
+			U8 mVerbosityLevel;
 
 #ifdef MONSOON_OS_WINDOWS
 			HANDLE mConsoleHandle;
