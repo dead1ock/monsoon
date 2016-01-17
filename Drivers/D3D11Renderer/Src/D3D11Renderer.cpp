@@ -62,7 +62,8 @@ void D3D11Renderer::Shutdown() {
 
 	mTextureFreeList.clear();
 	for (std::vector<D3D11Texture>::iterator i = mTextures.begin(); i < mTextures.end(); i++)
-		i->Resource->Release();
+		if(i->Resource != nullptr)
+			i->Resource->Release();
 	mTextures.clear();
 
 	mFreeIndexList.clear();
@@ -514,6 +515,7 @@ U32 D3D11Renderer::LoadTexture(std::string filename)
 void D3D11Renderer::ReleaseTexture(U32 textureId)
 {
 	mTextures[textureId].Resource->Release();
+	mTextures[textureId].Resource = nullptr;
 	//mTextures.erase(mTextures.begin() + textureId);
 	mTextureFreeList.push_back(textureId);
 }
