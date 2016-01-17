@@ -26,7 +26,7 @@ class Platformer2DApp : public Application
 {
 public:
 	Platformer2DApp()
-		: Application((Monsoon::Renderer::Renderer*)(new D3D11Renderer(RendererSettings(), &mSpatialSystem))) {
+		: Application((Monsoon::Renderer::Renderer*)(new D3D11Renderer(RendererSettings(), &mEventManager, &mSpatialSystem))) {
 		mLastFrameChange = 0.0f;
 		mLastJump = 0.0f;
 	}

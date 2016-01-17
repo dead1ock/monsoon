@@ -77,7 +77,7 @@ class TerrainApplication : public Application
 {
 public:
 	TerrainApplication()
-		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mSpatialSystem))) 
+		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mSpatialSystem))) 
 		, mFileReader((filename + ".hgt").c_str()) {
 	}
 
