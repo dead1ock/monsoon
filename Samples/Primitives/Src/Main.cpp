@@ -20,7 +20,7 @@ class PrimitivesApplication : public Application
 {
 public:
 	PrimitivesApplication()
-		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mSpatialSystem))) {
+		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mSpatialSystem))) {
 
 	}
 
@@ -40,23 +40,23 @@ protected:
 		Renderer::MeshComponent triangle_one;
 		Scene::SpatialComponent triangleOnePosition;
 		triangle_one.VertexBuffer = pyramidVB;
-		triangleOnePosition.x = 2.0f;
+		triangleOnePosition.position.mX = 2.0f;
 		mRenderer->AttachMeshComponent(0, triangle_one);
 		mSpatialSystem.AttachComponent(0, triangleOnePosition);
 
 		Renderer::MeshComponent cube_one;
 		Scene::SpatialComponent cubeOnePosition;
 		cube_one.VertexBuffer = cubeVB;
-		cubeOnePosition.x = -2.0f;
+		cubeOnePosition.position.mX = -2.0f;
 		mRenderer->AttachMeshComponent(1, cube_one);
 		mSpatialSystem.AttachComponent(1, cubeOnePosition);
 
 		Renderer::MeshComponent plane;
 		Scene::SpatialComponent planeOnePosition;
 		plane.VertexBuffer = planeVB;
-		planeOnePosition.y = -1.0f;
+		planeOnePosition.position.mY = -1.0f;
 		planeOnePosition.pitch = 1.57f;
-		plane.TextureId = -1; // mRenderer->LoadTexture("dirt_dath_desertcanyonfloor_a3.dds");
+		plane.TextureId = -1;
 		mRenderer->AttachMeshComponent(2, plane);
 		mSpatialSystem.AttachComponent(2, planeOnePosition);
 
@@ -68,7 +68,7 @@ protected:
 		auto& pyramidTransform = *mSpatialSystem.GetComponent(0);
 
 		mSpatialSystem.SetOrientation(0, pyramidTransform.yaw + (mGameClock.getDeltaTime() * 2.0f), pyramidTransform.pitch, pyramidTransform.roll);
-		mSpatialSystem.SetPosition(0, pyramidTransform.x, (cos(cameraTheta) + 1.0f), pyramidTransform.z);
+		mSpatialSystem.SetPosition(0, pyramidTransform.position.mX, (cos(cameraTheta) + 1.0f), pyramidTransform.position.mZ);
 
 		camera.x = cos(cameraTheta) * 15.0f;
 		camera.y = 8.0f;
