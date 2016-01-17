@@ -514,9 +514,14 @@ U32 D3D11Renderer::LoadTexture(std::string filename)
 
 void D3D11Renderer::ReleaseTexture(U32 textureId)
 {
+	// Release texture resource, set the texture's
+	// state to invalid, then add the resource id
+	// to the freelist.
 	mTextures[textureId].Resource->Release();
+	mTextures[textureId].Filename = "null";
+	mTextures[textureId].Width = 0;
+	mTextures[textureId].Height = 0;
 	mTextures[textureId].Resource = nullptr;
-	//mTextures.erase(mTextures.begin() + textureId);
 	mTextureFreeList.push_back(textureId);
 }
 
