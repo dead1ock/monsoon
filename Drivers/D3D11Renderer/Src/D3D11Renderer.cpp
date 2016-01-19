@@ -13,9 +13,9 @@
 using namespace Monsoon;
 using namespace Monsoon::Renderer;
 
-D3D11Renderer::D3D11Renderer(RendererSettings& settings, Event::EventManager* eventManager, Scene::SpatialSystem* spatialSystem)
-	: Renderer(settings, eventManager, spatialSystem),
-	mSpatialSystem(spatialSystem),
+D3D11Renderer::D3D11Renderer(RendererSettings& settings, Event::EventManager* eventManager, Scene::TransformSystem* transformSystem)
+	: Renderer(settings, eventManager, transformSystem),
+	mTransformSystem(transformSystem),
 	mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen),
 	mSettings(settings),
 	mEventManager(eventManager)
@@ -119,7 +119,7 @@ bool D3D11Renderer::Update() {
 
 	// Render 3d Meshes
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
-		if (auto component = mSpatialSystem->GetComponent(mMeshComponents.IndexToId(x)))
+		if (auto component = mTransformSystem->GetComponent(mMeshComponents.IndexToId(x)))
 		{
 			auto& spatialComponent = *component;
 			D3DXMatrixIdentity(&worldMatrix);
@@ -129,7 +129,7 @@ bool D3D11Renderer::Update() {
 
 			D3DXMatrixTranslation(&translation, spatialComponent.position.mX, spatialComponent.position.mY, spatialComponent.position.mZ);
 			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
-			D3DXMatrixScaling(&scale, spatialComponent.scaleX, spatialComponent.scaleY, spatialComponent.scaleZ);
+			D3DXMatrixScaling(&scale, spatialComponent.scale.mX, spatialComponent.scale.mY, spatialComponent.scale.mZ);
 
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
@@ -159,9 +159,9 @@ bool D3D11Renderer::Update() {
 
 	// Render sprites from back to front.
 	for (int x = mSpriteComponents.Size() - 1; x >= 0; x--) {
-		if (auto component = mSpatialSystem->GetComponent(mSpriteComponents.IndexToId(x)))
+		if (auto component = mTransformSystem->GetComponent(mSpriteComponents.IndexToId(x)))
 		{
-			const Scene::SpatialComponent& spatialComponent = *component;
+			const Scene::TransformComponent& spatialComponent = *component;
 			const SpriteComponent& spriteComponent = mSpriteComponents[mSpriteComponents.IndexToId(x)];
 			const Texture& spriteTexture = mTextures[spriteComponent.Texture];
 
@@ -189,7 +189,7 @@ bool D3D11Renderer::Update() {
 			D3DXMatrixTranslation(&translation, spatialComponent.position.mX, spatialComponent.position.mY, (Float)spriteComponent.ZOrder);
 			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
 
-			D3DXMatrixScaling(&scale, spatialComponent.scaleX * spriteWidth, spatialComponent.scaleY * spriteHeight, spatialComponent.scaleZ);
+			D3DXMatrixScaling(&scale, spatialComponent.scale.mX * spriteWidth, spatialComponent.scale.mY * spriteHeight, spatialComponent.scale.mZ);
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
 

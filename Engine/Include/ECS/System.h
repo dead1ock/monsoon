@@ -38,11 +38,11 @@ namespace Monsoon {
 				OnComponentAttached(entity, component);
 			};
 
-			boost::optional<const Component&> GetComponent(Monsoon::Entity entity) {
+			boost::optional<Component&> GetComponent(Monsoon::Entity entity) {
 				if (mComponents.Exists(entity))
-					return boost::optional<const Component&>(mComponents[entity]);
+					return boost::optional<Component&>(mComponents[entity]);
 				else
-					return boost::optional<const Component&>();
+					return boost::optional<Component&>();
 			}
 			
 			void DetachComponent(Monsoon::Entity entity) {

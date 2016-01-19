@@ -16,7 +16,7 @@
 #include "Platform\Clock.h"
 #include "Resource\ResourceManager.h"
 #include <Platform/Log.h>
-#include <Scene/SpatialSystem.h>
+#include <Scene/TransformSystem.h>
 
 namespace Monsoon {
 	/*
@@ -48,7 +48,7 @@ namespace Monsoon {
 		ECS::EntityManager mEntityManager;
 		Event::EventManager mEventManager;
 		Platform::Clock mGameClock;
-		Scene::SpatialSystem mSpatialSystem;
+		Scene::TransformSystem mTransformSystem;
 		Resource::ResourceManager mResourceManager;
 		Platform::Log mLog;
 		Renderer::AnimationSystem mAnimationSystem;

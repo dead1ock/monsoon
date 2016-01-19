@@ -28,7 +28,7 @@ namespace Monsoon {
 		class DRIVER D3D11Renderer : Renderer
 		{
 		public:
-			D3D11Renderer(RendererSettings& settings, Event::EventManager* eventManager, Scene::SpatialSystem* spatialSystem);
+			D3D11Renderer(RendererSettings& settings, Event::EventManager* eventManager, Scene::TransformSystem* transformSystem);
 			~D3D11Renderer();
 
 			bool Initialize();
@@ -86,7 +86,7 @@ namespace Monsoon {
 
 			VertexBufferHandle mSpritePlane;
 
-			Scene::SpatialSystem* mSpatialSystem;
+			Scene::TransformSystem* mTransformSystem;
 			Event::EventManager* mEventManager;
 			RendererSettings mSettings;
 		};

@@ -77,7 +77,7 @@ class TerrainApplication : public Application
 {
 public:
 	TerrainApplication()
-		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mSpatialSystem))) 
+		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mTransformSystem))) 
 		, mFileReader((filename + ".hgt").c_str()) {
 	}
 
@@ -92,14 +92,14 @@ protected:
 
 	Renderer::VertexBufferHandle* chunkVertexBuffers;
 	Renderer::MeshComponent* chunkMeshes;
-	Scene::SpatialComponent* chunkPositions;
+	Scene::TransformComponent* chunkPositions;
 	Renderer::TextureHandle* chunkTextures;
 	std::stringstream*	textureFiles;
 
 	void OnInitialize() {
 		chunkVertexBuffers = new Renderer::VertexBufferHandle[numChunks * numChunks]();
 		chunkMeshes = new Renderer::MeshComponent[numChunks * numChunks]();
-		chunkPositions = new Scene::SpatialComponent[numChunks * numChunks]();
+		chunkPositions = new Scene::TransformComponent[numChunks * numChunks]();
 		chunkTextures = new Renderer::TextureHandle[numChunks * numChunks]();
 		textureFiles = new std::stringstream[numChunks * numChunks]();
 
@@ -144,7 +144,7 @@ protected:
 				chunkPositions[index].position += Math::Vector3(-(chunkXScale * (float)(size - 1) * (float)numChunks) / 2.0f, 0.0f, -(chunkYScale * (float)(size - 1) * (float)numChunks) / 2.0f);
 
 				mRenderer->AttachMeshComponent(index, chunkMeshes[index]);
-				mSpatialSystem.AttachComponent(index, chunkPositions[index]);
+				mTransformSystem.AttachComponent(index, chunkPositions[index]);
 			}
 		}
 		
@@ -197,7 +197,7 @@ protected:
 			{
 				int index = (x * size) + y;
 
-				mSpatialSystem.DetachComponent(index);
+				mTransformSystem.DetachComponent(index);
 				mRenderer->DetachMeshComponent(index);
 				mRenderer->ReleaseTexture(index);
 			}

@@ -26,7 +26,7 @@ class Platformer2DApp : public Application
 {
 public:
 	Platformer2DApp()
-		: Application((Monsoon::Renderer::Renderer*)(new D3D11Renderer(RendererSettings(), &mEventManager, &mSpatialSystem))) {
+		: Application((Monsoon::Renderer::Renderer*)(new D3D11Renderer(RendererSettings(), &mEventManager, &mTransformSystem))) {
 		mLastFrameChange = 0.0f;
 		mLastJump = 0.0f;
 	}
@@ -150,7 +150,7 @@ protected:
 		backgroundSprite.Texture = mBackgroundTexture;
 		backgroundSprite.ZOrder = 4;
 		mRenderer->AttachSpriteComponent(mBackground, backgroundSprite);
-		mSpatialSystem.AttachComponent(mBackground, SpatialComponent());
+		mTransformSystem.AttachComponent(mBackground, TransformComponent());
 
 		// Forground Tiles
 		SpriteComponent tiles[3];
@@ -158,7 +158,7 @@ protected:
 		tiles[1].Texture = mTileTextures[14];
 		tiles[2].Texture = mTileTextures[15];
 
-		SpatialComponent tilePositions[3];
+		TransformComponent tilePositions[3];
 		tilePositions[0].position.mX = -128.0f;
 		tilePositions[2].position.mX = 128.0f;
 
@@ -166,17 +166,19 @@ protected:
 		mRenderer->AttachSpriteComponent(mTiles[1], tiles[1]);
 		mRenderer->AttachSpriteComponent(mTiles[2], tiles[2]);
 
-		mSpatialSystem.AttachComponent(mTiles[0], tilePositions[0]);
-		mSpatialSystem.AttachComponent(mTiles[1], tilePositions[1]);
-		mSpatialSystem.AttachComponent(mTiles[2], tilePositions[2]);
+		mTransformSystem.AttachComponent(mTiles[0], tilePositions[0]);
+		mTransformSystem.AttachComponent(mTiles[1], tilePositions[1]);
+		mTransformSystem.AttachComponent(mTiles[2], tilePositions[2]);
 
 		// Ground Tiles
 		
 		SpriteComponent groundTileSprites[12];
-		for (int x = 0; x < 12; x++)
+		for (int x = 0; x < 12; x++) {
 			groundTileSprites[x].Texture = mTileTextures[1];
+			groundTileSprites[x].ZOrder = 3;
+		}
 
-		SpatialComponent groundTilePositions[12];
+		TransformComponent groundTilePositions[12];
 		for (int x = 0; x < 6; x++) {
 			groundTilePositions[x].position.mX = (x * 128) - (1800.0f / 2);
 			groundTilePositions[x].position.mY = -400.0f;
@@ -191,49 +193,50 @@ protected:
 			mRenderer->AttachSpriteComponent(mGroundTiles[x], groundTileSprites[x]);
 
 		for (int x = 0; x < 12; x++)
-			mSpatialSystem.AttachComponent(mGroundTiles[x], groundTilePositions[x]);
+			mTransformSystem.AttachComponent(mGroundTiles[x], groundTilePositions[x]);
 
 		// Props
 		SpriteComponent crystalSprite;
 		crystalSprite.Texture = mCrystalTexture;
+		crystalSprite.ZOrder = 1;
 
-		SpatialComponent crystalPosition;
+		TransformComponent crystalPosition;
 		crystalPosition.position.mX = 400.0f;
 		crystalPosition.position.mY = -300.0f;
 
 		mRenderer->AttachSpriteComponent(mCrystal, crystalSprite);
-		mSpatialSystem.AttachComponent(mCrystal, crystalPosition);
+		mTransformSystem.AttachComponent(mCrystal, crystalPosition);
 
 		SpriteComponent crateSprite;
 		crateSprite.Texture = mCrateTexture;
 		crateSprite.ZOrder = 1;
 
-		SpatialComponent cratePosition;
+		TransformComponent cratePosition;
 		cratePosition.position.mY += 95.0f;
 		cratePosition.position.mX += 100.0f;
 
 		mRenderer->AttachSpriteComponent(mCrate, crateSprite);
-		mSpatialSystem.AttachComponent(mCrate, cratePosition);
+		mTransformSystem.AttachComponent(mCrate, cratePosition);
 
 		SpriteComponent stoneSprite;
 		stoneSprite.Texture = mStoneTexture;
 		stoneSprite.ZOrder = 1;
 
-		SpatialComponent stonePosition;
+		TransformComponent stonePosition;
 		stonePosition.position.mX = -550.0f;
 		stonePosition.position.mY = -300.0f;
 
 		mRenderer->AttachSpriteComponent(mStone, stoneSprite);
-		mSpatialSystem.AttachComponent(mStone, stonePosition);
+		mTransformSystem.AttachComponent(mStone, stonePosition);
 
 		// Trees
 		SpriteComponent treeComponents[2];
 		treeComponents[0].Texture = mTreeTextures[0];
 		treeComponents[1].Texture = mTreeTextures[1];
-		treeComponents[1].ZOrder = 1;
-		treeComponents[0].ZOrder = 1;
+		treeComponents[1].ZOrder = 2;
+		treeComponents[0].ZOrder = 2;
 
-		SpatialComponent treePositions[2];
+		TransformComponent treePositions[2];
 		treePositions[0].position.mY = 180.0f;
 		treePositions[1].position.mX = -500.0f;
 		treePositions[1].position.mY = -200.0f;
@@ -241,8 +244,8 @@ protected:
 		mRenderer->AttachSpriteComponent(mTrees[0], treeComponents[0]);
 		mRenderer->AttachSpriteComponent(mTrees[1], treeComponents[1]);
 
-		mSpatialSystem.AttachComponent(mTrees[0], treePositions[0]);
-		mSpatialSystem.AttachComponent(mTrees[1], treePositions[1]);
+		mTransformSystem.AttachComponent(mTrees[0], treePositions[0]);
+		mTransformSystem.AttachComponent(mTrees[1], treePositions[1]);
 
 		// Character
 		SpriteComponent characterComponent;
@@ -252,14 +255,13 @@ protected:
 		characterComponent.AtlasIndex = 6;
 		characterComponent.ZOrder = 0;
 
-		SpatialComponent characterPosition;
+		TransformComponent characterPosition;
 		characterPosition.position.mX -= 800.0f;
 		characterPosition.position.mY -= 305.0f;
-		characterPosition.scaleX = 0.10f;
-		characterPosition.scaleY = 0.10f;
+		characterPosition.scale = Math::Vector3(0.10f, 0.10f, 0.0f);
 
 		mRenderer->AttachSpriteComponent(mCharacter, characterComponent);
-		mSpatialSystem.AttachComponent(mCharacter, characterPosition);
+		mTransformSystem.AttachComponent(mCharacter, characterPosition);
 	
 		mLog.Debug("Done.");
 	}
@@ -271,22 +273,22 @@ protected:
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
 
 		auto& characterSprite = mRenderer->GetSpriteComponent(mCharacter);
-		auto& characterPosition = *mSpatialSystem.GetComponent(mCharacter);
+		auto& characterPosition = *mTransformSystem.GetComponent(mCharacter);
 
 		if (rightKeyState) {
-			if (characterPosition.scaleX < 0.0f)
-				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
+			if (characterPosition.scale.mX < 0.0f)
+				mTransformSystem.GetComponent(mCharacter).get().scale =  Math::Vector3(characterPosition.scale.mX * -1.0f, characterPosition.scale.mY, characterPosition.scale.mZ);
 
 			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
-			mSpatialSystem.Translate(mCharacter, Vector3(200.0f * mGameClock.getDeltaTime(), 0.0f, 0.0f));
+			mTransformSystem.Translate(mCharacter, Vector3(200.0f * mGameClock.getDeltaTime(), 0.0f, 0.0f));
 		}
 
 		if (leftKeyState) {
-			if (characterPosition.scaleX > 0.0f)
-				mSpatialSystem.SetScale(mCharacter, characterPosition.scaleX * -1.0f, characterPosition.scaleY, characterPosition.scaleZ);
+			if (characterPosition.scale.mX > 0.0f)
+				mTransformSystem.GetComponent(mCharacter).get().scale = Math::Vector3(characterPosition.scale.mX * -1.0f, characterPosition.scale.mY, characterPosition.scale.mZ);
 
 			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
-			mSpatialSystem.Translate(mCharacter, Vector3(-200.0f * mGameClock.getDeltaTime(), 0.0f, 0.0f));
+			mTransformSystem.Translate(mCharacter, Vector3(-200.0f * mGameClock.getDeltaTime(), 0.0f, 0.0f));
 		}
 
 		if (upKeyState)
@@ -297,15 +299,15 @@ protected:
 
 			if ((mGameClock.getTime() - mLastJump) < 0.25f) {
 				mAnimationSystem.Play2d(mCharacter, mJumpUpAnimation);
-				mSpatialSystem.Translate(mCharacter, Vector3(0.0f, 400.0f * mGameClock.getDeltaTime(), 0.0f));
+				mTransformSystem.Translate(mCharacter, Vector3(0.0f, 400.0f * mGameClock.getDeltaTime(), 0.0f));
 			}
 		}
 		if (characterPosition.position.mY > -305.0f && (mGameClock.getTime() - mLastJump) > 0.25f) {
 			mAnimationSystem.Play2d(mCharacter, mJumpDownAnimation);
-			mSpatialSystem.Translate(mCharacter, Vector3(0.0f, -450.0f * mGameClock.getDeltaTime(), 0.0f));
+			mTransformSystem.Translate(mCharacter, Vector3(0.0f, -450.0f * mGameClock.getDeltaTime(), 0.0f));
 		}
 		else if (characterPosition.position.mY < -305.0f) {
-			mSpatialSystem.SetPosition(mCharacter, characterPosition.position.mX, -305.0f, 0.0f);
+			mTransformSystem.GetComponent(mCharacter).get().position = Math::Vector3(characterPosition.position.mX, -305.0f, 0.0f);
 		}
 
 		if (!leftKeyState && !rightKeyState && !upKeyState && characterPosition.position.mY == -305.0f) {
@@ -314,7 +316,7 @@ protected:
 
 		mRenderer->GetCamera().x = characterPosition.position.mX + 400.0f;
 		mRenderer->GetCamera().lookAtX = characterPosition.position.mX + 400.0f;
-		mSpatialSystem.SetPosition(mBackground, characterPosition.position.mX + 400.0f, 0.0f, 0.0f);
+		mTransformSystem.GetComponent(mBackground).get().position = Math::Vector3(characterPosition.position.mX + 400.0f, 0.0f, 0.0f);
 
 
 	}
@@ -324,27 +326,27 @@ protected:
 		// Clean Up Components
 		//
 		mRenderer->DetachSpriteComponent(mStone);
-		mSpatialSystem.DetachComponent(mStone);
+		mTransformSystem.DetachComponent(mStone);
 
 		mRenderer->DetachSpriteComponent(mCrate);
-		mSpatialSystem.DetachComponent(mCrate);
+		mTransformSystem.DetachComponent(mCrate);
 
 		mRenderer->DetachSpriteComponent(mCrystal);
-		mSpatialSystem.DetachComponent(mCrystal);
+		mTransformSystem.DetachComponent(mCrystal);
 
 		for (int x = 0; x < 12; x++)
 			mRenderer->DetachSpriteComponent(mGroundTiles[x]);
 
 		for (int x = 0; x < 12; x++)
-			mSpatialSystem.DetachComponent(mGroundTiles[x]);
+			mTransformSystem.DetachComponent(mGroundTiles[x]);
 
 		for (int x = 0; x < 2; x++)
-			mSpatialSystem.DetachComponent(mTrees[x]);
+			mTransformSystem.DetachComponent(mTrees[x]);
 
 		for (int x = 0; x < 3; x++)
-			mSpatialSystem.DetachComponent(mTiles[x]);
+			mTransformSystem.DetachComponent(mTiles[x]);
 
-		mSpatialSystem.DetachComponent(mBackground);
+		mTransformSystem.DetachComponent(mBackground);
 
 		for (int x = 0; x < 2; x++)
 			mRenderer->DetachSpriteComponent(mTrees[x]);

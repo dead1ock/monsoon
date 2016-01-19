@@ -12,7 +12,7 @@
 #include "RendererSettings.h"
 #include "VertexBuffer.h"
 
-#include "Scene/SpatialSystem.h"
+#include "Scene/TransformSystem.h"
 
 namespace Monsoon {
 	namespace Renderer {
@@ -148,7 +148,7 @@ namespace Monsoon {
 		class DRIVER Renderer
 		{
 		public:
-			Renderer(RendererSettings& settings, Event::EventManager* eventManager, Scene::SpatialSystem* spatialSystem) { };
+			Renderer(RendererSettings& settings, Event::EventManager* eventManager, Scene::TransformSystem* spatialSystem) { };
 			virtual ~Renderer() { };
 
 			virtual bool Initialize() = 0;

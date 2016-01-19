@@ -20,7 +20,7 @@ class InsectContainerOpt : public Application
 {
 public:
 	InsectContainerOpt()
-		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mSpatialSystem))) {
+		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mTransformSystem))) {
 
 	}
 
@@ -46,12 +46,12 @@ protected:
 		rightPlaneMesh.TextureId = texture;
 		rightPlaneMesh.VertexBuffer = mRenderer->CreatePlane(50, 100);
 		
-		Scene::SpatialComponent rightPlanePosition;
-		rightPlanePosition.y += 50.0f;
-		rightPlanePosition.x += 25.0f;
-		rightPlanePosition.z -= 0.5f;
+		Scene::TransformComponent rightPlanePosition;
+		rightPlanePosition.position.mY += 50.0f;
+		rightPlanePosition.position.mX += 25.0f;
+		rightPlanePosition.position.mZ -= 0.5f;
 		rightPlanePosition.yaw -= (D3DX_PI);
-		mSpatialSystem.AttachComponent(rightPlane, rightPlanePosition);
+		mTransformSystem.AttachComponent(rightPlane, rightPlanePosition);
 		mRenderer->AttachMeshComponent(rightPlane, rightPlaneMesh);
 
 		Entity leftPlane = mEntityManager.CreateEntity();
@@ -59,11 +59,11 @@ protected:
 		leftPlaneMesh.TextureId = texture;
 		leftPlaneMesh.VertexBuffer = mRenderer->CreatePlane(50, 100);
 
-		Scene::SpatialComponent leftPlanePosition;
-		leftPlanePosition.y += 50.0f;
-		leftPlanePosition.x += 25.0f;
-		leftPlanePosition.z += 30.5f;
-		mSpatialSystem.AttachComponent(leftPlane, leftPlanePosition);
+		Scene::TransformComponent leftPlanePosition;
+		leftPlanePosition.position.mY += 50.0f;
+		leftPlanePosition.position.mX += 25.0f;
+		leftPlanePosition.position.mZ += 30.5f;
+		mTransformSystem.AttachComponent(leftPlane, leftPlanePosition);
 		mRenderer->AttachMeshComponent(leftPlane, leftPlaneMesh);
 
 
@@ -73,12 +73,12 @@ protected:
 		backPlaneMesh.VertexBuffer = mRenderer->CreatePlane(30, 100);
 		mRenderer->AttachMeshComponent(backPlane, backPlaneMesh);
 
-		Scene::SpatialComponent backPlanePosition;
-		backPlanePosition.y += 50.0f;
-		backPlanePosition.z += 15.0f;
-		backPlanePosition.x -= 0.5f;
+		Scene::TransformComponent backPlanePosition;
+		backPlanePosition.position.mY += 50.0f;
+		backPlanePosition.position.mZ += 15.0f;
+		backPlanePosition.position.mX -= 0.5f;
 		backPlanePosition.yaw -= (D3DX_PI / 2.0f);
-		mSpatialSystem.AttachComponent(backPlane, backPlanePosition);
+		mTransformSystem.AttachComponent(backPlane, backPlanePosition);
 
 
 		Entity frontPlane = mEntityManager.CreateEntity();
@@ -87,12 +87,12 @@ protected:
 		frontPlaneMesh.VertexBuffer = mRenderer->CreatePlane(30, 100);
 		mRenderer->AttachMeshComponent(frontPlane, frontPlaneMesh);
 
-		Scene::SpatialComponent frontPlanePosition;
-		frontPlanePosition.y += 50.0f;
-		frontPlanePosition.z += 15.0f;
-		frontPlanePosition.x += 50.5f;
+		Scene::TransformComponent frontPlanePosition;
+		frontPlanePosition.position.mY += 50.0f;
+		frontPlanePosition.position.mZ += 15.0f;
+		frontPlanePosition.position.mX += 50.5f;
 		frontPlanePosition.yaw += (D3DX_PI / 2.0f);
-		mSpatialSystem.AttachComponent(frontPlane, frontPlanePosition);
+		mTransformSystem.AttachComponent(frontPlane, frontPlanePosition);
 
 
 		numContainers = 0;
@@ -137,14 +137,14 @@ protected:
 			//boxMesh.TextureId = containerTexture;
 			mRenderer->AttachMeshComponent(boxes[x], boxMesh);
 
-			Scene::SpatialComponent boxPosition;
-			boxPosition.x += ((cRow )  * (radius * 2.0f)) - radius;
-			boxPosition.y += ((cStack ) * h) - (h / 2.0f);
-			boxPosition.z += ((cCol ) * (radius * 2.0f)) - radius;
-			boxPosition.scaleX = radius * 2;
-			boxPosition.scaleY = h;
-			boxPosition.scaleZ = radius * 2;
-			mSpatialSystem.AttachComponent(boxes[x], boxPosition);
+			Scene::TransformComponent boxPosition;
+			boxPosition.position.mX += ((cRow )  * (radius * 2.0f)) - radius;
+			boxPosition.position.mY += ((cStack ) * h) - (h / 2.0f);
+			boxPosition.position.mZ += ((cCol ) * (radius * 2.0f)) - radius;
+			boxPosition.scale.mX = radius * 2;
+			boxPosition.scale.mY = h;
+			boxPosition.scale.mZ = radius * 2;
+			mTransformSystem.AttachComponent(boxes[x], boxPosition);
 
 			if (cCol == cols)
 			{

@@ -31,7 +31,7 @@ class Asteroids : public Application
 {
 public:
 	Asteroids()
-		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mSpatialSystem)))
+		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mTransformSystem)))
 		, playerAABB(Math::AABB(-5.0f, 0.0f, 1.0f, 1.0f))
 		, currentPlayerLives(0) {
 		mAstroids.reserve(20);
@@ -67,33 +67,28 @@ protected:
 		Renderer::MeshComponent playerLiveMesh;
 		playerLiveMesh.VertexBuffer = playerVB;
 
-		Scene::SpatialComponent playerLiveTransform;
+		Scene::TransformComponent playerLiveTransform;
 		playerLiveTransform.position += Math::Vector3(14.0f, -19.0f, 0.0f);
-		playerLiveTransform.scaleX = 0.7f;
-		playerLiveTransform.scaleY = 0.7f;
-		playerLiveTransform.scaleZ = 0.7f;
+		playerLiveTransform.scale.mX = 0.7f;
+		playerLiveTransform.scale.mY = 0.7f;
+		playerLiveTransform.scale.mZ = 0.7f;
 
 		playerLives[0] = mEntityManager.CreateEntity();
 		mRenderer->AttachMeshComponent(playerLives[0], playerLiveMesh);
-		mSpatialSystem.AttachComponent(playerLives[0], playerLiveTransform);
+		mTransformSystem.AttachComponent(playerLives[0], playerLiveTransform);
 		playerLiveTransform.position += Math::Vector3(0.75f, 0.0f, 0.0f);
 
 		playerLives[1] = mEntityManager.CreateEntity();
 		mRenderer->AttachMeshComponent(playerLives[1], playerLiveMesh);
-		mSpatialSystem.AttachComponent(playerLives[1], playerLiveTransform);
+		mTransformSystem.AttachComponent(playerLives[1], playerLiveTransform);
 		playerLiveTransform.position += Math::Vector3(0.75f, 0.0f, 0.0f);
 
 		playerLives[2] = mEntityManager.CreateEntity();
 		mRenderer->AttachMeshComponent(playerLives[2], playerLiveMesh);
-		mSpatialSystem.AttachComponent(playerLives[2], playerLiveTransform);
+		mTransformSystem.AttachComponent(playerLives[2], playerLiveTransform);
 		playerLiveTransform.position += Math::Vector3(0.75f, 0.0f, 0.0f);
 
 		GenerateAsteroids();
-
-		mEventListener = mEventManager.Subscribe("Entity::Destroyed", [this](void* arg) {
-			mRenderer->DetachMeshComponent((Monsoon::Entity)arg);
-			return 0;
-		});
 	}
 
 	int mActiveBullets = 0;
@@ -146,14 +141,14 @@ protected:
 			Renderer::MeshComponent asteroidMesh;
 			asteroidMesh.VertexBuffer = astroidVB;
 
-			Scene::SpatialComponent asteroidPosition;
+			Scene::TransformComponent asteroidPosition;
 			asteroidPosition.position += Math::Vector3(rand_FloatRange(-10.0f, 10.0f), rand_FloatRange(-10.0f, 10.0f), 0.0f);
 			asteroidPosition.pitch = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
 			asteroidPosition.yaw = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
 			asteroidPosition.roll = rand_FloatRange(0.0f, 2.0f * D3DX_PI);
 
 			mRenderer->AttachMeshComponent(mAstroids[x], asteroidMesh);
-			mSpatialSystem.AttachComponent(mAstroids[x], asteroidPosition);
+			mTransformSystem.AttachComponent(mAstroids[x], asteroidPosition);
 			mAsteroidAABBs.push_back(Math::AABB(asteroidPosition.position.mX, asteroidPosition.position.mY, 0.75f, 0.75f));
 		}
 
@@ -164,13 +159,13 @@ protected:
 		Renderer::MeshComponent playerMesh;
 		playerMesh.VertexBuffer = playerVB;
 		mRenderer->AttachMeshComponent(player, playerMesh);
-		mSpatialSystem.AttachComponent(player, Scene::SpatialComponent());
+		mTransformSystem.AttachComponent(player, Scene::TransformComponent());
 		playerDead = false;
 	}
 
 	void FireBullet() {
 		Renderer::MeshComponent bullet;
-		Scene::SpatialComponent bulletSpatialComponent = *mSpatialSystem.GetComponent(player); // Copy player position.
+		Scene::TransformComponent bulletSpatialComponent = *mTransformSystem.GetComponent(player); // Copy player position.
 		bullet.VertexBuffer = bulletVB;
 
 		bulletSpatialComponent.position += Math::Vector3(cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f)), sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f)), 0.0f);
@@ -179,7 +174,7 @@ protected:
 		mBullets.push_back(id);
 		mBulletAABBs.push_back(Math::AABB(bulletSpatialComponent.position.mX, bulletSpatialComponent.position.mY, 0.25f, 0.5f));
 		mRenderer->AttachMeshComponent(id, bullet);
-		mSpatialSystem.AttachComponent(id, bulletSpatialComponent);
+		mTransformSystem.AttachComponent(id, bulletSpatialComponent);
 		mActiveBullets++;
 		playerLastShotTime = mGameClock.getTime();
 	}
@@ -190,18 +185,12 @@ protected:
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
 
-		const auto& playerSpatialComponent = *mSpatialSystem.GetComponent(player);
+		const auto& playerSpatialComponent = *mTransformSystem.GetComponent(player);
 
 		if (leftKeyState)
-			mSpatialSystem.SetOrientation(player,
-			playerSpatialComponent.yaw,
-			playerSpatialComponent.pitch,
-			playerSpatialComponent.roll + (mGameClock.getDeltaTime() * 3.0f));
+			mTransformSystem.GetComponent(player).get().roll += (mGameClock.getDeltaTime() * 3.0f);
 		if (rightKeyState)
-			mSpatialSystem.SetOrientation(player,
-			playerSpatialComponent.yaw,
-			playerSpatialComponent.pitch,
-			playerSpatialComponent.roll - (mGameClock.getDeltaTime() * 3.0f));
+			mTransformSystem.GetComponent(player).get().roll -= (mGameClock.getDeltaTime() * 3.0f);
 		if (upKeyState) {
 			if (playerSpeedMod < 2.0f)
 				// Speed up.
@@ -217,7 +206,7 @@ protected:
 		}
 
 		// Move player in the direction it is rotated.
-		mSpatialSystem.Translate(player,
+		mTransformSystem.Translate(player,
 			Math::Vector3((playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
 			(playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
 			0.0f));
@@ -226,23 +215,23 @@ protected:
 
 		// Wrap coordinates around when the player leaves the screen.
 		if (playerSpatialComponent.position.mX > 23.0f)
-			mSpatialSystem.SetPosition(player, -23.0f, playerSpatialComponent.position.mY, 0.0f);
+			mTransformSystem.GetComponent(player).get().position = Math::Vector3(-23.0f, playerSpatialComponent.position.mY, 0.0f);
 		else if (playerSpatialComponent.position.mX < -23.0f)
-			mSpatialSystem.SetPosition(player, 23.0f, playerSpatialComponent.position.mY, 0.0f);
+			mTransformSystem.GetComponent(player).get().position = Math::Vector3(23.0f, playerSpatialComponent.position.mY, 0.0f);
 
 		if (playerSpatialComponent.position.mY > 16.0f)
-			mSpatialSystem.SetPosition(player, playerSpatialComponent.position.mX, -16.0f, 0.0f);
+			mTransformSystem.GetComponent(player).get().position = Math::Vector3(playerSpatialComponent.position.mX, -16.0f, 0.0f);
 		else if (playerSpatialComponent.position.mY < -16.0f)
-			mSpatialSystem.SetPosition(player, playerSpatialComponent.position.mX, 16.0f, 0.0f);
+			mTransformSystem.GetComponent(player).get().position = Math::Vector3(playerSpatialComponent.position.mX, 16.0f, 0.0f);
 	}
 
 	void UpdateAsteroidPositions() {
 		// Update Asteroids
 		for (int x = 0; x < mAstroids.size(); x++)
 		{
-			const auto& asteroidSpatialComponent = *mSpatialSystem.GetComponent(mAstroids[x]);
+			const auto& asteroidSpatialComponent = *mTransformSystem.GetComponent(mAstroids[x]);
 
-			mSpatialSystem.Translate(mAstroids[x],
+			mTransformSystem.Translate(mAstroids[x],
 				Math::Vector3((ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
 				(ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
 				0.0f));
@@ -251,14 +240,14 @@ protected:
 			mAsteroidAABBs[x].mY = asteroidSpatialComponent.position.mY;
 
 			if (asteroidSpatialComponent.position.mX > 23.0f)
-				mSpatialSystem.SetPosition(mAstroids[x], -23.0f, asteroidSpatialComponent.position.mY, 0.0f);
+				mTransformSystem.GetComponent(mAstroids[x]).get().position = Math::Vector3(-23.0f, asteroidSpatialComponent.position.mY, 0.0f);
 			else if (asteroidSpatialComponent.position.mX < -23.0f)
-				mSpatialSystem.SetPosition(mAstroids[x], 23.0f, asteroidSpatialComponent.position.mY, 0.0f);
+				mTransformSystem.GetComponent(mAstroids[x]).get().position = Math::Vector3(23.0f, asteroidSpatialComponent.position.mY, 0.0f);
 
 			if (asteroidSpatialComponent.position.mY > 16.0f)
-				mSpatialSystem.SetPosition(mAstroids[x], asteroidSpatialComponent.position.mX, -16.0f, 0.0f);
+				mTransformSystem.GetComponent(mAstroids[x]).get().position = Math::Vector3(asteroidSpatialComponent.position.mX, -16.0f, 0.0f);
 			else if (asteroidSpatialComponent.position.mY < -16.0f)
-				mSpatialSystem.SetPosition(mAstroids[x], asteroidSpatialComponent.position.mX, 16.0f, 0.0f);
+				mTransformSystem.GetComponent(mAstroids[x]).get().position = Math::Vector3(asteroidSpatialComponent.position.mX, 16.0f, 0.0f);
 		}
 	}
 
@@ -266,8 +255,8 @@ protected:
 		// Update Bullets
 		for (int x = (mBullets.size() - 1); x >= 0; x--)
 		{
-			auto& bulletSpatialComponent = *mSpatialSystem.GetComponent(mBullets[x]);
-			mSpatialSystem.Translate(mBullets[x],
+			auto& bulletSpatialComponent = *mTransformSystem.GetComponent(mBullets[x]);
+			mTransformSystem.Translate(mBullets[x],
 				Math::Vector3((BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
 				(BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
 				0.0f));

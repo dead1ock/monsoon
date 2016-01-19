@@ -19,7 +19,7 @@ namespace Monsoon {
 		: mRenderer(renderer)
 		, mEventManager()
 		, mEntityManager(&mEventManager)
-		, mSpatialSystem(&mEventManager)
+		, mTransformSystem(&mEventManager)
 		, mAnimationSystem(&mGameClock, mRenderer)
 		, mQuit(false)
 	{

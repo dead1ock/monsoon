@@ -20,7 +20,7 @@ class PrimitivesApplication : public Application
 {
 public:
 	PrimitivesApplication()
-		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mSpatialSystem))) {
+		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mTransformSystem))) {
 
 	}
 
@@ -38,37 +38,37 @@ protected:
 
 
 		Renderer::MeshComponent triangle_one;
-		Scene::SpatialComponent triangleOnePosition;
+		Scene::TransformComponent triangleOnePosition;
 		triangle_one.VertexBuffer = pyramidVB;
-		triangleOnePosition.position.mX = 2.0f;
+		triangleOnePosition.position = Math::Vector3(2.0f, 0.0f, 0.0f);
 		mRenderer->AttachMeshComponent(0, triangle_one);
-		mSpatialSystem.AttachComponent(0, triangleOnePosition);
+		mTransformSystem.AttachComponent(0, triangleOnePosition);
 
 		Renderer::MeshComponent cube_one;
-		Scene::SpatialComponent cubeOnePosition;
+		Scene::TransformComponent cubeOnePosition;
 		cube_one.VertexBuffer = cubeVB;
-		cubeOnePosition.position.mX = -2.0f;
+		cubeOnePosition.position = Math::Vector3(-2.0f, 0.0f, 0.0f);
 		mRenderer->AttachMeshComponent(1, cube_one);
-		mSpatialSystem.AttachComponent(1, cubeOnePosition);
+		mTransformSystem.AttachComponent(1, cubeOnePosition);
 
 		Renderer::MeshComponent plane;
-		Scene::SpatialComponent planeOnePosition;
+		Scene::TransformComponent planeOnePosition;
 		plane.VertexBuffer = planeVB;
-		planeOnePosition.position.mY = -1.0f;
+		planeOnePosition.position = Math::Vector3(0.0f, -1.0f, 0.0f);
 		planeOnePosition.pitch = 1.57f;
 		plane.TextureId = -1;
 		mRenderer->AttachMeshComponent(2, plane);
-		mSpatialSystem.AttachComponent(2, planeOnePosition);
+		mTransformSystem.AttachComponent(2, planeOnePosition);
 
 		cameraTheta = 0.0f;
 	}
 
 	void OnUpdate() {
 		Renderer::Camera& camera = mRenderer->GetCamera();
-		auto& pyramidTransform = *mSpatialSystem.GetComponent(0);
+		auto& pyramidTransform = *mTransformSystem.GetComponent(0);
 
-		mSpatialSystem.SetOrientation(0, pyramidTransform.yaw + (mGameClock.getDeltaTime() * 2.0f), pyramidTransform.pitch, pyramidTransform.roll);
-		mSpatialSystem.SetPosition(0, pyramidTransform.position.mX, (cos(cameraTheta) + 1.0f), pyramidTransform.position.mZ);
+		mTransformSystem.GetComponent(0).get().yaw += (mGameClock.getDeltaTime() * 2.0f);
+		mTransformSystem.GetComponent(0).get().position = Math::Vector3(pyramidTransform.position.mX, (cos(cameraTheta) + 1.0f), pyramidTransform.position.mZ);
 
 		camera.x = cos(cameraTheta) * 15.0f;
 		camera.y = 8.0f;
@@ -78,13 +78,13 @@ protected:
 	}
 
 	void OnShutdown() {
-		mSpatialSystem.DetachComponent(2);
+		mTransformSystem.DetachComponent(2);
 		mRenderer->DetachMeshComponent(2);
 
-		mSpatialSystem.DetachComponent(1);
+		mTransformSystem.DetachComponent(1);
 		mRenderer->DetachMeshComponent(1);
 
-		mSpatialSystem.DetachComponent(0);
+		mTransformSystem.DetachComponent(0);
 		mRenderer->DetachMeshComponent(0);
 
 		mRenderer->ReleaseTexture(0);
