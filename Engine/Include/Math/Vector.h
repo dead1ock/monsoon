@@ -42,6 +42,13 @@ namespace Monsoon {
 			Vector2 operator/(Float scalar); // Scalar Division
 			void operator/=(Float scalar);
 
+			// These define the basis vectors for local space.
+			static const Vector2 Right() { return Vector2(1.0f, 0.0f); }
+			static const Vector2 Up() { return Vector2(0.0f, 1.0f); }
+			static const Vector2 Left() { return Vector2(-1.0f, 0.0f); }
+			static const Vector2 Down() { return Vector2(0.0f, -1.0f); }
+
+
 			Float mX, mY;
 		};
 
@@ -57,7 +64,7 @@ namespace Monsoon {
 			Vector3 Proj(Vector3& other);
 			Vector3 Perp(Vector3& other);
 			Vector3 Unit();
-			
+
 			Float Dot(Vector3& other);
 
 			Vector3 operator+(Vector3& other); // Vector Addition
@@ -73,6 +80,14 @@ namespace Monsoon {
 
 			Vector3 operator/(Float scalar); // Scalar Division
 			void operator/=(Float scalar);
+
+			// These define the basis vectors for local space.
+			static const Vector3 Front() { return Vector3(0.0f, 0.0f, 1.0f); }
+			static const Vector3 Right() { return Vector3(1.0f, 0.0f, 0.0f); }
+			static const Vector3 Up() { return Vector3(0.0f, 1.0f, 0.0f); }
+			static const Vector3 Left() { return Vector3(-1.0f, 0.0f, 0.0f); }
+			static const Vector3 Down() { return Vector3(0.0f, -1.0f, 0.0f); }
+			static const Vector3 Back() { return Vector3(0.0f, 0.0f, -1.0f); }
 
 			Float mX, mY, mZ;
 		};
