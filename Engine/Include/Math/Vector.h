@@ -14,11 +14,13 @@ namespace Monsoon {
 
 		class Vector2;
 		class Vector3;
+		class Vector4;
 
 		class DYNLIB Vector2
 		{
 		public:
 			Vector2(float x, float y);
+			Vector2(const Vector3& vector);
 			~Vector2();
 
 			Float Magnitude();
@@ -56,6 +58,7 @@ namespace Monsoon {
 		{
 		public:
 			Vector3(float x, float y, float z);
+			Vector3(const Vector4& vec);
 			~Vector3();
 
 			Float Magnitude();
@@ -96,6 +99,7 @@ namespace Monsoon {
 		{
 		public:
 			Vector4(float x, float y, float z, float w);
+			Vector4(const Vector3& vec3, float w);
 			~Vector4();
 
 			Float Magnitude();

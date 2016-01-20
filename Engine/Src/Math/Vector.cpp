@@ -111,6 +111,14 @@ Vector3::Vector3(float x, float y, float z)
 
 }
 
+Vector3::Vector3(const Vector4& vec4)
+	: mX(vec4.mX)
+	, mY(vec4.mY)
+	, mZ(vec4.mZ)
+{
+
+}
+
 Vector3::~Vector3()
 {
 
@@ -207,6 +215,15 @@ Vector4::Vector4(float x, float y, float z, float w)
 	: mX(x)
 	, mY(y)
 	, mZ(z)
+	, mW(w)
+{
+
+}
+
+Vector4::Vector4(const Vector3& vec3, float w)
+	: mX(vec3.mX)
+	, mY(vec3.mY)
+	, mZ(vec3.mZ)
 	, mW(w)
 {
 

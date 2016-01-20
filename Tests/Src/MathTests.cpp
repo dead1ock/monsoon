@@ -276,3 +276,10 @@ TEST(Matrix4x4, TransposeMultiplicationProperty)
 
 	EXPECT_EQ(true, m4 == m5);
 }
+
+TEST(Matrix4x4, TransformMatrix)
+{
+	Matrix4x4 transform = Matrix4x4::TransformMatrix(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, PI), Vector3(1.0f, 1.0f, 1.0f));
+	Matrix4x4 globalTransform = transform * Vector4(Vector3::Up(), 0.0f);
+	EXPECT_EQ(-1.0f, globalTransform(0, 1));
+}

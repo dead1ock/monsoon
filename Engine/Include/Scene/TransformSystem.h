@@ -18,37 +18,41 @@ namespace Monsoon
 {
 	namespace Scene
 	{
-		struct SpatialComponent
+		struct TransformComponent
 		{
-			SpatialComponent()
-				: position(Math::Vector3(0.0f, 0.0f, 0.0f))
+			TransformComponent()
+				: position(0.0f, 0.0f, 0.0f)
+				, scale(1.0f, 1.0f, 1.0f)
 			{
 				yaw = 0.0f;
 				pitch = 0.0f;
 				roll = 0.0f;
-				scaleX = 1.0f;
-				scaleY = 1.0f;
-				scaleZ = 1.0f;
 			}
 
 			Math::Vector3 position;
 			float yaw, pitch, roll;
-			float scaleX, scaleY, scaleZ;
+			Math::Vector3 scale;
 		};
 
 		/**
 		 * Manages entity spatial information, such as position, orientation, and scale.
+		 * Provides functions to translate, rotate, and change spaces.
 		 */
-		class DYNLIB SpatialSystem : public ECS::System<SpatialComponent>
+		class DYNLIB TransformSystem : public ECS::System<TransformComponent>
 		{
 		public:
-			SpatialSystem(Event::EventManager* eventManager);
-			~SpatialSystem();
+			TransformSystem(Event::EventManager* eventManager);
+			~TransformSystem();
 
-			void SetPosition(Entity entity, float x, float y, float z);
-			void SetOrientation(Entity entity, float yaw, float pitch, float roll);
-			void SetScale(Entity entity, float scaleX, float scaleY, float scaleZ);
 			void Translate(Entity entity, Math::Vector3 delta);
+
+			//
+			// Transforms the target's local basis axis into world
+			// space coordinates.
+			//
+			Math::Vector3 Front(Entity entity);
+			Math::Vector3 Up(Entity entity);
+			Math::Vector3 Right(Entity entity);
 		};
 	}
 }

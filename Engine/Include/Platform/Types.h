@@ -44,6 +44,8 @@
 	 typedef float Float;
 #endif
 
+	#define PI 3.14159265
+
  } // namespace Monsoon
 
 #endif // _MONSON_TYPES_H_

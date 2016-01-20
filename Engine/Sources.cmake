@@ -26,7 +26,7 @@ SET(MODULE_SRC
 	Include/Renderer/Renderer.h
 	Include/Renderer/RendererSettings.h
 	Include/Renderer/VertexBuffer.h
-	Include/Scene/SpatialSystem.h
+	Include/Scene/TransformSystem.h
 	Include/Util/PackedPool.h
 	
 	# Private Sources (Source/)
@@ -41,7 +41,7 @@ SET(MODULE_SRC
 	Src/Platform/Log.cpp
 	Src/Renderer/AnimationSystem.cpp
 	Src/Resource/ResourceManager.cpp
-	Src/Scene/SpatialSystem.cpp
+	Src/Scene/TransformSystem.cpp
 	)
 
 #

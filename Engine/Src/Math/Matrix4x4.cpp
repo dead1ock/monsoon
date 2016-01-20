@@ -45,6 +45,15 @@ void Matrix4x4::operator*=(Matrix4x4& other) {
 
 }
 
+Matrix4x4 Matrix4x4::operator*(const Vector4& other) {
+	Matrix4x4 vecMat;
+	vecMat.SetRow(0, other);
+	vecMat.SetRow(1, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+	vecMat.SetRow(2, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+	vecMat.SetRow(3, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+	return vecMat * (*this);
+}
+
 bool Matrix4x4::operator==(Matrix4x4& other) {
 	bool equal = true;
 	for (int i = 0; i < 4; i++)
@@ -68,8 +77,58 @@ float& Matrix4x4::operator()(U8 i, U8 j)  {
 	return m[i][j];
 }
 
-float* Matrix4x4::GetRow(U8 i)  {
-	return m[i];
+Vector4 Matrix4x4::GetRow(U8 row)
+{
+	return Vector4(m[row][0], m[row][1], m[row][2], m[row][3]);
+}
+
+Vector4 Matrix4x4::GetColumn(U8 col)
+{
+	return Vector4(m[0][col], m[1][col], m[2][col], m[3][col]);
+}
+
+void Matrix4x4::SetRow(U8 row, Vector4 data)
+{
+	m[row][0] = data.mX;
+	m[row][1] = data.mY;
+	m[row][2] = data.mZ;
+	m[row][3] = data.mW;
+}
+
+void Matrix4x4::SetColumn(U8 col, Vector4 data)
+{
+	m[0][col] = data.mX;
+	m[1][col] = data.mY;
+	m[2][col] = data.mZ;
+	m[3][col] = data.mW;
+}
+
+Matrix4x4 Matrix4x4::TransformMatrix(Vector3 position, Vector3 rotation, Vector3 scale)
+{
+	Matrix4x4 rotX, rotY, rotZ;
+	float yaw = rotation.mY;
+	float pitch = rotation.mX;
+	float roll = rotation.mZ;
+
+	rotZ.SetRow(0, Vector4(cos(roll), sin(roll), 0.0f, 0.0f));
+	rotZ.SetRow(1, Vector4(-sin(roll), cos(roll), 0.0f, 0.0f));
+	rotZ.SetRow(2, Vector4(0.0f, 0.0f, 1.0f, 0.0f));
+	rotZ.SetRow(3, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	rotY.SetRow(0, Vector4(cos(yaw), 0.0f, -sin(yaw), 0.0f));
+	rotY.SetRow(1, Vector4(0.0f, 1.0f, 0.0f, 0.0f));
+	rotY.SetRow(2, Vector4(sin(yaw), 0.0f, -cos(yaw), 0.0f));
+	rotY.SetRow(3, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	rotX.SetRow(0, Vector4(1.0f, 0.0f, 0.0f, 0.0f));
+	rotX.SetRow(1, Vector4(0.0f, cos(pitch), sin(pitch), 0.0f));
+	rotX.SetRow(2, Vector4(0.0f, -sin(pitch), cos(pitch), 0.0f));
+	rotX.SetRow(3, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	Matrix4x4 result = rotX * rotY * rotZ;
+	result.SetRow(3, Vector4(position, 1.0f));
+
+	return result;
 }
 
 void Matrix4x4::Transpose() {
