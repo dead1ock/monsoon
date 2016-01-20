@@ -41,3 +41,27 @@ Math::Vector3 TransformSystem::Up(Entity entity)
 	Math::Matrix4x4 transform = globalTransform * Math::Vector4(Math::Vector3::Up(), 0.0f);
 	return transform.GetRow(0);
 }
+
+Math::Vector3 TransformSystem::Front(Entity entity)
+{
+	if (!mComponents.Exists(entity))
+		return Math::Vector3::Up();
+
+	Math::Matrix4x4 globalTransform = Math::Matrix4x4::TransformMatrix(mComponents[entity].position,
+		Math::Vector3(mComponents[entity].pitch, mComponents[entity].yaw, mComponents[entity].roll),
+		mComponents[entity].scale);
+	Math::Matrix4x4 transform = globalTransform * Math::Vector4(Math::Vector3::Front(), 0.0f);
+	return transform.GetRow(0);
+}
+
+Math::Vector3 TransformSystem::Right(Entity entity)
+{
+	if (!mComponents.Exists(entity))
+		return Math::Vector3::Up();
+
+	Math::Matrix4x4 globalTransform = Math::Matrix4x4::TransformMatrix(mComponents[entity].position,
+		Math::Vector3(mComponents[entity].pitch, mComponents[entity].yaw, mComponents[entity].roll),
+		mComponents[entity].scale);
+	Math::Matrix4x4 transform = globalTransform * Math::Vector4(Math::Vector3::Right(), 0.0f);
+	return transform.GetRow(0);
+}
