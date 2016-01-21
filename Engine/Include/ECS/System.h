@@ -37,13 +37,6 @@ namespace Monsoon {
 
 				OnComponentAttached(entity, component);
 			};
-
-			boost::optional<Component&> GetComponent(Monsoon::Entity entity) {
-				if (mComponents.Exists(entity))
-					return boost::optional<Component&>(mComponents[entity]);
-				else
-					return boost::optional<Component&>();
-			}
 			
 			void DetachComponent(Monsoon::Entity entity) {
 				if (!mComponents.Exists(entity))
@@ -52,6 +45,13 @@ namespace Monsoon {
 				OnComponentDetached(entity, mComponents[entity]);
 				mComponents.Remove(entity);
 			};
+
+			bool IsValid(Monsoon::Entity entity) {
+				if (mComponents.Exists(entity))
+					return true;
+				else
+					return false;
+			}
 
 		protected:
 			virtual void OnComponentAttached(Monsoon::Entity& entity, Component& component) { };

@@ -119,17 +119,24 @@ bool D3D11Renderer::Update() {
 
 	// Render 3d Meshes
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
-		if (auto component = mTransformSystem->GetComponent(mMeshComponents.IndexToId(x)))
+		Entity entity = mMeshComponents.IndexToId(x);
+		if (mTransformSystem->IsValid(entity))
 		{
-			auto& spatialComponent = *component;
+			// Gather relevent transform information.
+			Math::Vector3 position = mTransformSystem->GetPosition(entity);
+			float yaw = mTransformSystem->GetRotation(entity).mY;
+			float pitch = mTransformSystem->GetRotation(entity).mX;
+			float roll = mTransformSystem->GetRotation(entity).mZ;
+			Math::Vector3 mscale = mTransformSystem->GetScale(entity);
+
 			D3DXMatrixIdentity(&worldMatrix);
 			D3DXMatrixIdentity(&translation);
 			D3DXMatrixIdentity(&rotation);
 			D3DXMatrixIdentity(&scale);
 
-			D3DXMatrixTranslation(&translation, spatialComponent.position.mX, spatialComponent.position.mY, spatialComponent.position.mZ);
-			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
-			D3DXMatrixScaling(&scale, spatialComponent.scale.mX, spatialComponent.scale.mY, spatialComponent.scale.mZ);
+			D3DXMatrixTranslation(&translation, position.mX, position.mY, position.mZ);
+			D3DXMatrixRotationYawPitchRoll(&rotation, yaw, pitch, roll);
+			D3DXMatrixScaling(&scale, mscale.mX, mscale.mY, mscale.mZ);
 
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
@@ -159,9 +166,16 @@ bool D3D11Renderer::Update() {
 
 	// Render sprites from back to front.
 	for (int x = mSpriteComponents.Size() - 1; x >= 0; x--) {
-		if (auto component = mTransformSystem->GetComponent(mSpriteComponents.IndexToId(x)))
+		Entity entity = mSpriteComponents.IndexToId(x);
+		if (mTransformSystem->IsValid(entity))
 		{
-			const Scene::TransformComponent& spatialComponent = *component;
+			// Gather relevent transform information.
+			Math::Vector3 position = mTransformSystem->GetPosition(entity);
+			float yaw = mTransformSystem->GetRotation(entity).mY;
+			float pitch = mTransformSystem->GetRotation(entity).mX;
+			float roll = mTransformSystem->GetRotation(entity).mZ;
+			Math::Vector3 mscale = mTransformSystem->GetScale(entity);
+
 			const SpriteComponent& spriteComponent = mSpriteComponents[mSpriteComponents.IndexToId(x)];
 			const Texture& spriteTexture = mTextures[spriteComponent.Texture];
 
@@ -186,10 +200,10 @@ bool D3D11Renderer::Update() {
 			D3DXMatrixIdentity(&rotation);
 			D3DXMatrixIdentity(&scale);
 
-			D3DXMatrixTranslation(&translation, spatialComponent.position.mX, spatialComponent.position.mY, (Float)spriteComponent.ZOrder);
-			D3DXMatrixRotationYawPitchRoll(&rotation, spatialComponent.yaw, spatialComponent.pitch, spatialComponent.roll);
+			D3DXMatrixTranslation(&translation, position.mX, position.mY, (Float)spriteComponent.ZOrder);
+			D3DXMatrixRotationYawPitchRoll(&rotation, yaw, pitch, roll);
 
-			D3DXMatrixScaling(&scale, spatialComponent.scale.mX * spriteWidth, spatialComponent.scale.mY * spriteHeight, spatialComponent.scale.mZ);
+			D3DXMatrixScaling(&scale, mscale.mX * spriteWidth, mscale.mY * spriteHeight, mscale.mZ);
 			D3DXMatrixMultiply(&worldMatrix, &rotation, &scale);
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
 

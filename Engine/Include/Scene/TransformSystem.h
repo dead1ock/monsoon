@@ -32,6 +32,7 @@ namespace Monsoon
 			Math::Vector3 position;
 			float yaw, pitch, roll;
 			Math::Vector3 scale;
+			Entity parent;
 		};
 
 		/**
@@ -45,13 +46,58 @@ namespace Monsoon
 			~TransformSystem();
 
 			void Translate(Entity entity, Math::Vector3 delta);
+			void Rotate(Entity entity, Math::Vector3 eulers);
+			void Scale(Entity entity, Math::Vector3 scalars);
 
-			//
-			// Transforms the target's local basis axis into world
-			// space coordinates.
-			//
+			/*
+			 * Position in world space.
+			 */
+			const Math::Vector3& GetPosition(Entity entity);
+
+			void SetPosition(Entity entity, Math::Vector3 position);
+
+			/**
+			 * Scale
+			 */
+			const Math::Vector3& GetScale(Entity entity);
+
+			void SetScale(Entity entity, Math::Vector3 scalars);
+
+			/**
+			 * Rotation in world space.
+			 */
+			const Math::Vector3& GetRotation(Entity entity);
+
+			void SetRotation(Entity entity, Math::Vector3 eulers);
+
+			/**
+			 * Sets the parent of the target entity.
+			 */
+			//void SetParent(Entity child, Entity parent);
+
+			/**
+			 * Returns the parent fo the target entity.
+			 */
+			//Entity GetParent(Entity entity);
+
+			/**
+			 * Sets the parent of the target entity. 
+			 */
+			//void AddChild(Entity parent, Entity child);
+
+			/**
+			 * Returns the front vector of the entity in world space.
+			 */
 			Math::Vector3 Front(Entity entity);
+
+			/**
+			 * Returns the up vector of the entity in world space.
+			 */
 			Math::Vector3 Up(Entity entity);
+
+			/**
+			 * Returns the right vector the entity in world space.
+			 */
 			Math::Vector3 Right(Entity entity);
 		};
 	}

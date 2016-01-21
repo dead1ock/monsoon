@@ -273,19 +273,21 @@ protected:
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
 
 		auto& characterSprite = mRenderer->GetSpriteComponent(mCharacter);
-		auto& characterPosition = *mTransformSystem.GetComponent(mCharacter);
+		
+		Vector3 scale = mTransformSystem.GetScale(mCharacter);
+		Vector3 position = mTransformSystem.GetPosition(mCharacter);
 
 		if (rightKeyState) {
-			if (characterPosition.scale.mX < 0.0f)
-				mTransformSystem.GetComponent(mCharacter).get().scale =  Math::Vector3(characterPosition.scale.mX * -1.0f, characterPosition.scale.mY, characterPosition.scale.mZ);
+			if (scale.mX < 0.0f)
+				mTransformSystem.Scale(mCharacter, Math::Vector3(-1.0f, 1.0f, 1.0f));
 
 			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
 			mTransformSystem.Translate(mCharacter, Vector3(200.0f * mGameClock.getDeltaTime(), 0.0f, 0.0f));
 		}
 
 		if (leftKeyState) {
-			if (characterPosition.scale.mX > 0.0f)
-				mTransformSystem.GetComponent(mCharacter).get().scale = Math::Vector3(characterPosition.scale.mX * -1.0f, characterPosition.scale.mY, characterPosition.scale.mZ);
+			if (scale.mX > 0.0f)
+				mTransformSystem.Scale(mCharacter, Math::Vector3(-1.0f, 1.0f, 1.0f));
 
 			mAnimationSystem.Play2d(mCharacter, mRunAnimation);
 			mTransformSystem.Translate(mCharacter, Vector3(-200.0f * mGameClock.getDeltaTime(), 0.0f, 0.0f));
@@ -302,21 +304,21 @@ protected:
 				mTransformSystem.Translate(mCharacter, Vector3(0.0f, 400.0f * mGameClock.getDeltaTime(), 0.0f));
 			}
 		}
-		if (characterPosition.position.mY > -305.0f && (mGameClock.getTime() - mLastJump) > 0.25f) {
+		if (position.mY > -305.0f && (mGameClock.getTime() - mLastJump) > 0.25f) {
 			mAnimationSystem.Play2d(mCharacter, mJumpDownAnimation);
 			mTransformSystem.Translate(mCharacter, Vector3(0.0f, -450.0f * mGameClock.getDeltaTime(), 0.0f));
 		}
-		else if (characterPosition.position.mY < -305.0f) {
-			mTransformSystem.GetComponent(mCharacter).get().position = Math::Vector3(characterPosition.position.mX, -305.0f, 0.0f);
+		else if (position.mY < -305.0f) {
+			mTransformSystem.SetPosition(mCharacter, Math::Vector3(position.mX, -305.0f, 0.0f));
 		}
 
-		if (!leftKeyState && !rightKeyState && !upKeyState && characterPosition.position.mY == -305.0f) {
+		if (!leftKeyState && !rightKeyState && !upKeyState && position.mY == -305.0f) {
 			mAnimationSystem.Play2d(mCharacter, mIdleAnimation);
 		}
 
-		mRenderer->GetCamera().x = characterPosition.position.mX + 400.0f;
-		mRenderer->GetCamera().lookAtX = characterPosition.position.mX + 400.0f;
-		mTransformSystem.GetComponent(mBackground).get().position = Math::Vector3(characterPosition.position.mX + 400.0f, 0.0f, 0.0f);
+		mRenderer->GetCamera().x = position.mX + 400.0f;
+		mRenderer->GetCamera().lookAtX = position.mX + 400.0f;
+		mTransformSystem.SetPosition(mBackground, Math::Vector3(position.mX + 400.0f, 0.0f, 0.0f));
 
 
 	}

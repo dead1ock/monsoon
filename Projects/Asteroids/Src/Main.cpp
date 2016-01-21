@@ -165,7 +165,9 @@ protected:
 
 	void FireBullet() {
 		Renderer::MeshComponent bullet;
-		Scene::TransformComponent bulletSpatialComponent = *mTransformSystem.GetComponent(player); // Copy player position.
+		Scene::TransformComponent bulletSpatialComponent; // Copy player position.
+		bulletSpatialComponent.position = mTransformSystem.GetPosition(player);
+		bulletSpatialComponent.roll = mTransformSystem.GetRotation(player).mZ;
 		bullet.VertexBuffer = bulletVB;
 
 		bulletSpatialComponent.position += Math::Vector3(cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f)), sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f)), 0.0f);
@@ -185,12 +187,13 @@ protected:
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
 
-		const auto& playerSpatialComponent = *mTransformSystem.GetComponent(player);
+		Math::Vector3 position = mTransformSystem.GetPosition(player);
+		float roll = mTransformSystem.GetRotation(player).mZ;
 
 		if (leftKeyState)
-			mTransformSystem.GetComponent(player).get().roll += (mGameClock.getDeltaTime() * 3.0f);
+			mTransformSystem.Rotate(player, Math::Vector3(0.0f, 0.0f, mGameClock.getDeltaTime() * 3.0f));
 		if (rightKeyState)
-			mTransformSystem.GetComponent(player).get().roll -= (mGameClock.getDeltaTime() * 3.0f);
+			mTransformSystem.Rotate(player, Math::Vector3(0.0f, 0.0f, mGameClock.getDeltaTime() * -3.0f));
 		if (upKeyState) {
 			if (playerSpeedMod < 2.0f)
 				// Speed up.
@@ -207,47 +210,48 @@ protected:
 
 		// Move player in the direction it is rotated.
 		mTransformSystem.Translate(player,
-			Math::Vector3((playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
-			(playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(playerSpatialComponent.roll + (D3DX_PI / 2.0f))),
+			Math::Vector3((playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * cos(roll + (D3DX_PI / 2.0f))),
+			(playerSpeedMod * PLAYER_BASE_SPEED * mGameClock.getDeltaTime() * sin(roll + (D3DX_PI / 2.0f))),
 			0.0f));
 
-		playerAABB = Math::AABB(playerSpatialComponent.position.mX, playerSpatialComponent.position.mY, 0.8f, 1.0f);
+		playerAABB = Math::AABB(position.mX, position.mY, 0.8f, 1.0f);
 
 		// Wrap coordinates around when the player leaves the screen.
-		if (playerSpatialComponent.position.mX > 23.0f)
-			mTransformSystem.GetComponent(player).get().position = Math::Vector3(-23.0f, playerSpatialComponent.position.mY, 0.0f);
-		else if (playerSpatialComponent.position.mX < -23.0f)
-			mTransformSystem.GetComponent(player).get().position = Math::Vector3(23.0f, playerSpatialComponent.position.mY, 0.0f);
+		if (position.mX > 23.0f)
+			mTransformSystem.SetPosition(player, Math::Vector3(-23.0f, position.mY, 0.0f));
+		else if (position.mX < -23.0f)
+			mTransformSystem.SetPosition(player, Math::Vector3(23.0f, position.mY, 0.0f));
 
-		if (playerSpatialComponent.position.mY > 16.0f)
-			mTransformSystem.GetComponent(player).get().position = Math::Vector3(playerSpatialComponent.position.mX, -16.0f, 0.0f);
-		else if (playerSpatialComponent.position.mY < -16.0f)
-			mTransformSystem.GetComponent(player).get().position = Math::Vector3(playerSpatialComponent.position.mX, 16.0f, 0.0f);
+		if (position.mY > 16.0f)
+			mTransformSystem.SetPosition(player, Math::Vector3(position.mX, -16.0f, 0.0f));
+		else if (position.mY < -16.0f)
+			mTransformSystem.SetPosition(player, Math::Vector3(position.mX, 16.0f, 0.0f));
 	}
 
 	void UpdateAsteroidPositions() {
 		// Update Asteroids
 		for (int x = 0; x < mAstroids.size(); x++)
 		{
-			const auto& asteroidSpatialComponent = *mTransformSystem.GetComponent(mAstroids[x]);
+			Math::Vector3 position = mTransformSystem.GetPosition(mAstroids[x]);
+			float roll = mTransformSystem.GetRotation(mAstroids[x]).mZ;
 
 			mTransformSystem.Translate(mAstroids[x],
-				Math::Vector3((ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
-				(ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(asteroidSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				Math::Vector3((ASTEROID_SPEED * mGameClock.getDeltaTime() * cos(roll + (D3DX_PI / 2.0f))),
+				(ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(roll + (D3DX_PI / 2.0f))),
 				0.0f));
 
-			mAsteroidAABBs[x].mX = asteroidSpatialComponent.position.mX;
-			mAsteroidAABBs[x].mY = asteroidSpatialComponent.position.mY;
+			mAsteroidAABBs[x].mX = position.mX;
+			mAsteroidAABBs[x].mY = position.mY;
 
-			if (asteroidSpatialComponent.position.mX > 23.0f)
-				mTransformSystem.GetComponent(mAstroids[x]).get().position = Math::Vector3(-23.0f, asteroidSpatialComponent.position.mY, 0.0f);
-			else if (asteroidSpatialComponent.position.mX < -23.0f)
-				mTransformSystem.GetComponent(mAstroids[x]).get().position = Math::Vector3(23.0f, asteroidSpatialComponent.position.mY, 0.0f);
+			if (position.mX > 23.0f)
+				mTransformSystem.SetPosition(mAstroids[x], Math::Vector3(-23.0f, position.mY, 0.0f));
+			else if (position.mX < -23.0f)
+				mTransformSystem.SetPosition(mAstroids[x], Math::Vector3(23.0f, position.mY, 0.0f));
 
-			if (asteroidSpatialComponent.position.mY > 16.0f)
-				mTransformSystem.GetComponent(mAstroids[x]).get().position = Math::Vector3(asteroidSpatialComponent.position.mX, -16.0f, 0.0f);
-			else if (asteroidSpatialComponent.position.mY < -16.0f)
-				mTransformSystem.GetComponent(mAstroids[x]).get().position = Math::Vector3(asteroidSpatialComponent.position.mX, 16.0f, 0.0f);
+			if (position.mY > 16.0f)
+				mTransformSystem.SetPosition(mAstroids[x], Math::Vector3(position.mX, -16.0f, 0.0f));
+			else if (position.mY < -16.0f)
+				mTransformSystem.SetPosition(mAstroids[x], Math::Vector3(position.mX, 16.0f, 0.0f));
 		}
 	}
 
@@ -255,39 +259,41 @@ protected:
 		// Update Bullets
 		for (int x = (mBullets.size() - 1); x >= 0; x--)
 		{
-			auto& bulletSpatialComponent = *mTransformSystem.GetComponent(mBullets[x]);
+			Math::Vector3 position = mTransformSystem.GetPosition(mBullets[x]);
+			float roll = mTransformSystem.GetRotation(mBullets[x]).mZ;
+
 			mTransformSystem.Translate(mBullets[x],
-				Math::Vector3((BULLET_SPEED * mGameClock.getDeltaTime() * cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
-				(BULLET_SPEED * mGameClock.getDeltaTime() * sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f))),
+				Math::Vector3((BULLET_SPEED * mGameClock.getDeltaTime() * cos(roll + (D3DX_PI / 2.0f))),
+				(BULLET_SPEED * mGameClock.getDeltaTime() * sin(roll + (D3DX_PI / 2.0f))),
 				0.0f));
 
 			// Update AABB
-			mBulletAABBs[x].mX = bulletSpatialComponent.position.mX;
-			mBulletAABBs[x].mY = bulletSpatialComponent.position.mY;
+			mBulletAABBs[x].mX = position.mX;
+			mBulletAABBs[x].mY = position.mY;
 
 			//
-			if (bulletSpatialComponent.position.mX > 23.0f)
+			if (position.mX > 23.0f)
 			{
 				mEntityManager.DestroyEntity(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else if (bulletSpatialComponent.position.mX < -23.0f)
+			else if (position.mX < -23.0f)
 			{
 				mEntityManager.DestroyEntity(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else if (bulletSpatialComponent.position.mY > 16.0f)
+			else if (position.mY > 16.0f)
 			{
 				mEntityManager.DestroyEntity(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
-			else if (bulletSpatialComponent.position.mY < -16.0f)
+			else if (position.mY < -16.0f)
 			{
 				mEntityManager.DestroyEntity(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);

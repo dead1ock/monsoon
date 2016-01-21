@@ -65,10 +65,9 @@ protected:
 
 	void OnUpdate() {
 		Renderer::Camera& camera = mRenderer->GetCamera();
-		auto& pyramidTransform = *mTransformSystem.GetComponent(0);
 
-		mTransformSystem.GetComponent(0).get().yaw += (mGameClock.getDeltaTime() * 2.0f);
-		mTransformSystem.GetComponent(0).get().position = Math::Vector3(pyramidTransform.position.mX, (cos(cameraTheta) + 1.0f), pyramidTransform.position.mZ);
+		mTransformSystem.Rotate(0, Math::Vector3(0.0f, mGameClock.getDeltaTime() * 2.0f, 0.0f));
+		mTransformSystem.SetPosition(0, Math::Vector3(mTransformSystem.GetPosition(0).mX, (cos(cameraTheta) + 1.0f), mTransformSystem.GetPosition(0).mZ));
 
 		camera.x = cos(cameraTheta) * 15.0f;
 		camera.y = 8.0f;
