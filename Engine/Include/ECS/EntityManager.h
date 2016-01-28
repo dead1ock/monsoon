@@ -55,7 +55,7 @@ namespace Monsoon {
 			Event::EventManager* mEventManager;
 			Monsoon::Entity mNextEntityHandle;
 			std::unordered_map<std::string, Monsoon::Entity> mEntities;
-			std::list<Monsoon::Entity> mEntityFreeList;
+			std::vector<Monsoon::Entity> mEntityFreeList;
 		};
 	}
 }

@@ -16,23 +16,26 @@ using namespace Monsoon::Event;
 
 EntityManager::EntityManager(EventManager* eventManager)
 : mNextEntityHandle(0)
+, mEntityFreeList()
 , mEventManager(eventManager)
+, mEntities()
 {
 	
 }
 
 EntityManager::~EntityManager()
 {
-
+	mEntityFreeList.clear();
+	mEntities.clear();
 }
 
 Monsoon::Entity EntityManager::CreateEntity()
 {
-	Monsoon::Entity entity;
+	Monsoon::Entity entity = UINT32_MAX;
 	if (mEntityFreeList.size())
 	{
 		entity = mEntityFreeList.front();
-		mEntityFreeList.pop_front();
+		mEntityFreeList.erase(mEntityFreeList.begin());
 	}
 	else
 		entity = mNextEntityHandle++;
