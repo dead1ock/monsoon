@@ -20,7 +20,8 @@ mContext(nullptr),
 mSwapChain(nullptr),
 mRenderTargetView(nullptr),
 mDepthStencilBuffer(nullptr),
-mDepthStencilView(nullptr)
+mDepthStencilView(nullptr),
+mRasterStateNoCulling(nullptr)
 {
 
 }
@@ -46,6 +47,9 @@ bool D3D::Initialize(D3D11Window& renderWindow) {
 		return false;
 
 	if (!CreateViewport(renderWindow))
+		return false;
+
+	if (!CreateRasterStateNoCull())
 		return false;
 
 	//
@@ -76,6 +80,9 @@ bool D3D::Initialize(D3D11Window& renderWindow) {
 }
 
 void D3D::Shutdown() {
+
+	if (mRasterStateNoCulling != nullptr)
+		mRasterStateNoCulling->Release();
 
 	if (mBlendState != nullptr)
 		mBlendState->Release();
@@ -181,6 +188,7 @@ bool D3D::CreateRenderTarget() {
 bool D3D::CreateDepthStencilBuffer(D3D11Window& renderWindow) {
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	D3D11_DEPTH_STENCIL_DESC depthStencilDescNoZBuffer;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	HRESULT result;
 
@@ -229,6 +237,29 @@ bool D3D::CreateDepthStencilBuffer(D3D11Window& renderWindow) {
 	}
 
 	mContext->OMSetDepthStencilState(mDepthStencilState, 1);
+
+	ZeroMemory(&depthStencilDescNoZBuffer, sizeof(depthStencilDescNoZBuffer));
+
+	depthStencilDescNoZBuffer.DepthEnable = false;
+	depthStencilDescNoZBuffer.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDescNoZBuffer.DepthFunc = D3D11_COMPARISON_LESS;
+	depthStencilDescNoZBuffer.StencilEnable = true;
+	depthStencilDescNoZBuffer.StencilReadMask = 0xFF;
+	depthStencilDescNoZBuffer.StencilWriteMask = 0xFF;
+	depthStencilDescNoZBuffer.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDescNoZBuffer.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthStencilDescNoZBuffer.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDescNoZBuffer.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	depthStencilDescNoZBuffer.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDescNoZBuffer.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthStencilDescNoZBuffer.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDescNoZBuffer.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	result = mDevice->CreateDepthStencilState(&depthStencilDescNoZBuffer, &mDepthStencilStateNoZBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
 	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
 
@@ -284,6 +315,29 @@ bool D3D::SetRasterState() {
 	return true;
 }
 
+bool D3D::CreateRasterStateNoCull() {
+	D3D11_RASTERIZER_DESC rasterDesc;
+	HRESULT result;
+
+	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.CullMode = D3D11_CULL_NONE;
+	rasterDesc.DepthBias = 0;
+	rasterDesc.DepthBiasClamp = 0.0f;
+	rasterDesc.DepthClipEnable = true;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.MultisampleEnable = false;
+	rasterDesc.ScissorEnable = false;
+	rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+	result = mDevice->CreateRasterizerState(&rasterDesc, &mRasterStateNoCulling);
+	if (FAILED(result))
+	{
+		return false;
+	}
+	return true;
+}
+
 void D3D::BeginScene() {
 	float color[4];
 	color[0] = 0.0f;
@@ -305,4 +359,24 @@ void D3D::EnableAlphaBlending() {
 
 void D3D::DisableAlphaBlending() {
 	mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
+}
+
+void D3D::TurnOnCulling()
+{
+	mContext->RSSetState(mRasterState);
+}
+
+void D3D::TurnOffCulling()
+{
+	mContext->RSSetState(mRasterStateNoCulling);
+}
+
+void D3D::TurnOnZBuffer()
+{
+	mContext->OMSetDepthStencilState(mDepthStencilState, 1);
+}
+
+void D3D::TurnOffZBuffer()
+{
+	mContext->OMSetDepthStencilState(mDepthStencilStateNoZBuffer, 1);
 }

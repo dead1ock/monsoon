@@ -181,6 +181,8 @@ namespace Monsoon {
 			virtual void ReleaseTexture(TextureHandle textureHandle) = 0;
 			//virtual const Texture& GetTexture(TextureHandle textureHandle) = 0;
 
+			virtual void CreateGradientSkydome(Math::Vector3 apexColor, Math::Vector3 lowColor) = 0;
+
 			// Camera
 			virtual Camera& GetCamera() = 0;
 		};

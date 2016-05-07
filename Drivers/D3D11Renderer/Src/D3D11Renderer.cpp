@@ -10,6 +10,8 @@
 
 #include <d3dx11tex.h>
 
+#include <fstream>
+
 using namespace Monsoon;
 using namespace Monsoon::Renderer;
 
@@ -18,7 +20,10 @@ D3D11Renderer::D3D11Renderer(RendererSettings& settings, Event::EventManager* ev
 	mTransformSystem(transformSystem),
 	mWindow(settings.windowName, settings.screenWidth, settings.screenHeight, settings.fullscreen),
 	mSettings(settings),
-	mEventManager(eventManager)
+	mEventManager(eventManager),
+	mSkydomeVB(-1),
+	mSkydomeApexColor(0.3f, 0.8f, 1.0f),
+	mSkydomeBottomColor(1.0f, 1.0f, 1.0f)
 {
 	mVertexBuffers.reserve(MONSOON_MAX_ENTITIES);
 	mTextures.reserve(1024);
@@ -54,6 +59,9 @@ bool D3D11Renderer::Initialize() {
 	if (!mSpriteMaterial.Load(mD3d.GetDevice(), mWindow.getHandle()))
 		return false;
 
+	if (!mGradientSkydomeMaterial.Load(mD3d.GetDevice(), mWindow.getHandle()))
+		return false;
+
 	mSpritePlane = CreatePlane(1.0f, 1.0f);
 	return true;
 }
@@ -71,6 +79,7 @@ void D3D11Renderer::Shutdown() {
 		i->Free();
 	mVertexBuffers.clear();
 
+	mGradientSkydomeMaterial.Release();
 	mSpriteMaterial.Release();
 	mTextureMaterial.Release();
 	mColorMaterial.Release();
@@ -116,6 +125,24 @@ bool D3D11Renderer::Update() {
 	mD3d.BeginScene();
 
 	D3DXMATRIX translation, rotation, scale;
+
+	// Render Skydome
+	if (mSkydomeVB != -1)
+	{
+		mD3d.TurnOffCulling();
+		mD3d.TurnOffZBuffer();
+		Math::Vector3 position = Math::Vector3(defaultCamera.x, defaultCamera.y, defaultCamera.z);
+
+		D3DXMatrixIdentity(&worldMatrix);
+
+		D3DXMatrixTranslation(&worldMatrix, position.mX, position.mY, position.mZ);
+
+		mVertexBuffers[mSkydomeVB].Render(mD3d.GetContext());
+		mGradientSkydomeMaterial.Render(mD3d.GetContext(), D3DXVECTOR4(mSkydomeBottomColor.mX, mSkydomeBottomColor.mY, mSkydomeBottomColor.mZ, 0.0f), D3DXVECTOR4(mSkydomeApexColor.mX, mSkydomeApexColor.mY, mSkydomeApexColor.mZ, 0.0f), worldMatrix, viewMatrix, projectionMatrix);
+		mD3d.GetContext()->DrawIndexed(mVertexBuffers[mSkydomeVB].GetIndexCount(), 0, 0);
+		mD3d.TurnOnZBuffer();
+		mD3d.TurnOnCulling();
+	}
 
 	// Render 3d Meshes
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
@@ -560,4 +587,51 @@ void D3D11Renderer::ReleaseAtlasSheet(AtlasSheetHandle sheet)
 {
 	mAtlasSheets.erase(mAtlasSheets.begin() + sheet);
 	mAtlasSheetFreeList.push_back(sheet);
+}
+
+VertexBufferHandle D3D11Renderer::LoadMeshTxt(std::string filename)
+{
+	std::ifstream file(filename.c_str(), std::ios::binary);
+	U32 vertexCount = 0;
+	char input = '\0';
+	VertexType* vertices;
+	U32* indicies;
+
+	// Dummy Vertex Normals
+	float nx, ny, nz;
+
+	// Read up to "Vertex Count:"
+	do
+	{
+		file.get(input);
+	} while (input != ':');
+
+	file >> vertexCount;
+
+	// Read up to "Data: "
+	do
+	{
+		file.get(input);
+	} while (input != ':');
+
+	file.get(input);
+	file.get(input);
+
+	vertices = new VertexType[vertexCount];
+	indicies = new U32[vertexCount];
+	for (U32 count = 0; count < vertexCount; count++)
+	{
+		file >> vertices[count].x >> vertices[count].y >> vertices[count].z;
+		file >> vertices[count].u >> vertices[count].v;
+		file >> nx >> ny >> nz;
+		indicies[count] = count;
+	}
+
+	return CreateVertexBuffer(vertices, vertexCount, indicies, vertexCount);
+}
+
+void D3D11Renderer::CreateGradientSkydome(Math::Vector3 apexColor, Math::Vector3 bottomColor)
+{
+	mSkydomeVB = LoadMeshTxt("Meshes/skydome.txt");
+	
 }

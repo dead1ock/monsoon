@@ -15,6 +15,7 @@
 #include "D3D11ColorMaterial.h"
 #include "D3D11TextureMaterial.h"
 #include "D3D11SpriteMaterial.h"
+#include "D3D11GradientSkydomeMaterial.h"
 #include "Util/PackedPool.h"
 
 namespace Monsoon {
@@ -62,6 +63,11 @@ namespace Monsoon {
 
 			Camera& GetCamera() { return defaultCamera; }
 
+			// Creates a "Gradient" skydome and attaches it to the camera.
+			// A gradient skydome takes two colors and interpolates between them from the apex (top) and bottom
+			// of the skydome.
+			void CreateGradientSkydome(Math::Vector3 apexColor, Math::Vector3 lowColor);
+
 		private:
 			D3D11Window mWindow;
 			D3D mD3d;
@@ -74,6 +80,9 @@ namespace Monsoon {
 			std::vector<AtlasSheet> mAtlasSheets;
 			std::vector<AtlasSheetHandle> mAtlasSheetFreeList;
 
+			VertexBufferHandle mSkydomeVB;
+			Math::Vector3 mSkydomeApexColor, mSkydomeBottomColor;
+
 			Camera defaultCamera;
 
 			Util::PackedPool<Entity, MeshComponent> mMeshComponents;
@@ -83,12 +92,16 @@ namespace Monsoon {
 			D3D11ColorMaterial mColorMaterial;
 			D3D11TextureMaterial mTextureMaterial;
 			D3D11SpriteMaterial mSpriteMaterial;
+			D3D11GradientSkydomeMaterial mGradientSkydomeMaterial;
 
 			VertexBufferHandle mSpritePlane;
 
 			Scene::TransformSystem* mTransformSystem;
 			Event::EventManager* mEventManager;
 			RendererSettings mSettings;
+
+			// Loads a mesh from a text file and returns a vertex buffer handle.
+			VertexBufferHandle LoadMeshTxt(std::string filename);
 		};
 	}
 }

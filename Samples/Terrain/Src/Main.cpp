@@ -24,12 +24,27 @@ using namespace Monsoon;
  *
  */
 const U32 size = 76;
-const U32 numChunks = 5; // The number of chunks to render as a square. (Must be greater than 2).
+const U32 numChunks = 4; // The number of chunks to render as a square. (Must be greater than 2).
 const float chunkXScale = 65.0f;
-const float chunkYScale = 50.0f;
-const int chunkXOffset = 10;
-const int chunkYOffset = 6;
-const std::string filename = "N35W112";
+const float chunkYScale = 65.0f;
+const int chunkXOffset = 7;
+const int chunkYOffset = 12;
+const std::string filename = "N39W107";
+
+const float peakViewX = -1897.81921;
+const float peakViewZ = -3074.84082;
+
+/**
+ * Viewing Modes
+ */
+enum VIEW_MODE
+{
+	DEFAULT,
+	PEAK,
+	TRAIL
+};
+
+VIEW_MODE cameraMode = VIEW_MODE::PEAK;
 
 /**
  * 
@@ -63,7 +78,7 @@ public:
 	}
 
 	~HGTReader() {
-
+		mFile.close();
 	}
 
 
@@ -95,6 +110,7 @@ protected:
 	Scene::TransformComponent* chunkPositions;
 	Renderer::TextureHandle* chunkTextures;
 	std::stringstream*	textureFiles;
+	Renderer::MeshComponent skydomeMesh;
 
 	void OnInitialize() {
 		chunkVertexBuffers = new Renderer::VertexBufferHandle[numChunks * numChunks]();
@@ -102,6 +118,12 @@ protected:
 		chunkPositions = new Scene::TransformComponent[numChunks * numChunks]();
 		chunkTextures = new Renderer::TextureHandle[numChunks * numChunks]();
 		textureFiles = new std::stringstream[numChunks * numChunks]();
+
+		//
+		// Generate Skydome
+		//
+		mRenderer->CreateGradientSkydome(Math::Vector3(0.0f, 0.0f, 0.0f), Math::Vector3(0.0f, 0.0f, 0.0f));
+
 
 		//
 		// Generate Texture Map
@@ -159,10 +181,24 @@ protected:
 	void OnUpdate() {
 		Renderer::Camera& camera = mRenderer->GetCamera();
 		
-		camera.lookAtX = 0;
-		camera.lookAtZ = 0;
-		camera.x = cos(cameraTheta) * ((float)size * (float)numChunks / 2.0f * chunkXScale) * cameraZoom;
-		camera.z = sin(cameraTheta) * ((float)size * (float)numChunks/2.0f * chunkXScale) * cameraZoom;
+		switch (cameraMode)
+		{
+		case VIEW_MODE::DEFAULT:
+			camera.lookAtX = 0;
+			camera.lookAtZ = 0;
+			camera.x = cos(cameraTheta) * ((float)size * (float)numChunks / 2.0f * chunkXScale) * cameraZoom;
+			camera.z = sin(cameraTheta) * ((float)size * (float)numChunks / 2.0f * chunkXScale) * cameraZoom;
+			break;
+		case VIEW_MODE::PEAK:
+			camera.x = peakViewX;
+			camera.z = peakViewZ;
+			camera.lookAtX = camera.x + (cos(cameraTheta) * 500.0f);
+			camera.lookAtZ = camera.z + (sin(cameraTheta) * 500.0f);
+			camera.lookAtY = 4394.12f; //mFileReader.mHeightMap[(int)camera.x][(int)camera.z] + 5.0f;
+			camera.y = 4394.12f; //mFileReader.mHeightMap[(int)camera.x][(int)camera.z] + 5.0f;
+			break;
+		}
+		
 		camera.farClip = 1000000.0f;
 
 		U16 leftKeyState = GetAsyncKeyState(VK_LEFT);
@@ -181,9 +217,9 @@ protected:
 		if (downKeyState)
 			cameraZoom += mGameClock.getDeltaTime() / 4.0f;
 		if (sKeyState)
-			camera.y -= 100.0f;
+			camera.y -= 50.0f;
 		if (altKeyState)
-			camera.y += 100.0f;
+			camera.y += 50.0f;
 
 		if (cameraZoom <= 0.0f)
 			cameraZoom = 0.001f;
@@ -202,6 +238,9 @@ protected:
 				mRenderer->ReleaseTexture(index);
 			}
 		}
+
+		mRenderer->DetachMeshComponent(1000);
+		mTransformSystem.DetachComponent(1000);
 
 		delete textureFiles;
 		delete chunkTextures;
