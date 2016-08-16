@@ -14,11 +14,13 @@
 #include <sstream>
 
 #include <App/Application.h>
+#include <Math/Vector.h>
 #include <D3D11Renderer.h>
 
 #include <fstream>
 
 using namespace Monsoon;
+using namespace Monsoon::Math;
 
 /*
  *
@@ -41,10 +43,11 @@ enum VIEW_MODE
 {
 	DEFAULT,
 	PEAK,
-	TRAIL
+	TRAIL,
+	FIRST_PERSON
 };
 
-VIEW_MODE cameraMode = VIEW_MODE::PEAK;
+VIEW_MODE cameraMode = VIEW_MODE::FIRST_PERSON;
 
 /**
  * 
@@ -93,7 +96,12 @@ class TerrainApplication : public Application
 public:
 	TerrainApplication()
 		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mTransformSystem))) 
-		, mFileReader((filename + ".hgt").c_str()) {
+		, mFileReader((filename + ".hgt").c_str())
+		, mFirstPersonPosition(0.0f, 4394.12f, 0.0f)
+		, mFirstPersonDirection(0.0f, 0.0f, 0.0f)
+		, cameraTheta(0.0f)
+		, cameraPhi(0.0f)
+		, mFirstPersonCursorOn(false) {
 	}
 
 	~TerrainApplication() {
@@ -101,9 +109,17 @@ public:
 	}
 
 protected:
-	float cameraTheta;
+	float cameraTheta; // Yaw
+	float cameraPhi; // Pitch
 	float cameraZoom;
+	Vector3 mFirstPersonPosition;
+	Vector3 mFirstPersonDirection;
 	HGTReader mFileReader;
+	float cursorX;
+	float cursorY;
+	float cursorDiffX;
+	float cursorDiffY;
+	bool mFirstPersonCursorOn;
 
 	Renderer::VertexBufferHandle* chunkVertexBuffers;
 	Renderer::MeshComponent* chunkMeshes;
@@ -176,6 +192,25 @@ protected:
 		Renderer::Camera& camera = mRenderer->GetCamera();
 		camera.y = mFileReader.mMaxHeight + 3000.0f;
 		camera.lookAtY = mFileReader.mMinHeight + 1700.0f;
+
+		PollMousePosition();
+	}
+
+	void PollMousePosition() {
+		float x = 0;
+		float y = 0;
+		
+		POINT cursorPosition;
+		GetCursorPos(&cursorPosition);
+
+		x = cursorPosition.x;
+		y = cursorPosition.y;
+
+		cursorDiffX = x - cursorX;
+		cursorDiffY = y - cursorY;
+
+		cursorX = x;
+		cursorY = y;
 	}
 
 	void OnUpdate() {
@@ -197,6 +232,15 @@ protected:
 			camera.lookAtY = 4394.12f; //mFileReader.mHeightMap[(int)camera.x][(int)camera.z] + 5.0f;
 			camera.y = 4394.12f; //mFileReader.mHeightMap[(int)camera.x][(int)camera.z] + 5.0f;
 			break;
+		case VIEW_MODE::FIRST_PERSON:
+			mFirstPersonDirection = Vector3(cos(cameraTheta), sin(cameraPhi), sin(cameraTheta));
+			camera.x = mFirstPersonPosition.mX;
+			camera.z = mFirstPersonPosition.mZ;
+			camera.y = mFirstPersonPosition.mY;
+			camera.lookAtX = camera.x + (mFirstPersonDirection.mX * 500.0f);
+			camera.lookAtZ = camera.z + (mFirstPersonDirection.mZ * 500.0f);
+			camera.lookAtY = camera.y + (mFirstPersonDirection.mY * 500.0f);
+			break;
 		}
 		
 		camera.farClip = 1000000.0f;
@@ -205,9 +249,19 @@ protected:
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 upKeyState = GetAsyncKeyState(VK_UP);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
-		U16 sKeyState = GetAsyncKeyState(VK_SPACE);
-		U16 altKeyState = GetAsyncKeyState(VK_RETURN);
+		U16 spaceKeyState = GetAsyncKeyState(VK_SPACE);
+		U16 leftShiftKeyState = GetAsyncKeyState(0xA0);
 
+		U16 wKeyState = GetAsyncKeyState(0x57);
+		U16 aKeyState = GetAsyncKeyState(0x41);
+		U16 sKeyState = GetAsyncKeyState(0x53);
+		U16 dKeyState = GetAsyncKeyState(0x44);
+		U16 qKeyState = GetAsyncKeyState(0x51);
+		U16 eKeyState = GetAsyncKeyState(0x45);
+
+		// 
+		// Default View Controls
+		// 
 		if (leftKeyState)
 			cameraTheta += mGameClock.getDeltaTime()/4.0f;
 		if (rightKeyState)
@@ -216,13 +270,44 @@ protected:
 			cameraZoom -= mGameClock.getDeltaTime() / 4.0f;
 		if (downKeyState)
 			cameraZoom += mGameClock.getDeltaTime() / 4.0f;
+
+
+		//
+		// First Person View Controls
+		//
+		if (wKeyState)
+		{
+			mFirstPersonPosition += mFirstPersonDirection * mGameClock.getDeltaTime() * 2500.0f;
+		}
+		if (aKeyState)
+		{
+			mFirstPersonPosition += Vector3(cos((3 * PI) / 2 + cameraTheta), 0.0f, sin((3 * PI) / 2 + cameraTheta)) * -1.0f * mGameClock.getDeltaTime() * 2500.0f;
+		}
 		if (sKeyState)
-			camera.y -= 50.0f;
-		if (altKeyState)
-			camera.y += 50.0f;
+		{
+			mFirstPersonPosition += mFirstPersonDirection * (-1.0f) * mGameClock.getDeltaTime() * 2500.0f;
+		}
+		if (dKeyState)
+		{
+			mFirstPersonPosition += Vector3(cos((3 * PI) / 2 + cameraTheta), 0.0f, sin((3 * PI) / 2 + cameraTheta)) * mGameClock.getDeltaTime() * 2500.0f;
+		}
+		if (spaceKeyState)
+			mQuit = true;
 
 		if (cameraZoom <= 0.0f)
 			cameraZoom = 0.001f;
+
+		if (!mFirstPersonCursorOn)
+		{
+			PollMousePosition();
+
+			cameraTheta -= cursorDiffX * mGameClock.getDeltaTime() / 4.0f;
+			cameraPhi -= cursorDiffY * mGameClock.getDeltaTime() / 4.0f;
+
+			SetCursorPos(2560.0f / 2.0f, 1440.0f / 2.0f);
+			cursorX = 2560.0f / 2.0f;
+			cursorY = 1440.0f / 2.0f;
+		}
 	}
 
 	void OnShutdown() {
