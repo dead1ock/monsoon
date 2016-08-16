@@ -27,14 +27,79 @@ using namespace Monsoon::Math;
  */
 const U32 size = 76;
 const U32 numChunks = 4; // The number of chunks to render as a square. (Must be greater than 2).
-const float chunkXScale = 65.0f;
-const float chunkYScale = 65.0f;
 const int chunkXOffset = 7;
 const int chunkYOffset = 12;
 const std::string filename = "N39W107";
 
 const float peakViewX = -1897.81921;
 const float peakViewZ = -3074.84082;
+
+const float WorldScale = 1.0f;
+
+float FirstPersonCameraSpeed = 10.0f;
+
+struct GcsCoord
+{
+	GcsCoord(int _degrees, int _minutes, int _seconds) 
+	: degrees(_degrees)
+	, minutes(_minutes)
+	, seconds(_seconds) {
+
+	}
+
+	GcsCoord()
+		: degrees(0)
+		, minutes(0)
+		, seconds(0) {
+
+	}
+
+	int degrees;
+	int minutes;
+	int seconds;
+
+	float ToDecimal() {
+		return degrees + (minutes / 60.0f) + (seconds / 60.0f);
+	}
+};
+
+struct GcsLocation
+{
+	GcsCoord latitude;
+	GcsCoord longitude;
+};
+
+Vector2 GcsToCartesian(GcsCoord latitude, GcsCoord longitude)
+{
+	Vector2 cartesian(0.0f, 0.0f);
+	cartesian.mX = latitude.ToDecimal();
+	cartesian.mY = longitude.ToDecimal();
+	return cartesian;
+}
+
+Vector2 GcsToCartesian(GcsLocation location)
+{
+	Vector2 cartesian(0.0f, 0.0f);
+	cartesian.mX = location.latitude.ToDecimal();
+	cartesian.mY = location.longitude.ToDecimal();
+	return cartesian;
+}
+
+GcsLocation CartesianToGcs(Vector2 cartesian)
+{
+	GcsLocation gcs;
+	gcs.latitude.degrees = (int)cartesian.mX;
+	gcs.latitude.minutes = 60 * (cartesian.mX - gcs.latitude.degrees);
+	gcs.latitude.seconds = 3600 * (cartesian.mX - gcs.latitude.degrees) - (60 * (gcs.latitude.minutes));
+	gcs.longitude.degrees = (int)cartesian.mY;
+	gcs.longitude.minutes = 60 * (cartesian.mY - gcs.longitude.degrees);
+	gcs.longitude.seconds = 3600 * (cartesian.mY - gcs.longitude.degrees) - (60 * (gcs.longitude.minutes));
+	return gcs;
+}
+
+float MetersToCartesian(float meters) {
+	return (meters/50.0f);
+}
 
 /**
  * Viewing Modes
@@ -97,7 +162,7 @@ public:
 	TerrainApplication()
 		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mTransformSystem))) 
 		, mFileReader((filename + ".hgt").c_str())
-		, mFirstPersonPosition(0.0f, 4394.12f, 0.0f)
+		, mFirstPersonPosition(0.0f, 0.0f, 0.0f)
 		, mFirstPersonDirection(0.0f, 0.0f, 0.0f)
 		, cameraTheta(0.0f)
 		, cameraPhi(0.0f)
@@ -134,6 +199,9 @@ protected:
 		chunkPositions = new Scene::TransformComponent[numChunks * numChunks]();
 		chunkTextures = new Renderer::TextureHandle[numChunks * numChunks]();
 		textureFiles = new std::stringstream[numChunks * numChunks]();
+
+		Vector2 cartesian = GcsToCartesian(GcsCoord(39, 0, 0), GcsCoord(-117, 0, 0));
+		mFirstPersonPosition = Vector3(cartesian.mX * WorldScale, 4394.12f/50.0f, cartesian.mY * WorldScale);
 
 		//
 		// Generate Skydome
@@ -178,8 +246,11 @@ protected:
 				chunkMeshes[index].TextureId = chunkTextures[index];
 				chunkMeshes[index].VertexBuffer = chunkVertexBuffers[index];
 
-				chunkPositions[index].position += Math::Vector3((y * chunkXScale * (size - 1)), 0.0f, (x * chunkYScale * (size - 1)));
-				chunkPositions[index].position += Math::Vector3(-(chunkXScale * (float)(size - 1) * (float)numChunks) / 2.0f, 0.0f, -(chunkYScale * (float)(size - 1) * (float)numChunks) / 2.0f);
+				//chunkPositions[index].position += Math::Vector3((y * chunkXScale * (size - 1)), 0.0f, (x * chunkYScale * (size - 1)));
+				//chunkPositions[index].position += Math::Vector3(-(chunkXScale * (float)(size - 1) * (float)numChunks) / 2.0f, 0.0f, -(chunkYScale * (float)(size - 1) * (float)numChunks) / 2.0f);
+				chunkPositions[index].position += Vector3((y * 1.25f * WorldScale * (size - 1)), 0.0f, (x * WorldScale * (size - 1)));
+				Vector2 cartesian = GcsToCartesian(GcsCoord(39, 0, 0), GcsCoord(-117, 0, 0));
+				chunkPositions[index].position += Vector3(cartesian.mX, 0.0f, cartesian.mY);
 
 				mRenderer->AttachMeshComponent(index, chunkMeshes[index]);
 				mTransformSystem.AttachComponent(index, chunkPositions[index]);
@@ -221,8 +292,8 @@ protected:
 		case VIEW_MODE::DEFAULT:
 			camera.lookAtX = 0;
 			camera.lookAtZ = 0;
-			camera.x = cos(cameraTheta) * ((float)size * (float)numChunks / 2.0f * chunkXScale) * cameraZoom;
-			camera.z = sin(cameraTheta) * ((float)size * (float)numChunks / 2.0f * chunkXScale) * cameraZoom;
+			camera.x = cos(cameraTheta) * ((float)size * (float)numChunks / 2.0f * WorldScale) * cameraZoom;
+			camera.z = sin(cameraTheta) * ((float)size * (float)numChunks / 2.0f * WorldScale) * cameraZoom;
 			break;
 		case VIEW_MODE::PEAK:
 			camera.x = peakViewX;
@@ -252,6 +323,9 @@ protected:
 		U16 spaceKeyState = GetAsyncKeyState(VK_SPACE);
 		U16 leftShiftKeyState = GetAsyncKeyState(0xA0);
 
+		U16 rightMouseState = GetAsyncKeyState(VK_RBUTTON);
+		U16 leftMouseState = GetAsyncKeyState(VK_LBUTTON);
+
 		U16 wKeyState = GetAsyncKeyState(0x57);
 		U16 aKeyState = GetAsyncKeyState(0x41);
 		U16 sKeyState = GetAsyncKeyState(0x53);
@@ -277,32 +351,38 @@ protected:
 		//
 		if (wKeyState)
 		{
-			mFirstPersonPosition += mFirstPersonDirection * mGameClock.getDeltaTime() * 2500.0f;
+			mFirstPersonPosition += mFirstPersonDirection * mGameClock.getDeltaTime() * FirstPersonCameraSpeed;
 		}
 		if (aKeyState)
 		{
-			mFirstPersonPosition += Vector3(cos((3 * PI) / 2 + cameraTheta), 0.0f, sin((3 * PI) / 2 + cameraTheta)) * -1.0f * mGameClock.getDeltaTime() * 2500.0f;
+			mFirstPersonPosition += Vector3(cos((3 * PI) / 2 + cameraTheta), 0.0f, sin((3 * PI) / 2 + cameraTheta)) * -1.0f * mGameClock.getDeltaTime() * FirstPersonCameraSpeed;
 		}
 		if (sKeyState)
 		{
-			mFirstPersonPosition += mFirstPersonDirection * (-1.0f) * mGameClock.getDeltaTime() * 2500.0f;
+			mFirstPersonPosition += mFirstPersonDirection * (-1.0f) * mGameClock.getDeltaTime() * FirstPersonCameraSpeed;
 		}
 		if (dKeyState)
 		{
-			mFirstPersonPosition += Vector3(cos((3 * PI) / 2 + cameraTheta), 0.0f, sin((3 * PI) / 2 + cameraTheta)) * mGameClock.getDeltaTime() * 2500.0f;
+			mFirstPersonPosition += Vector3(cos((3 * PI) / 2 + cameraTheta), 0.0f, sin((3 * PI) / 2 + cameraTheta)) * mGameClock.getDeltaTime() * FirstPersonCameraSpeed;
 		}
 		if (spaceKeyState)
 			mQuit = true;
+
+		if (leftMouseState)
+			FirstPersonCameraSpeed += mGameClock.getDeltaTime() * 100.0f;
+		if (rightMouseState)
+			FirstPersonCameraSpeed -= mGameClock.getDeltaTime() * 100.0f;
 
 		if (cameraZoom <= 0.0f)
 			cameraZoom = 0.001f;
 
 		if (!mFirstPersonCursorOn)
 		{
+			ShowCursor(false);
 			PollMousePosition();
 
-			cameraTheta -= cursorDiffX * mGameClock.getDeltaTime() / 4.0f;
-			cameraPhi -= cursorDiffY * mGameClock.getDeltaTime() / 4.0f;
+			cameraTheta -= cursorDiffX * mGameClock.getDeltaTime() / 10.0f;
+			cameraPhi -= cursorDiffY * mGameClock.getDeltaTime() / 10.0f;
 
 			SetCursorPos(2560.0f / 2.0f, 1440.0f / 2.0f);
 			cursorX = 2560.0f / 2.0f;
@@ -348,7 +428,7 @@ protected:
 			{
 				float height = mFileReader.mHeightMap[x + xOffset][y + yOffset];
 				float color = (mFileReader.mHeightMap[x + xOffset][y + yOffset] - mFileReader.mMinHeight) / (mFileReader.mMaxHeight - mFileReader.mMinHeight);
-				vertices[(x * size) + y].SetPosition((x * chunkXScale) - ((chunkXScale * size) / 2.0f), (mFileReader.mHeightMap[x + xOffset][y + yOffset]), (y * chunkYScale) - ((chunkYScale * size) / 2.0f));
+				vertices[(x * size) + y].SetPosition(x * 1.25f * WorldScale, MetersToCartesian(mFileReader.mHeightMap[x + xOffset][y + yOffset]), y * WorldScale); // This is where i'll convert to simulation world coords for scaling.
 				vertices[(x * size) + y].SetColor(color, color, color, 1.0f);
 				vertices[(x * size) + y].SetUV((float)(y) / (float)size, (float)(x) / (float)size );
 			}
