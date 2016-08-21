@@ -17,6 +17,9 @@
 #include <Math/Vector.h>
 #include <D3D11Renderer.h>
 
+#include "HgtReader.h"
+#include "GCS.h"
+
 #include <fstream>
 
 using namespace Monsoon;
@@ -38,69 +41,6 @@ const float WorldScale = 1.0f;
 
 float FirstPersonCameraSpeed = 10.0f;
 
-struct GcsCoord
-{
-	GcsCoord(int _degrees, int _minutes, int _seconds) 
-	: degrees(_degrees)
-	, minutes(_minutes)
-	, seconds(_seconds) {
-
-	}
-
-	GcsCoord()
-		: degrees(0)
-		, minutes(0)
-		, seconds(0) {
-
-	}
-
-	int degrees;
-	int minutes;
-	int seconds;
-
-	float ToDecimal() {
-		return degrees + (minutes / 60.0f) + (seconds / 60.0f);
-	}
-};
-
-struct GcsLocation
-{
-	GcsCoord latitude;
-	GcsCoord longitude;
-};
-
-Vector2 GcsToCartesian(GcsCoord latitude, GcsCoord longitude)
-{
-	Vector2 cartesian(0.0f, 0.0f);
-	cartesian.mX = latitude.ToDecimal();
-	cartesian.mY = longitude.ToDecimal();
-	return cartesian;
-}
-
-Vector2 GcsToCartesian(GcsLocation location)
-{
-	Vector2 cartesian(0.0f, 0.0f);
-	cartesian.mX = location.latitude.ToDecimal();
-	cartesian.mY = location.longitude.ToDecimal();
-	return cartesian;
-}
-
-GcsLocation CartesianToGcs(Vector2 cartesian)
-{
-	GcsLocation gcs;
-	gcs.latitude.degrees = (int)cartesian.mX;
-	gcs.latitude.minutes = 60 * (cartesian.mX - gcs.latitude.degrees);
-	gcs.latitude.seconds = 3600 * (cartesian.mX - gcs.latitude.degrees) - (60 * (gcs.latitude.minutes));
-	gcs.longitude.degrees = (int)cartesian.mY;
-	gcs.longitude.minutes = 60 * (cartesian.mY - gcs.longitude.degrees);
-	gcs.longitude.seconds = 3600 * (cartesian.mY - gcs.longitude.degrees) - (60 * (gcs.longitude.minutes));
-	return gcs;
-}
-
-float MetersToCartesian(float meters) {
-	return (meters/50.0f);
-}
-
 /**
  * Viewing Modes
  */
@@ -113,48 +53,7 @@ enum VIEW_MODE
 };
 
 VIEW_MODE cameraMode = VIEW_MODE::FIRST_PERSON;
-
-/**
- * 
- */
-class HGTReader
-{
-public:
-	HGTReader(const char* filename)
-		: mFile(filename, std::ios::binary)
-		, mMaxHeight(0.0f)
-		, mMinHeight(50000.0f) {
-		mHeightMap = new float*[1201];
-		for (int i = 0; i < 1201; i++)
-			mHeightMap[i] = new float[1201];
-
-		for (int x = 0; x < 1201; x++)
-		{
-			for (int y = 0; y < 1201; y++)
-				{
-					float elevation = ((int) mFile.get() * 256) + mFile.get();
-					mHeightMap[x][y] = elevation;
-
-					if (elevation > mMaxHeight)
-						mMaxHeight = elevation;
-					if (elevation < mMinHeight)
-						mMinHeight = elevation;
-				}
-		}
-
-		int i = 0;
-	}
-
-	~HGTReader() {
-		mFile.close();
-	}
-
-
-public:
-	float** mHeightMap;
-	float mMaxHeight, mMinHeight;
-	std::ifstream mFile;
-};
+const GcsLocation startLocation = GcsLocation(GcsCoord(39, 0, 0), GcsCoord(107, 0, 0));
 
 class TerrainApplication : public Application
 {
@@ -246,8 +145,6 @@ protected:
 				chunkMeshes[index].TextureId = chunkTextures[index];
 				chunkMeshes[index].VertexBuffer = chunkVertexBuffers[index];
 
-				//chunkPositions[index].position += Math::Vector3((y * chunkXScale * (size - 1)), 0.0f, (x * chunkYScale * (size - 1)));
-				//chunkPositions[index].position += Math::Vector3(-(chunkXScale * (float)(size - 1) * (float)numChunks) / 2.0f, 0.0f, -(chunkYScale * (float)(size - 1) * (float)numChunks) / 2.0f);
 				chunkPositions[index].position += Vector3((y * 1.25f * WorldScale * (size - 1)), 0.0f, (x * WorldScale * (size - 1)));
 				Vector2 cartesian = GcsToCartesian(GcsCoord(39, 0, 0), GcsCoord(-117, 0, 0));
 				chunkPositions[index].position += Vector3(cartesian.mX, 0.0f, cartesian.mY);

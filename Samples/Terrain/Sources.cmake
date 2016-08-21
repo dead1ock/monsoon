@@ -6,6 +6,9 @@
 
 SET(MODULE_SRC
 	Src/Main.cpp
+	Src/GCS.h
+	Src/HgtReader.h
+	Src/HgtReader.cpp
 	)
 
 #
