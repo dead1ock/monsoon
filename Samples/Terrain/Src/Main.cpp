@@ -32,7 +32,6 @@ const U32 size = 76;
 const U32 numChunks = 4; // The number of chunks to render as a square. (Must be greater than 2).
 const int chunkXOffset = 7;
 const int chunkYOffset = 12;
-const std::string filename = "N39W107";
 
 const float peakViewX = -1897.81921;
 const float peakViewZ = -3074.84082;
@@ -60,12 +59,16 @@ class TerrainApplication : public Application
 public:
 	TerrainApplication()
 		: Application((Renderer::Renderer*)(new Renderer::D3D11Renderer(Renderer::RendererSettings(), &mEventManager, &mTransformSystem))) 
-		, mFileReader((filename + ".hgt").c_str())
+		, mFileReader()
 		, mFirstPersonPosition(0.0f, 0.0f, 0.0f)
 		, mFirstPersonDirection(0.0f, 0.0f, 0.0f)
 		, cameraTheta(0.0f)
 		, cameraPhi(0.0f)
 		, mFirstPersonCursorOn(false) {
+
+		std::stringstream filename;
+		filename << "I:/terrain/" << "N" << startLocation.latitude.degrees << "W" << startLocation.longitude.degrees << "-2.hgt";
+		mFileReader.Load(filename.str().c_str());
 	}
 
 	~TerrainApplication() {
@@ -137,7 +140,7 @@ protected:
 			{
 				int index = y + (x * numChunks);
 
-				textureFiles[index] << "I:/terrain/" << filename << "/" << textureMap[x + chunkXOffset][y + chunkYOffset] << ".tif" << '\0';
+				textureFiles[index] << "I:/terrain/" << "N" << startLocation.latitude.degrees << "W" << startLocation.longitude.degrees << "/" << textureMap[x + chunkXOffset][y + chunkYOffset] << ".tif" << '\0';
 
 				chunkVertexBuffers[index] = generateTerrain(x + chunkXOffset, y + chunkYOffset);
 				chunkTextures[index] = mRenderer->LoadTexture(textureFiles[index].str());

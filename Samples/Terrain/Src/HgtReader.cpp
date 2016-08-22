@@ -33,9 +33,12 @@ void HGTReader::Load(const char* filename)
 {
 	long size = GetFileSize(filename);
 
+	if (!mFile.is_open())
+		mFile.open(filename, std::ios::binary);
+
 	if (size == std::streampos(2884802)) // 1201 Resolution (3 arc-seconds)
 		mResolution = 1201;
-	else if (size == std::streampos(25327000)) // 3067 Resolution (1 arc-second)
+	else if (size == std::streampos(25934402)) // 3067 Resolution (1 arc-second)
 		mResolution = 3601;
 	else {
 		throw std::exception("File format is not recognized.");
@@ -61,5 +64,6 @@ void HGTReader::Load(const char* filename)
 }
 
 HGTReader::~HGTReader() {
-	mFile.close();
+	if (!mFile.is_open())
+		mFile.close();
 }
