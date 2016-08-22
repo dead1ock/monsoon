@@ -31,10 +31,14 @@ public:
 			return NOT_LOADED;
 	}
 
+	unsigned int GetResolution() {
+		return mResolution;
+	}
+
 public:
 	float** mHeightMap;
 	float mMaxHeight, mMinHeight;
-	int mResolution;
+	unsigned int mResolution;
 	TYPE mType;
 	std::ifstream mFile;
 };

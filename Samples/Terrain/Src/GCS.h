@@ -71,5 +71,5 @@ GcsLocation CartesianToGcs(Monsoon::Math::Vector2 cartesian)
 }
 
 float MetersToCartesian(float meters) {
-	return (meters / 50.0f);
+	return (meters / 20.0f);
 }

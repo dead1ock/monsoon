@@ -25,10 +25,6 @@
 using namespace Monsoon;
 using namespace Monsoon::Math;
 
-/*
- *
- */
-const U32 size = 76;
 const U32 numChunks = 4; // The number of chunks to render as a square. (Must be greater than 2).
 const int chunkXOffset = 7;
 const int chunkYOffset = 12;
@@ -69,6 +65,7 @@ public:
 		std::stringstream filename;
 		filename << "I:/terrain/" << "N" << startLocation.latitude.degrees << "W" << startLocation.longitude.degrees << "-2.hgt";
 		mFileReader.Load(filename.str().c_str());
+		chunkSize = ceil(sqrt((mFileReader.GetResolution() * mFileReader.GetResolution()) / 256));
 	}
 
 	~TerrainApplication() {
@@ -87,6 +84,7 @@ protected:
 	float cursorDiffX;
 	float cursorDiffY;
 	bool mFirstPersonCursorOn;
+	U32 chunkSize = 0; // The number of points on a single side of a chunk. The number of total points is chunkSize ^ 2. Set dynamically after loading the HGT file.
 
 	Renderer::VertexBufferHandle* chunkVertexBuffers;
 	Renderer::MeshComponent* chunkMeshes;
@@ -103,7 +101,7 @@ protected:
 		textureFiles = new std::stringstream[numChunks * numChunks]();
 
 		Vector2 cartesian = GcsToCartesian(GcsCoord(39, 0, 0), GcsCoord(-117, 0, 0));
-		mFirstPersonPosition = Vector3(cartesian.mX * WorldScale, 4394.12f/50.0f, cartesian.mY * WorldScale);
+		mFirstPersonPosition = Vector3(cartesian.mX * WorldScale, MetersToCartesian(4394.12f), cartesian.mY * WorldScale);
 
 		//
 		// Generate Skydome
@@ -148,7 +146,7 @@ protected:
 				chunkMeshes[index].TextureId = chunkTextures[index];
 				chunkMeshes[index].VertexBuffer = chunkVertexBuffers[index];
 
-				chunkPositions[index].position += Vector3((y * 1.25f * WorldScale * (size - 1)), 0.0f, (x * WorldScale * (size - 1)));
+				chunkPositions[index].position += Vector3((y * 1.25f * WorldScale * (chunkSize - 1)), 0.0f, (x * WorldScale * (chunkSize - 1)));
 				Vector2 cartesian = GcsToCartesian(GcsCoord(39, 0, 0), GcsCoord(-117, 0, 0));
 				chunkPositions[index].position += Vector3(cartesian.mX, 0.0f, cartesian.mY);
 
@@ -186,14 +184,14 @@ protected:
 
 	void OnUpdate() {
 		Renderer::Camera& camera = mRenderer->GetCamera();
-		
+
 		switch (cameraMode)
 		{
 		case VIEW_MODE::DEFAULT:
 			camera.lookAtX = 0;
 			camera.lookAtZ = 0;
-			camera.x = cos(cameraTheta) * ((float)size * (float)numChunks / 2.0f * WorldScale) * cameraZoom;
-			camera.z = sin(cameraTheta) * ((float)size * (float)numChunks / 2.0f * WorldScale) * cameraZoom;
+			camera.x = cos(cameraTheta) * ((float)chunkSize * (float)numChunks / 2.0f * WorldScale) * cameraZoom;
+			camera.z = sin(cameraTheta) * ((float)chunkSize * (float)numChunks / 2.0f * WorldScale) * cameraZoom;
 			break;
 		case VIEW_MODE::PEAK:
 			camera.x = peakViewX;
@@ -291,12 +289,11 @@ protected:
 	}
 
 	void OnShutdown() {
-
 		for (int x = 0; x < numChunks / 2.0f; x++)
 		{
 			for (int y = 0; y < numChunks / 2.0f; y++)
 			{
-				int index = (x * size) + y;
+				int index = (x * chunkSize) + y;
 
 				mTransformSystem.DetachComponent(index);
 				mRenderer->DetachMeshComponent(index);
@@ -315,44 +312,44 @@ protected:
 	}
 
 	Renderer::VertexBufferHandle generateTerrain(U32 chunkX, U32 chunkY) {
-		Renderer::VertexType* vertices = new Renderer::VertexType[size * size];
-		unsigned int* indicies = new unsigned int[6 * ((size-1) * (size-1))];
+		Renderer::VertexType* vertices = new Renderer::VertexType[chunkSize * chunkSize];
+		unsigned int* indicies = new unsigned int[6 * ((chunkSize - 1) * (chunkSize - 1))];
 
-		int yOffset = chunkX * 75.0f;
-		int xOffset = chunkY * 75.0f;
+		int yOffset = chunkX * (chunkSize - 1);
+		int xOffset = chunkY * (chunkSize - 1);
 
 		// Generate Vertices
-		for (int x = 0; x < size; x++)
+		for (int x = 0; x < chunkSize; x++)
 		{
-			for (int y = 0; y < size; y++)
+			for (int y = 0; y < chunkSize; y++)
 			{
 				float height = mFileReader.mHeightMap[x + xOffset][y + yOffset];
 				float color = (mFileReader.mHeightMap[x + xOffset][y + yOffset] - mFileReader.mMinHeight) / (mFileReader.mMaxHeight - mFileReader.mMinHeight);
-				vertices[(x * size) + y].SetPosition(x * 1.25f * WorldScale, MetersToCartesian(mFileReader.mHeightMap[x + xOffset][y + yOffset]), y * WorldScale); // This is where i'll convert to simulation world coords for scaling.
-				vertices[(x * size) + y].SetColor(color, color, color, 1.0f);
-				vertices[(x * size) + y].SetUV((float)(y) / (float)size, (float)(x) / (float)size );
+				vertices[(x * chunkSize) + y].SetPosition(x * 1.25f * WorldScale, MetersToCartesian(mFileReader.mHeightMap[x + xOffset][y + yOffset]), y * WorldScale); // This is where i'll convert to simulation world coords for scaling.
+				vertices[(x * chunkSize) + y].SetColor(color, color, color, 1.0f);
+				vertices[(x * chunkSize) + y].SetUV((float)(y) / (float)chunkSize, (float)(x) / (float)chunkSize);
 			}
 		}
 
 		// Generate Indicies
 		int i = 0;
-		for (int z = 0; z < (size - 1); z++)
+		for (int z = 0; z < (chunkSize - 1); z++)
 		{
-			for (int d = 0; d < (size - 1); d++)
+			for (int d = 0; d < (chunkSize - 1); d++)
 			{
-				int index = (z * size) + d;
-				indicies[i] = index + size;
+				int index = (z * chunkSize) + d;
+				indicies[i] = index + chunkSize;
 				indicies[i + 1] = index;
 				indicies[i + 2] = index + 1;
-				indicies[i + 3] = index + size;
+				indicies[i + 3] = index + chunkSize;
 				indicies[i + 4] = index + 1;
-				indicies[i + 5] = index + size + 1;
+				indicies[i + 5] = index + chunkSize + 1;
 
 				i += 6;
 			}
 		}
 
-		return mRenderer->CreateVertexBuffer(vertices, size * size, indicies, 6 * ((size - 1) * (size - 1)));
+		return mRenderer->CreateVertexBuffer(vertices, chunkSize * chunkSize, indicies, 6 * ((chunkSize - 1) * (chunkSize - 1)));
 	}
 
 };
