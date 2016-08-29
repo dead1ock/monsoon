@@ -8,6 +8,12 @@
 
 #include <vector>
 
+#define OCULUS_VR_0_2_3
+#ifdef OCULUS_VR_0_2_3
+#include "OVR.h"
+#endif
+
+
 #include <Renderer/Renderer.h>
 
 #include "D3D.h"
@@ -69,6 +75,15 @@ namespace Monsoon {
 			void CreateGradientSkydome(Math::Vector3 apexColor, Math::Vector3 lowColor);
 
 		private:
+			enum EYE
+			{
+				BOTH,
+				LEFT,
+				RIGHT
+			};
+
+			void Render(EYE eye = BOTH);
+
 			D3D11Window mWindow;
 			D3D mD3d;
 			std::vector<D3D11VertexBuffer> mVertexBuffers;
@@ -99,6 +114,11 @@ namespace Monsoon {
 			Scene::TransformSystem* mTransformSystem;
 			Event::EventManager* mEventManager;
 			RendererSettings mSettings;
+
+#ifdef OCULUS_VR_0_2_3
+			OVR::Ptr<OVR::DeviceManager>	mOvrManager;
+			OVR::Ptr<OVR::HMDDevice>		mOvrDevice;
+#endif
 
 			// Loads a mesh from a text file and returns a vertex buffer handle.
 			VertexBufferHandle LoadMeshTxt(std::string filename);

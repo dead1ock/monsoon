@@ -57,6 +57,10 @@ namespace Monsoon {
 			void TurnOnZBuffer();
 			void TurnOffZBuffer();
 
+			void Present();
+
+			bool SetViewport(int x, int y, int width, int height);
+
 			ID3D11Device* GetDevice() { return mDevice; }
 			ID3D11DeviceContext* GetContext() { return mContext; }
 
@@ -64,7 +68,6 @@ namespace Monsoon {
 			bool CreateDeviceAndSwapChain(D3D11Window& renderWindow);
 			bool CreateRenderTarget();
 			bool CreateDepthStencilBuffer(D3D11Window& renderWindow);
-			bool CreateViewport(D3D11Window& renderWindow);
 			bool SetRasterState();
 			bool CreateRasterStateNoCull();
 
@@ -79,6 +82,7 @@ namespace Monsoon {
 			ID3D11RasterizerState* mRasterState;
 			ID3D11BlendState* mBlendState;
 			ID3D11RasterizerState* mRasterStateNoCulling;
+			D3D11_VIEWPORT viewport;
 		};
 
 	} // namespace renderer

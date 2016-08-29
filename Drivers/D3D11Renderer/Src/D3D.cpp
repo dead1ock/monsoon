@@ -46,7 +46,7 @@ bool D3D::Initialize(D3D11Window& renderWindow) {
 	if (!SetRasterState())
 		return false;
 
-	if (!CreateViewport(renderWindow))
+	if (!SetViewport(0, 0, renderWindow.getWidth(), renderWindow.getHeight()))
 		return false;
 
 	if (!CreateRasterStateNoCull())
@@ -104,6 +104,10 @@ void D3D::Shutdown() {
 
 	if (mDevice != nullptr)
 		mDevice->Release();
+}
+
+void D3D::Present() {
+	mSwapChain->Present(1, 0);
 }
 
 bool D3D::CreateDeviceAndSwapChain(D3D11Window& renderWindow) {
@@ -276,15 +280,14 @@ bool D3D::CreateDepthStencilBuffer(D3D11Window& renderWindow) {
 	return true;
 }
 
-bool D3D::CreateViewport(D3D11Window& renderWindow) {
-	D3D11_VIEWPORT viewport;
+bool D3D::SetViewport(int x, int y, int width, int height) {
 
-	viewport.Width = (float)renderWindow.getWidth();
-	viewport.Height = (float)renderWindow.getHeight();
+	viewport.Width = (float)width;
+	viewport.Height = (float)height;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
+	viewport.TopLeftX = (float)x;
+	viewport.TopLeftY = (float)y;
 
 	mContext->RSSetViewports(1, &viewport);
 	return true;
@@ -345,12 +348,12 @@ void D3D::BeginScene() {
 	color[2] = 0.0f;
 	color[3] = 1.0f;
 
-	mContext->ClearRenderTargetView(mRenderTargetView, color);
+	//mContext->ClearRenderTargetView(mRenderTargetView, color);
 	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void D3D::EndScene() {
-	mSwapChain->Present(1, 0);
+	
 }
 
 void D3D::EnableAlphaBlending() {

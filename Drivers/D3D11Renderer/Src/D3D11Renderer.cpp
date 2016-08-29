@@ -7,6 +7,7 @@
 
 #include "D3D11Renderer.h"
 #include "D3D11VertexBuffer.h"
+#include "Math/Matrix4x4.h"
 
 #include <d3dx11tex.h>
 
@@ -34,6 +35,16 @@ D3D11Renderer::~D3D11Renderer() {
 }
 
 bool D3D11Renderer::Initialize() {
+
+#ifdef OCULUS_VR_0_2_3
+	OVR::System::Init(OVR::Log::ConfigureDefaultLog(OVR::LogMask_All));
+
+	mOvrManager = OVR::DeviceManager::Create();
+	mOvrDevice = mOvrManager->EnumerateDevices<OVR::HMDDevice>().CreateDevice();
+
+
+#endif
+
 	mEventManager->Subscribe("Entity::Destroyed", [this](void* arg) {
 
 	if (mMeshComponents.Exists((Monsoon::Entity)arg))
@@ -85,18 +96,34 @@ void D3D11Renderer::Shutdown() {
 	mColorMaterial.Release();
 	mD3d.Shutdown();
 	mWindow.Shutdown();
+
+#ifdef OCULUS_VR_0_2_3
+	OVR::System::Destroy();
+#endif
 }
 
 bool D3D11Renderer::Update() {
-	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
-	float fieldOfView = (float)D3DX_PI / 4.0f;
-	float screenAspect = (float)mWindow.getWidth() / (float)mWindow.getHeight();
 
-	if (defaultCamera.mode == Camera::PERSPECTIVE)
-		D3DXMatrixPerspectiveFovLH(&projectionMatrix, fieldOfView, screenAspect, defaultCamera.nearClip, defaultCamera.farClip);
-	else if (defaultCamera.mode == Camera::ORTHOGRAPHIC)
-		D3DXMatrixOrthoLH(&projectionMatrix, defaultCamera.orthoWidth, defaultCamera.orthoHeight, defaultCamera.nearClip, defaultCamera.farClip);
-	
+	if (!mWindow.Update())
+		return false;
+
+#ifdef OCULUS_VR_0_2_3
+	Render(LEFT);
+	Render(RIGHT);
+#else
+	Render(BOTH);
+#endif
+
+	mD3d.Present();
+
+	return true;
+}
+
+float worldTrans = -20.0f;
+
+void D3D11Renderer::Render(D3D11Renderer::EYE eye) {
+	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
+
 	D3DXVECTOR3 up, position, lookAt;
 	D3DXMATRIX rotationMatrix;
 
@@ -119,10 +146,53 @@ bool D3D11Renderer::Update() {
 
 	D3DXMatrixLookAtLH(&viewMatrix, &position, &lookAt, &up);
 
-	if (!mWindow.Update())
-		return false;
-
 	mD3d.BeginScene();
+
+#ifdef OCULUS_VR_0_2_3
+	OVR::HMDInfo deviceInfo;
+	
+	mOvrDevice->GetDeviceInfo(&deviceInfo);
+	
+	float aspect = (float)deviceInfo.HResolution / (2 * (float)deviceInfo.VResolution);
+	float fov = 2 * atan((float)deviceInfo.VScreenSize / (2 * (float)deviceInfo.EyeToScreenDistance));
+
+	D3DXMatrixPerspectiveFovLH(&projectionMatrix, fov, aspect, defaultCamera.nearClip, defaultCamera.farClip);
+
+	D3DXMATRIX lensSeperationTransformation;
+	D3DXMATRIX interpupillaryDistTransformation;
+
+	float h = (4.0f * ((float)deviceInfo.HScreenSize / 4.0f) - ((float)deviceInfo.LensSeparationDistance / 2.0f))/(float)deviceInfo.HScreenSize;
+
+	if (GetAsyncKeyState(VK_F1))
+		worldTrans += 0.01f;
+	if (GetAsyncKeyState(VK_F2))
+		worldTrans -= 0.01f;
+	if (GetAsyncKeyState(VK_F3))
+		worldTrans = worldTrans;
+
+	if (eye == LEFT) {
+		mD3d.SetViewport(0, 0, (float)mWindow.getWidth() / 2, (float)mWindow.getHeight());
+		D3DXMatrixTranslation(&lensSeperationTransformation, h, 0.0f, 0.0f);
+		D3DXMatrixTranslation(&interpupillaryDistTransformation, ((float)deviceInfo.InterpupillaryDistance / 2.0f) * worldTrans, 0.0f, 0.0f);
+	}
+	else if (eye == RIGHT) {
+		mD3d.SetViewport((float)mWindow.getWidth() / 2, 0, (float)mWindow.getWidth() / 2, (float)mWindow.getHeight());
+		D3DXMatrixTranslation(&lensSeperationTransformation, -h, 0.0f, 0.0f);
+		D3DXMatrixTranslation(&interpupillaryDistTransformation, -((float)deviceInfo.InterpupillaryDistance / 2.0f) * worldTrans, 0.0f, 0.0f);
+		
+	}
+
+	D3DXMatrixMultiply(&projectionMatrix, &projectionMatrix, &lensSeperationTransformation);
+	D3DXMatrixMultiply(&projectionMatrix, &projectionMatrix, &interpupillaryDistTransformation);
+#else
+	float fieldOfView = (float)D3DX_PI / 4.0f;
+	float screenAspect = (float)mWindow.getWidth() / (float)mWindow.getHeight();
+
+	if (defaultCamera.mode == Camera::PERSPECTIVE)
+		D3DXMatrixPerspectiveFovLH(&projectionMatrix, fieldOfView, screenAspect, defaultCamera.nearClip, defaultCamera.farClip);
+	else if (defaultCamera.mode == Camera::ORTHOGRAPHIC)
+		D3DXMatrixOrthoLH(&projectionMatrix, defaultCamera.orthoWidth, defaultCamera.orthoHeight, defaultCamera.nearClip, defaultCamera.farClip);
+#endif
 
 	D3DXMATRIX translation, rotation, scale;
 
@@ -169,7 +239,7 @@ bool D3D11Renderer::Update() {
 			D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translation);
 
 			mVertexBuffers[mMeshComponents.At(x).VertexBuffer].Render(mD3d.GetContext());
-			
+
 			// This is BAD BAD BAD, temporary code. We shouldn't be switching
 			// render states for every object, but this will work until a 
 			// proper material system can be put into place.
@@ -178,7 +248,7 @@ bool D3D11Renderer::Update() {
 			else
 				mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 
-			mD3d.GetContext()->DrawIndexed(mVertexBuffers[mMeshComponents.At(x).VertexBuffer].GetIndexCount() , 0, 0);
+			mD3d.GetContext()->DrawIndexed(mVertexBuffers[mMeshComponents.At(x).VertexBuffer].GetIndexCount(), 0, 0);
 		}
 	}
 
@@ -240,7 +310,7 @@ bool D3D11Renderer::Update() {
 				currentTexture = spriteComponent.Texture;
 				mSpriteMaterial.SetTexture(mD3d.GetContext(), mTextures[spriteComponent.Texture].Resource);
 			}
-			
+
 			mSpriteMaterial.SetAtlasBuffer(mD3d.GetContext(), spriteWidth, spriteHeight, uOffset, vOffset);
 			mSpriteMaterial.SetMatrixBuffer(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
 
@@ -249,9 +319,9 @@ bool D3D11Renderer::Update() {
 	}
 
 	mD3d.DisableAlphaBlending();
+
 	mD3d.EndScene();
 
-	return true;
 }
 
 int nextFreeId = 0;

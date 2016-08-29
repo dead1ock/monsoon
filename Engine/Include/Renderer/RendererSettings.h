@@ -19,7 +19,7 @@ namespace Monsoon {
 			RendererSettings() {
 				screenWidth = 1920;
 				screenHeight = 1080;
-				fullscreen = false;
+				fullscreen = true;
 				showCursor = true;
 				windowName = "Monsoon Game Engine";
 			}
