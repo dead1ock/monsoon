@@ -348,11 +348,16 @@ void D3D::BeginScene() {
 	color[2] = 0.0f;
 	color[3] = 1.0f;
 
-	//mContext->ClearRenderTargetView(mRenderTargetView, color);
+	mContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
+
+	mContext->ClearRenderTargetView(mRenderTargetView, color);
 	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void D3D::EndScene() {
+	
+	// Switch back to backbuffer and draw screen aligned quad
+	// with texture shader.
 	
 }
 
