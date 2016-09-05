@@ -18,10 +18,13 @@ D3D::D3D()
 mDevice(nullptr),
 mContext(nullptr),
 mSwapChain(nullptr),
+mRenderTargetTexture(nullptr),
 mRenderTargetView(nullptr),
+mRenderTargetShaderResource(nullptr),
 mDepthStencilBuffer(nullptr),
 mDepthStencilView(nullptr),
-mRasterStateNoCulling(nullptr)
+mRasterStateNoCulling(nullptr),
+mRenderTextureTarget(nullptr)
 {
 
 }
@@ -35,13 +38,14 @@ bool D3D::Initialize(D3D11Window& renderWindow) {
 	if (!CreateDeviceAndSwapChain(renderWindow))
 		return false;
 
-	if (!CreateRenderTarget())
+	if (!CreateRenderTarget(renderWindow))
+		return false;
+
+	if (!CreateRenderTexture(renderWindow))
 		return false;
 
 	if (!CreateDepthStencilBuffer(renderWindow))
 		return false;
-
-	mContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
 
 	if (!SetRasterState())
 		return false;
@@ -93,8 +97,17 @@ void D3D::Shutdown() {
 	if (mDepthStencilBuffer != nullptr)
 		mDepthStencilBuffer->Release();
 
+	if (mRenderTargetShaderResource != nullptr)
+		mRenderTargetShaderResource->Release();
+
+	if (mRenderTextureTarget != nullptr)
+		mRenderTextureTarget->Release();
+
 	if (mRenderTargetView != nullptr)
 		mRenderTargetView->Release();
+
+	if (mRenderTargetTexture != nullptr)
+		mRenderTargetTexture->Release();
 
 	if (mSwapChain != nullptr)
 		mSwapChain->Release();
@@ -166,7 +179,7 @@ bool D3D::CreateDeviceAndSwapChain(D3D11Window& renderWindow) {
 	return true;
 }
 
-bool D3D::CreateRenderTarget() {
+bool D3D::CreateRenderTarget(D3D11Window& renderWindow) {
 	ID3D11Texture2D* backBufferPtr;
 	HRESULT result;
 
@@ -348,17 +361,25 @@ void D3D::BeginScene() {
 	color[2] = 0.0f;
 	color[3] = 1.0f;
 
-	mContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
+	mContext->ClearRenderTargetView(mRenderTextureTarget, color);
+	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	mContext->ClearRenderTargetView(mRenderTargetView, color);
 	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void D3D::EndScene() {
-	
-	// Switch back to backbuffer and draw screen aligned quad
-	// with texture shader.
-	
+
+}
+
+void D3D::SetRenderTargetAsBackBuffer()
+{
+	mContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
+}
+
+void D3D::SetRenderTargetAsRenderTexture()
+{
+	mContext->OMSetRenderTargets(1, &mRenderTextureTarget, mDepthStencilView);
 }
 
 void D3D::EnableAlphaBlending() {
@@ -387,4 +408,50 @@ void D3D::TurnOnZBuffer()
 void D3D::TurnOffZBuffer()
 {
 	mContext->OMSetDepthStencilState(mDepthStencilStateNoZBuffer, 1);
+}
+
+bool D3D::CreateRenderTexture(D3D11Window& renderWindow)
+{
+	HRESULT result;
+	D3D11_TEXTURE2D_DESC renderTextureDesc;
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+	D3D11_SHADER_RESOURCE_VIEW_DESC renderTextureShaderResDesc;
+
+	ZeroMemory(&renderTextureDesc, sizeof(renderTextureDesc));
+
+	renderTextureDesc.Width = renderWindow.getWidth();
+	renderTextureDesc.Height = renderWindow.getHeight();
+	renderTextureDesc.MipLevels = 1;
+	renderTextureDesc.ArraySize = 1;
+	renderTextureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	renderTextureDesc.SampleDesc.Count = 1;
+	renderTextureDesc.SampleDesc.Quality = 0;
+	renderTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+	renderTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	renderTextureDesc.CPUAccessFlags = 0;
+	renderTextureDesc.MiscFlags = 0;
+
+	result = mDevice->CreateTexture2D(&renderTextureDesc, NULL, &mRenderTargetTexture);
+
+	if (FAILED(result))
+		return false;
+
+	renderTargetViewDesc.Format = renderTextureDesc.Format;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+	result = mDevice->CreateRenderTargetView(mRenderTargetTexture, NULL, &mRenderTextureTarget);
+	if (FAILED(result))
+		return false;
+
+	renderTextureShaderResDesc.Format = renderTextureDesc.Format;
+	renderTextureShaderResDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	renderTextureShaderResDesc.Texture2D.MostDetailedMip = 0;
+	renderTextureShaderResDesc.Texture2D.MipLevels = 1;
+
+	result = mDevice->CreateShaderResourceView(mRenderTargetTexture, &renderTextureShaderResDesc, &mRenderTargetShaderResource);
+	if (FAILED(result))
+		return false;
+
+	return true;
 }

@@ -8,12 +8,6 @@
 
 #include <vector>
 
-#define OCULUS_VR_0_2_3
-#ifdef OCULUS_VR_0_2_3
-#include "OVR.h"
-#endif
-
-
 #include <Renderer/Renderer.h>
 
 #include "D3D.h"
@@ -84,8 +78,12 @@ namespace Monsoon {
 
 			void Render(EYE eye = BOTH);
 
+			// Renders post processing fullscreen quad.
+			void RenderPostProcessingQuad();
+
 			D3D11Window mWindow;
 			D3D mD3d;
+
 			std::vector<D3D11VertexBuffer> mVertexBuffers;
 			std::vector<VertexBufferHandle> mFreeIndexList;
 
@@ -109,16 +107,13 @@ namespace Monsoon {
 			D3D11SpriteMaterial mSpriteMaterial;
 			D3D11GradientSkydomeMaterial mGradientSkydomeMaterial;
 
+			// Fixed Vertex Buffers
 			VertexBufferHandle mSpritePlane;
+			VertexBufferHandle mScreenAlignedQuadVB;	// Used rendering post processing effects.
 
 			Scene::TransformSystem* mTransformSystem;
 			Event::EventManager* mEventManager;
 			RendererSettings mSettings;
-
-#ifdef OCULUS_VR_0_2_3
-			OVR::Ptr<OVR::DeviceManager>	mOvrManager;
-			OVR::Ptr<OVR::HMDDevice>		mOvrDevice;
-#endif
 
 			// Loads a mesh from a text file and returns a vertex buffer handle.
 			VertexBufferHandle LoadMeshTxt(std::string filename);

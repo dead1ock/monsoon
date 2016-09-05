@@ -13,6 +13,11 @@
 
 #include <fstream>
 
+#include "OVR.h"
+
+OVR::Ptr<OVR::DeviceManager>	mOvrManager;
+OVR::Ptr<OVR::HMDDevice>		mOvrDevice;
+
 using namespace Monsoon;
 using namespace Monsoon::Renderer;
 
@@ -24,7 +29,8 @@ D3D11Renderer::D3D11Renderer(RendererSettings& settings, Event::EventManager* ev
 	mEventManager(eventManager),
 	mSkydomeVB(-1),
 	mSkydomeApexColor(0.3f, 0.8f, 1.0f),
-	mSkydomeBottomColor(1.0f, 1.0f, 1.0f)
+	mSkydomeBottomColor(1.0f, 1.0f, 1.0f),
+	mScreenAlignedQuadVB(-1)
 {
 	mVertexBuffers.reserve(MONSOON_MAX_ENTITIES);
 	mTextures.reserve(1024);
@@ -35,15 +41,6 @@ D3D11Renderer::~D3D11Renderer() {
 }
 
 bool D3D11Renderer::Initialize() {
-
-#ifdef OCULUS_VR_0_2_3
-	OVR::System::Init(OVR::Log::ConfigureDefaultLog(OVR::LogMask_All));
-
-	mOvrManager = OVR::DeviceManager::Create();
-	mOvrDevice = mOvrManager->EnumerateDevices<OVR::HMDDevice>().CreateDevice();
-
-
-#endif
 
 	mEventManager->Subscribe("Entity::Destroyed", [this](void* arg) {
 
@@ -74,6 +71,16 @@ bool D3D11Renderer::Initialize() {
 		return false;
 
 	mSpritePlane = CreatePlane(1.0f, 1.0f);
+	mScreenAlignedQuadVB = CreatePlane(mWindow.getWidth(), mWindow.getHeight());
+
+	if (mSettings.enableVR)
+	{
+		OVR::System::Init(OVR::Log::ConfigureDefaultLog(OVR::LogMask_All));
+
+		mOvrManager = OVR::DeviceManager::Create();
+		mOvrDevice = mOvrManager->EnumerateDevices<OVR::HMDDevice>().CreateDevice();
+	}
+
 	return true;
 }
 
@@ -97,9 +104,8 @@ void D3D11Renderer::Shutdown() {
 	mD3d.Shutdown();
 	mWindow.Shutdown();
 
-#ifdef OCULUS_VR_0_2_3
-	OVR::System::Destroy();
-#endif
+	if (mSettings.enableVR)
+		OVR::System::Destroy();
 }
 
 bool D3D11Renderer::Update() {
@@ -107,13 +113,26 @@ bool D3D11Renderer::Update() {
 	if (!mWindow.Update())
 		return false;
 
-#ifdef OCULUS_VR_0_2_3
-	Render(LEFT);
-	Render(RIGHT);
-#else
-	Render(BOTH);
-#endif
+	if (mSettings.enablePostProcessing)
+		mD3d.SetRenderTargetAsRenderTexture();
+	else
+		mD3d.SetRenderTargetAsBackBuffer();
 
+	mD3d.BeginScene();
+	if (mSettings.enableVR)
+	{
+		Render(LEFT);
+		Render(RIGHT);
+	}
+	else
+		Render(BOTH);
+	
+	if (mSettings.enablePostProcessing) {
+		mD3d.SetRenderTargetAsBackBuffer();
+		RenderPostProcessingQuad();
+	}
+
+	mD3d.EndScene();
 	mD3d.Present();
 
 	return true;
@@ -146,53 +165,53 @@ void D3D11Renderer::Render(D3D11Renderer::EYE eye) {
 
 	D3DXMatrixLookAtLH(&viewMatrix, &position, &lookAt, &up);
 
-	mD3d.BeginScene();
+	if (mSettings.enableVR)
+	{
+		OVR::HMDInfo deviceInfo;
 
-#ifdef OCULUS_VR_0_2_3
-	OVR::HMDInfo deviceInfo;
-	
-	mOvrDevice->GetDeviceInfo(&deviceInfo);
-	
-	float aspect = (float)deviceInfo.HResolution / (2 * (float)deviceInfo.VResolution);
-	float fov = 2 * atan((float)deviceInfo.VScreenSize / (2 * (float)deviceInfo.EyeToScreenDistance));
+		mOvrDevice->GetDeviceInfo(&deviceInfo);
 
-	D3DXMatrixPerspectiveFovLH(&projectionMatrix, fov, aspect, defaultCamera.nearClip, defaultCamera.farClip);
+		float aspect = (float)deviceInfo.HResolution / (2 * (float)deviceInfo.VResolution);
+		float fov = 2 * atan((float)deviceInfo.VScreenSize / (2 * (float)deviceInfo.EyeToScreenDistance));
 
-	D3DXMATRIX lensSeperationTransformation;
-	D3DXMATRIX interpupillaryDistTransformation;
+		D3DXMatrixPerspectiveFovLH(&projectionMatrix, fov, aspect, defaultCamera.nearClip, defaultCamera.farClip);
 
-	float h = (4.0f * ((float)deviceInfo.HScreenSize / 4.0f) - ((float)deviceInfo.LensSeparationDistance / 2.0f))/(float)deviceInfo.HScreenSize;
+		D3DXMATRIX lensSeperationTransformation;
+		D3DXMATRIX interpupillaryDistTransformation;
 
-	if (GetAsyncKeyState(VK_F1))
-		worldTrans += 0.01f;
-	if (GetAsyncKeyState(VK_F2))
-		worldTrans -= 0.01f;
-	if (GetAsyncKeyState(VK_F3))
-		worldTrans = worldTrans;
+		float h = (4.0f * ((float)deviceInfo.HScreenSize / 4.0f) - ((float)deviceInfo.LensSeparationDistance / 2.0f)) / (float)deviceInfo.HScreenSize;
 
-	if (eye == LEFT) {
-		mD3d.SetViewport(0, 0, (float)mWindow.getWidth() / 2, (float)mWindow.getHeight());
-		D3DXMatrixTranslation(&lensSeperationTransformation, h, 0.0f, 0.0f);
-		D3DXMatrixTranslation(&interpupillaryDistTransformation, ((float)deviceInfo.InterpupillaryDistance / 2.0f) * worldTrans, 0.0f, 0.0f);
+		if (GetAsyncKeyState(VK_F1))
+			worldTrans += 0.01f;
+		if (GetAsyncKeyState(VK_F2))
+			worldTrans -= 0.01f;
+		if (GetAsyncKeyState(VK_F3))
+			worldTrans = worldTrans;
+
+		if (eye == LEFT) {
+			mD3d.SetViewport(0, 0, (float)mWindow.getWidth() / 2, (float)mWindow.getHeight());
+			D3DXMatrixTranslation(&lensSeperationTransformation, h, 0.0f, 0.0f);
+			D3DXMatrixTranslation(&interpupillaryDistTransformation, ((float)deviceInfo.InterpupillaryDistance / 2.0f) * worldTrans, 0.0f, 0.0f);
+		}
+		else if (eye == RIGHT) {
+			mD3d.SetViewport((float)mWindow.getWidth() / 2, 0, (float)mWindow.getWidth() / 2, (float)mWindow.getHeight());
+			D3DXMatrixTranslation(&lensSeperationTransformation, -h, 0.0f, 0.0f);
+			D3DXMatrixTranslation(&interpupillaryDistTransformation, -((float)deviceInfo.InterpupillaryDistance / 2.0f) * worldTrans, 0.0f, 0.0f);
+
+		}
+
+		D3DXMatrixMultiply(&projectionMatrix, &projectionMatrix, &lensSeperationTransformation);
+		D3DXMatrixMultiply(&projectionMatrix, &projectionMatrix, &interpupillaryDistTransformation);
 	}
-	else if (eye == RIGHT) {
-		mD3d.SetViewport((float)mWindow.getWidth() / 2, 0, (float)mWindow.getWidth() / 2, (float)mWindow.getHeight());
-		D3DXMatrixTranslation(&lensSeperationTransformation, -h, 0.0f, 0.0f);
-		D3DXMatrixTranslation(&interpupillaryDistTransformation, -((float)deviceInfo.InterpupillaryDistance / 2.0f) * worldTrans, 0.0f, 0.0f);
-		
+	else {
+		float fieldOfView = (float)D3DX_PI / 4.0f;
+		float screenAspect = (float)mWindow.getWidth() / (float)mWindow.getHeight();
+
+		if (defaultCamera.mode == Camera::PERSPECTIVE)
+			D3DXMatrixPerspectiveFovLH(&projectionMatrix, fieldOfView, screenAspect, defaultCamera.nearClip, defaultCamera.farClip);
+		else if (defaultCamera.mode == Camera::ORTHOGRAPHIC)
+			D3DXMatrixOrthoLH(&projectionMatrix, defaultCamera.orthoWidth, defaultCamera.orthoHeight, defaultCamera.nearClip, defaultCamera.farClip);
 	}
-
-	D3DXMatrixMultiply(&projectionMatrix, &projectionMatrix, &lensSeperationTransformation);
-	D3DXMatrixMultiply(&projectionMatrix, &projectionMatrix, &interpupillaryDistTransformation);
-#else
-	float fieldOfView = (float)D3DX_PI / 4.0f;
-	float screenAspect = (float)mWindow.getWidth() / (float)mWindow.getHeight();
-
-	if (defaultCamera.mode == Camera::PERSPECTIVE)
-		D3DXMatrixPerspectiveFovLH(&projectionMatrix, fieldOfView, screenAspect, defaultCamera.nearClip, defaultCamera.farClip);
-	else if (defaultCamera.mode == Camera::ORTHOGRAPHIC)
-		D3DXMatrixOrthoLH(&projectionMatrix, defaultCamera.orthoWidth, defaultCamera.orthoHeight, defaultCamera.nearClip, defaultCamera.farClip);
-#endif
 
 	D3DXMATRIX translation, rotation, scale;
 
@@ -319,9 +338,40 @@ void D3D11Renderer::Render(D3D11Renderer::EYE eye) {
 	}
 
 	mD3d.DisableAlphaBlending();
+}
 
-	mD3d.EndScene();
+void D3D11Renderer::RenderPostProcessingQuad()
+{
+	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
+	D3DXVECTOR3 up, position, lookAt;
 
+	mD3d.SetViewport(0, 0, (float)mWindow.getWidth(), (float)mWindow.getHeight());
+
+	up.x = 0.0f;
+	up.y = 1.0f;
+	up.z = 0.0f;
+
+	position.x = 0.0f;
+	position.y = 0.0f;
+	position.z = -1.0f;
+
+	lookAt.x = 0.0f;
+	lookAt.y = 0.0f;
+	lookAt.z = 0.0f;
+
+	D3DXMatrixLookAtLH(&viewMatrix, &position, &lookAt, &up);
+	D3DXMatrixOrthoLH(&projectionMatrix, mWindow.getWidth(), mWindow.getHeight(), 0.1f, 1000.0f);
+
+	// Render Screen Aligned Quad
+	if (mScreenAlignedQuadVB != -1)
+	{
+		D3DXMatrixIdentity(&worldMatrix);
+
+		mVertexBuffers[mScreenAlignedQuadVB].Render(mD3d.GetContext());
+		mColorMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix);
+		mTextureMaterial.Render(mD3d.GetContext(), worldMatrix, viewMatrix, projectionMatrix, mD3d.GetRenderTextureShaderResource());
+		mD3d.GetContext()->DrawIndexed(mVertexBuffers[mScreenAlignedQuadVB].GetIndexCount(), 0, 0);
+	}
 }
 
 int nextFreeId = 0;

@@ -16,12 +16,17 @@ namespace Monsoon {
 		*/
 		struct RendererSettings
 		{
+			/*
+			 * Initializes the default settings for the Renderer.
+			 */
 			RendererSettings() {
-				screenWidth = 1920;
-				screenHeight = 1080;
+				screenWidth = 2560;
+				screenHeight = 1440;
 				fullscreen = true;
 				showCursor = true;
 				windowName = "Monsoon Game Engine";
+				enablePostProcessing = true;
+				enableVR = true;
 			}
 
 			RendererSettings(U16 scrWidth, U16 scrHeight, std::string windName, bool scrFull = false, bool showCur = false) {
@@ -36,6 +41,8 @@ namespace Monsoon {
 			U16 screenHeight;
 			bool fullscreen;
 			bool showCursor;
+			bool enableVR;
+			bool enablePostProcessing;
 			std::string windowName;
 		};
 

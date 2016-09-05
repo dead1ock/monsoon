@@ -54,6 +54,18 @@ namespace Monsoon {
 			void TurnOnCulling();
 			void TurnOffCulling();
 
+			/**
+			 * Instructs the video card to set the current render target to
+			 * the Back Buffer.
+			 */
+			void SetRenderTargetAsBackBuffer();
+
+			/**
+			 * Instructs the video card to set the current render target to our
+			 * current render texture.
+			 */
+			void SetRenderTargetAsRenderTexture();
+
 			void TurnOnZBuffer();
 			void TurnOffZBuffer();
 
@@ -64,15 +76,19 @@ namespace Monsoon {
 			ID3D11Device* GetDevice() { return mDevice; }
 			ID3D11DeviceContext* GetContext() { return mContext; }
 
+			ID3D11ShaderResourceView* GetRenderTextureShaderResource() { return mRenderTargetShaderResource; }
+
 		private:
 			bool CreateDeviceAndSwapChain(D3D11Window& renderWindow);
-			bool CreateRenderTarget();
+			bool CreateRenderTarget(D3D11Window& renderWindow);
 			bool CreateDepthStencilBuffer(D3D11Window& renderWindow);
 			bool SetRasterState();
 			bool CreateRasterStateNoCull();
+			bool CreateRenderTexture(D3D11Window& renderWindow);
 
 			ID3D11Device* mDevice;
 			ID3D11DeviceContext* mContext;
+
 			IDXGISwapChain* mSwapChain;
 			ID3D11RenderTargetView* mRenderTargetView;
 			ID3D11Texture2D* mDepthStencilBuffer;
@@ -83,6 +99,11 @@ namespace Monsoon {
 			ID3D11BlendState* mBlendState;
 			ID3D11RasterizerState* mRasterStateNoCulling;
 			D3D11_VIEWPORT viewport;
+
+			// VR Distortion Effect
+			ID3D11RenderTargetView* mRenderTextureTarget;
+			ID3D11Texture2D* mRenderTargetTexture;
+			ID3D11ShaderResourceView* mRenderTargetShaderResource;
 		};
 
 	} // namespace renderer
