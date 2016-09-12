@@ -16,7 +16,10 @@
 #include "D3D11TextureMaterial.h"
 #include "D3D11SpriteMaterial.h"
 #include "D3D11GradientSkydomeMaterial.h"
+#include "D3D11BarrelDistortionPostFx.h"
 #include "Util/PackedPool.h"
+
+const float RENDERSCALE = 1.0f;
 
 namespace Monsoon {
 	namespace Renderer{
@@ -79,7 +82,7 @@ namespace Monsoon {
 			void Render(EYE eye = BOTH);
 
 			// Renders post processing fullscreen quad.
-			void RenderPostProcessingQuad();
+			void RenderPostProcessingQuad(EYE eye);
 
 			D3D11Window mWindow;
 			D3D mD3d;
@@ -106,6 +109,7 @@ namespace Monsoon {
 			D3D11TextureMaterial mTextureMaterial;
 			D3D11SpriteMaterial mSpriteMaterial;
 			D3D11GradientSkydomeMaterial mGradientSkydomeMaterial;
+			D3D11BarrelDistortionPostFx mBarrelDistortionPostFx;
 
 			// Fixed Vertex Buffers
 			VertexBufferHandle mSpritePlane;

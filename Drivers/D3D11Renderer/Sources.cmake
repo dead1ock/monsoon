@@ -12,6 +12,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 		Include/D3D11ColorMaterial.h
 		Include/D3D.h
 		Include/D3D11GradientSkydomeMaterial.h
+		Include/D3D11BarrelDistortionPostFx.h
 		Include/D3D11Renderer.h
 		Include/D3D11SpriteMaterial.h
 		Include/D3D11TextureMaterial.h
@@ -20,6 +21,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 		Src/D3D11ColorMaterial.cpp
 		Src/D3D.cpp
+		Src/D3D11BarrelDistortionPostFx.cpp
 		Src/D3D11GradientSkydomeMaterial.cpp
 		Src/D3D11Renderer.cpp
 		Src/D3D11SpriteMaterial.cpp

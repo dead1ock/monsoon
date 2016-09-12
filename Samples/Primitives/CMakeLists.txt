@@ -9,10 +9,12 @@ INCLUDE_DIRECTORIES(
 	${CMAKE_SOURCE_DIR}/Drivers/D3D11Renderer/Include
 	${DirectX_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
+	D:/ovr_sdk_win_0.2.3_public/LibOVR/Include
 )
 
 LINK_DIRECTORIES(
 	${DirectX_LIBRARY_DIR}
+	D:/ovr_sdk_win_0.2.3_public/LibOVR/Lib/x64
 )
 
 INCLUDE(Sources.cmake)
@@ -21,3 +23,5 @@ ADD_EXECUTABLE(Primitives WIN32 ${MODULE_SOURCES})
 TARGET_LINK_LIBRARIES(Primitives Engine)
 TARGET_LINK_LIBRARIES(Primitives RendererD3D11)
 TARGET_LINK_LIBRARIES(Primitives ${DirectX_LIBRARY})
+TARGET_LINK_LIBRARIES(Primitives libovr64)
+TARGET_LINK_LIBRARIES(Primitives winmm)

@@ -42,7 +42,8 @@ float4 SkyDomePixelShader(PixelInputType input) : SV_TARGET
     }
 
     // Determine the gradient color by interpolating between the apex and center based on the height of the pixel in the sky dome.
-    outputColor = lerp(float4(1.0f, 1.0f, 1.0f, 1.0f), float4(0.5f, 0.3f, 1.0f, 1.0f), height);
+    outputColor = lerp(float4(0.4f, 0.6f, 1.0f, 1.0f), float4(183.0f/255.0f, 237.0f/255.0f, 1.0f, 1.0f), height);
+	//outputColor = lerp(float4(0.0f, 0.0f, 0.0f, 0.0f), float4(183.0f/255.0f, 237.0f/255.0f, 1.0f, 1.0f), height);
 
     return outputColor;
 }

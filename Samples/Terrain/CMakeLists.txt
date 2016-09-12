@@ -9,10 +9,12 @@ INCLUDE_DIRECTORIES(
 	${CMAKE_SOURCE_DIR}/Drivers/D3D11Renderer/Include
 	${DirectX_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
+	D:/ovr_sdk_win_0.2.3_public/LibOVR/Include
 )
 
 LINK_DIRECTORIES(
 	${DirectX_LIBRARY_DIR}
+	D:/ovr_sdk_win_0.2.3_public/LibOVR/Lib/x64
 )
 
 INCLUDE(Sources.cmake)
@@ -20,4 +22,7 @@ INCLUDE(Sources.cmake)
 ADD_EXECUTABLE(Terrain WIN32 ${MODULE_SOURCES})
 TARGET_LINK_LIBRARIES(Terrain Engine)
 TARGET_LINK_LIBRARIES(Terrain RendererD3D11)
+TARGET_LINK_LIBRARIES(Terrain libovr64)
+TARGET_LINK_LIBRARIES(Terrain winmm)
+
 TARGET_LINK_LIBRARIES(Terrain ${DirectX_LIBRARY})

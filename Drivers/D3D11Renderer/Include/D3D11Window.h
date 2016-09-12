@@ -19,6 +19,7 @@ namespace Monsoon {
 			~D3D11Window();
 
 			bool Initialize();
+			bool Initialize(unsigned short scrWidth, unsigned short scrHeight);
 
 			void Shutdown();
 

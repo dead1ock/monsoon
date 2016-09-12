@@ -23,6 +23,13 @@ D3D11Window::~D3D11Window() {
 
 }
 
+bool D3D11Window::Initialize(unsigned short scrWidth, unsigned short scrHeight)
+{
+	mScreenWidth = scrWidth;
+	mScreenHeight = scrHeight;
+	return Initialize();
+}
+
 bool D3D11Window::Initialize()
 {
 	WNDCLASSEX wc;
@@ -51,8 +58,8 @@ bool D3D11Window::Initialize()
 	if (mFullscreen)
 	{
 		// Query desktop resolution.
-		mScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-		mScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+		mScreenWidth = mScreenWidth;
+		mScreenHeight = mScreenHeight;
 
 		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
 		dmScreenSettings.dmSize = sizeof(dmScreenSettings);

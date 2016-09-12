@@ -26,7 +26,7 @@ namespace Monsoon {
 				showCursor = true;
 				windowName = "Monsoon Game Engine";
 				enablePostProcessing = true;
-				enableVR = true;
+				enableVR = false;
 			}
 
 			RendererSettings(U16 scrWidth, U16 scrHeight, std::string windName, bool scrFull = false, bool showCur = false) {

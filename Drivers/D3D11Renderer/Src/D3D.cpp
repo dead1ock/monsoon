@@ -12,6 +12,7 @@ using namespace Monsoon::Renderer;
 
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
+const float RENDERSCALE = 1.0f;
 
 D3D::D3D()
 :
@@ -150,7 +151,7 @@ bool D3D::CreateDeviceAndSwapChain(D3D11Window& renderWindow) {
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	swapChainDesc.Flags = 0;
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
 
@@ -171,7 +172,7 @@ bool D3D::CreateDeviceAndSwapChain(D3D11Window& renderWindow) {
 	}
 
 	if (featureLevel != D3D_FEATURE_LEVEL_11_0)
-	{
+	{ 
 		MessageBox(0, "DirectX 11 Unsupported!", 0, 0);
 		return false;
 	}
@@ -212,8 +213,8 @@ bool D3D::CreateDepthStencilBuffer(D3D11Window& renderWindow) {
 
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
-	depthBufferDesc.Width = renderWindow.getWidth();
-	depthBufferDesc.Height = renderWindow.getHeight();
+	depthBufferDesc.Width = (float)ceil(renderWindow.getWidth() * RENDERSCALE);
+	depthBufferDesc.Height = (float)ceil(renderWindow.getHeight() * RENDERSCALE);
 	depthBufferDesc.MipLevels = 1;
 	depthBufferDesc.ArraySize = 1;
 	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -295,12 +296,12 @@ bool D3D::CreateDepthStencilBuffer(D3D11Window& renderWindow) {
 
 bool D3D::SetViewport(int x, int y, int width, int height) {
 
-	viewport.Width = (float)width;
-	viewport.Height = (float)height;
+	viewport.Width = width;
+	viewport.Height = height;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = (float)x;
-	viewport.TopLeftY = (float)y;
+	viewport.TopLeftX = x;
+	viewport.TopLeftY = y;
 
 	mContext->RSSetViewports(1, &viewport);
 	return true;
@@ -362,7 +363,6 @@ void D3D::BeginScene() {
 	color[3] = 1.0f;
 
 	mContext->ClearRenderTargetView(mRenderTextureTarget, color);
-	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	mContext->ClearRenderTargetView(mRenderTargetView, color);
 	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -419,15 +419,15 @@ bool D3D::CreateRenderTexture(D3D11Window& renderWindow)
 
 	ZeroMemory(&renderTextureDesc, sizeof(renderTextureDesc));
 
-	renderTextureDesc.Width = renderWindow.getWidth();
-	renderTextureDesc.Height = renderWindow.getHeight();
+	renderTextureDesc.Width = (int)ceil(renderWindow.getWidth() * RENDERSCALE);
+	renderTextureDesc.Height = (int)ceil(renderWindow.getHeight() * RENDERSCALE);
 	renderTextureDesc.MipLevels = 1;
 	renderTextureDesc.ArraySize = 1;
-	renderTextureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	renderTextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	renderTextureDesc.SampleDesc.Count = 1;
 	renderTextureDesc.SampleDesc.Quality = 0;
 	renderTextureDesc.Usage = D3D11_USAGE_DEFAULT;
-	renderTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	renderTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	renderTextureDesc.CPUAccessFlags = 0;
 	renderTextureDesc.MiscFlags = 0;
 
