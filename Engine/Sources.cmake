@@ -32,7 +32,6 @@ SET(MODULE_SRC
 	# Private Sources (Source/)
 	Src/App/Application.cpp
 	Src/ECS/EntityMAnager.cpp
-	Src/ECS/System.cpp
 	Src/Event/EventManager.cpp
 	Src/Math/AABB.cpp
 	Src/Math/Matrix4x4.cpp

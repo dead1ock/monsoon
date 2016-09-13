@@ -20,14 +20,25 @@
 
 namespace Monsoon {
 	/*
-	* Manages the initialization and shutdown of sub-systems (rendering, sound, physics, networking, simulation ect...) and
-	* handles the application loop.
+	* A barebones application implimentation which manages the initialization, shutdown, and updating of simulation sub-systems.
 	*/
 	class DYNLIB Application : boost::noncopyable {
 	public:
+
+		/**
+		* Default Constructor
+		*/
 		Application(Renderer::Renderer* renderer);
+		
+		/**
+		 * Default Destructor
+		 */
 		~Application();
 
+		/**
+		 * Boots the application and enters the application loop until
+		 * Application::Quit() is called.
+		 */
 		void Run();
 
 	protected:
@@ -41,7 +52,16 @@ namespace Monsoon {
 		*/
 		virtual void OnShutdown()=0;
 
+		/**
+		 * Called on every iteration of the application loop after simulation
+		 * subsystems are updated.
+		 */
 		virtual void OnUpdate() = 0;
+
+		/**
+		 * Flags the application for shutdown.
+		 */
+		void Quit();
 
 
 		Renderer::Renderer* mRenderer;
@@ -57,6 +77,8 @@ namespace Monsoon {
 	private:
 		/**
 		* Initializes each simulation sub-system and checks for initialization failures.
+		*
+		* @return bool If initialization is successful, returns true, otherwise this function returns false.
 		*/
 		bool Initialize();
 

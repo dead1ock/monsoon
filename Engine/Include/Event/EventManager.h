@@ -21,8 +21,7 @@ namespace Monsoon {
 		typedef U32								ListenerHandle;
 
 		/**
-		* Manages a collection of event listeners which are subscribe to a specific event type and how these
-		* listeners are invoked.
+		* Manages a collection of event listeners and allows users to invoke events.
 		*/
 		class DYNLIB EventManager
 		{
@@ -34,24 +33,37 @@ namespace Monsoon {
 			 * Subscribes a callback function to the target event type, then returns
 			 * a listener handle which should later be used when unsubscribing this specific
 			 * listener.
+			 *
+			 * @param handle An identifier for the type of event to subscribe to.
+			 * @param callback A function pointer to the method which will be called when
+			 * the specified event is invoked.
+			 * 
+			 * @return A unique listener handle which should be used to unsubscribe from the event.
 			 */
 			ListenerHandle Subscribe(EventType handle, EventCallback callback);
 
 			/**
 			 * Unsubscribe a specific listener from the target event type.
+			 *
+			 * @param handle The event type.
+			 * @param listenerId The unique listener which is unsubscribing.
 			 */
 			void Unsubscribe(EventType handle, ListenerHandle listenerId);
 
 			/**
-			 * Unsubscribe all listeners from the target event type.
+			 * Unsubscribes all listeners from the target event type.
+			 *
+			 * @param handle The target event type.
 			 */
 			void Unsubscribe(EventType handle);
 
 			/**
-			 * Invokes all listeners of the target event type and passes them
-			 * the specificed argument.
+			 * Invokes all listeners of the target event type, and passes
+			 * the specificed argument to their callback functions.
+			 *
+			 * @param handle The target event type.
 			 */
-			void Invoke(EventType, void*);
+			void Invoke(EventType handle, void* arg);
 
 		private:
 			struct Listener
