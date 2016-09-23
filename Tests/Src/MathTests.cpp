@@ -178,7 +178,7 @@ TEST(Vector3, ScalarDivision) {
  * [I] * [I] = [I]
  */
 TEST(Matrix4x4, IdentitySquared) {
-	Matrix4x4 m1, m2;
+	Matrix4x4 m1 = Matrix4x4::Identity(), m2 = Matrix4x4::Identity();
 	Matrix4x4 m3 = m1 * m2;
 
 	EXPECT_EQ(1.0f, m3(0,0));
@@ -199,7 +199,7 @@ TEST(Matrix4x4, IdentityMultiplicationProperty) {
 	};
 
 	Matrix4x4 m1(matrix);
-	Matrix4x4 i;
+	Matrix4x4 i = Matrix4x4::Identity();
 	Matrix4x4 left = m1 * i;
 	Matrix4x4 right = i * m1;
 

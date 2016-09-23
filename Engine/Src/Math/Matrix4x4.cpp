@@ -8,11 +8,19 @@
 using namespace Monsoon;
 using namespace Monsoon::Math;
 
+float identity[4][4] = {	{ 1.0f, 0.0f, 0.0f, 0.0f },
+							{ 0.0f, 1.0f, 0.0f, 0.0f },
+							{ 0.0f, 0.0f, 1.0f, 0.0f },
+							{ 0.0f, 0.0f, 0.0f, 1.0f } };
+
+Matrix4x4 Matrix4x4::mIdentityMatrix = Matrix4x4(identity);
+
+
 Matrix4x4::Matrix4x4() {
-	m[0][0] = 1;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = 0;
-	m[1][0] = 0;	m[1][1] = 1;	m[1][2] = 0;	m[1][3] = 0;
-	m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 1;	m[2][3] = 0;
-	m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
+	m[0][0] = 0;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = 0;
+	m[1][0] = 0;	m[1][1] = 0;	m[1][2] = 0;	m[1][3] = 0;
+	m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 0;	m[2][3] = 0;
+	m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 0;
 }
 
 Matrix4x4::Matrix4x4(float matrix[4][4]) {
@@ -73,7 +81,7 @@ bool Matrix4x4::operator==(Matrix4x4& other) {
 	return equal;
 }
 
-float& Matrix4x4::operator()(U8 i, U8 j)  {
+float Matrix4x4::operator()(U8 i, U8 j)  {
 	return m[i][j];
 }
 
@@ -155,4 +163,8 @@ Matrix4x4 Matrix4x4::GetTranspose() {
 	}
 
 	return Matrix4x4(trans);
+}
+
+Matrix4x4 Matrix4x4::Identity() {
+	return mIdentityMatrix;
 }
