@@ -48,5 +48,19 @@ AABB::~AABB()
 
 bool AABB::Intersects(AABB& other)
 {
-	return (abs(mX - other.mX) * 2 < (mWidth + other.mWidth)) && (abs(mY - other.mY) * 2 < (mHeight + other.mHeight));
+   	return (abs(mX - other.mX) * 2 < (mWidth + other.mWidth)) && (abs(mY - other.mY) * 2 < (mHeight + other.mHeight));
+}
+
+void AABB::SetPosition(float x, float y, float z)
+{
+	mX = x;
+	mY = y;
+	mZ = z;
+}
+
+void AABB::SetScale(float x, float y, float z)
+{
+	mWidth = x;
+	mHeight = y;
+	mDepth = z;
 }
