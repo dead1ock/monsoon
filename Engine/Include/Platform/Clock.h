@@ -14,7 +14,7 @@ namespace Monsoon {
 	namespace Platform {
 		
 		/**
-		 * High-Resolution clock to track current time and calculate delta time.
+		 * High-Resolution clock to track current time and calculate change in time over frames (delta time).
 		 */
 		class DYNLIB Clock
 		{
@@ -25,7 +25,9 @@ namespace Monsoon {
 			void Update();
 
 			/**
-			 * Returns the time between the last frame and now in seconds.
+			 * Calculates the time between the last frame and now in seconds.
+			 *
+			 * @return How many seconds have passed since the last frame.
 			 */
 			const double getDeltaTime() const;
 
