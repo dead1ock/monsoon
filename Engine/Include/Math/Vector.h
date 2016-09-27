@@ -491,6 +491,7 @@ namespace Monsoon {
 			*/
 			Vector4 operator/(Float scalar);
 
+
 			/**
 			* Vector-Scalar division. Divides each component (x, y) of the vector by the scalar,
 			* storing the results in this vector.
