@@ -26,7 +26,7 @@ struct GcsCoord
 	int seconds;
 
 	float ToDecimal() {
-		return degrees + (minutes / 60.0f) + (seconds / 60.0f);
+		return degrees + (minutes / 60.0f) + (seconds / 3600.0f);
 	}
 };
 
@@ -71,5 +71,5 @@ GcsLocation CartesianToGcs(Monsoon::Math::Vector2 cartesian)
 }
 
 float MetersToCartesian(float meters) {
-	return (meters / 20.0f);
+	return (meters / 25.0f);
 }
