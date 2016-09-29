@@ -32,9 +32,11 @@ const int chunkYOffset = 12;
 const float peakViewX = -1897.81921;
 const float peakViewZ = -3074.84082;
 
-const float WorldScale = 1.0f;
 
-float FirstPersonCameraSpeed = 1000.0f;
+const float SurfaceLengthMi = 2 * PI *  3959.0f;
+const float WorldScale = SurfaceLengthMi / (360.0f);
+
+float FirstPersonCameraSpeed = 4.0f;
 
 /**
  * Viewing Modes
@@ -63,7 +65,7 @@ public:
 		, mFirstPersonCursorOn(false) {
 
 		std::stringstream filename;
-		filename << "I:/terrain/" << "N" << startLocation.latitude.degrees << "W" << startLocation.longitude.degrees << "-2.hgt";
+		filename << "I:/terrain/" << "N" << abs(startLocation.latitude.degrees) << "W" << abs(startLocation.longitude.degrees) << "-2.hgt";
 		mFileReader.Load(filename.str().c_str());
 		chunkSize = ceil(sqrt((mFileReader.GetResolution() * mFileReader.GetResolution()) / 256));
 	}
@@ -100,8 +102,8 @@ protected:
 		chunkTextures = new Renderer::TextureHandle[numChunks * numChunks]();
 		textureFiles = new std::stringstream[numChunks * numChunks]();
 
-		Vector2 cartesian = GcsToCartesian(GcsCoord(35, 0, 0), GcsCoord(112, 0, 0));
-		mFirstPersonPosition = Vector3(cartesian.mX * 90.0f * WorldScale, 4394.12f, cartesian.mY * 90.0f * WorldScale);
+		Vector2 cartesian = GcsToCartesian(startLocation.latitude, startLocation.longitude);
+		mFirstPersonPosition = Vector3(cartesian.mX, 4394.12f/80.0f, cartesian.mY);
 
 		//
 		// Generate Skydome
@@ -146,7 +148,7 @@ protected:
 				chunkMeshes[index].TextureId = chunkTextures[index];
 				chunkMeshes[index].VertexBuffer = chunkVertexBuffers[index];
 
-				chunkPositions[index].position += Vector3((y * 90.0f * WorldScale * (chunkSize - 1)), 0.0f, (x * 90.0f * WorldScale * (chunkSize - 1)));
+				chunkPositions[index].position += Vector3((((float)y/(float)chunkSize) * WorldScale * (chunkSize - 1)), 0.0f, (((float)x/(float)chunkSize) * WorldScale * (chunkSize - 1)));
 				Vector2 cartesian = GcsToCartesian(startLocation.latitude, startLocation.longitude);
 				chunkPositions[index].position += Vector3(cartesian.mX, 0.0f, cartesian.mY);
 
@@ -160,7 +162,6 @@ protected:
 
 		Renderer::Camera& camera = mRenderer->GetCamera();
 		camera.y = mFileReader.mMaxHeight + 3000.0f;
-		camera.lookAtY = mFileReader.mMinHeight + 1700.0f;
 
 		PollMousePosition();
 	}
@@ -330,7 +331,7 @@ protected:
 			{
 				float height = mFileReader.mHeightMap[x + xOffset][y + yOffset];
 				float color = (mFileReader.mHeightMap[x + xOffset][y + yOffset] - mFileReader.mMinHeight) / (mFileReader.mMaxHeight - mFileReader.mMinHeight);
-				vertices[(x * chunkSize) + y].SetPosition(x * 90.0f * WorldScale, mFileReader.mHeightMap[x + xOffset][y + yOffset] * 4.0f, y * 90.0f * WorldScale); // This is where i'll convert to simulation world coords for scaling.
+				vertices[(x * chunkSize) + y].SetPosition(((float)x/(float)chunkSize) * WorldScale, mFileReader.mHeightMap[x + xOffset][y + yOffset]/80.0f, ((float)y/(float)chunkSize) * WorldScale); // This is where i'll convert to simulation world coords for scaling.
 				vertices[(x * chunkSize) + y].SetColor(color, color, color, 1.0f);
 				vertices[(x * chunkSize) + y].SetUV((float)(y) / (float)chunkSize, (float)(x) / (float)chunkSize);
 			}
