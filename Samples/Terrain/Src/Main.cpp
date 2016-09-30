@@ -267,6 +267,21 @@ protected:
 		if (spaceKeyState)
 			mQuit = true;
 
+		//
+		// Debug Actions
+		//
+		if (upKeyState)
+		{
+			std::stringstream locationText;
+			GcsLocation location = CartesianToGcs(mFirstPersonPosition);
+			locationText << "=======================================================" << std::endl;
+			locationText << "Latitude: " << location.latitude.degrees << " " << location.latitude.minutes << " " << location.latitude.seconds << std::endl;
+			locationText << "Longittude: " << location.longitude.degrees << " " << location.longitude.minutes << " " << location.longitude.seconds << std::endl;
+			locationText << "Direction: " << std::endl;
+			locationText << "=======================================================" << std:: endl;
+			mLog.Debug(Platform::VERBOSITY::ALL, locationText.str().c_str());
+		}
+
 		if (leftMouseState)
 			FirstPersonCameraSpeed += mGameClock.getDeltaTime() * 100.0f;
 		if (rightMouseState)

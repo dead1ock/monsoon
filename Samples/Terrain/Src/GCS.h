@@ -30,8 +30,17 @@ struct GcsCoord
 	}
 };
 
+/**
+ * Represents a Geographical Location (latitude and longitude) of the earth.
+ */
 struct GcsLocation
 {
+	/**
+	 * Builds a Geographical Coordinate using the provided latitude and longitude.
+	 *
+	 * @param _latitude The latitude of the coordinate.
+	 * @param _longitude The longitutde of the coordinate.
+	 */
 	GcsLocation(GcsCoord _latitude, GcsCoord _longitude)
 		: latitude(_latitude)
 		, longitude(_longitude) { }

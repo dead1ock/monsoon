@@ -20,6 +20,13 @@ Vector2::Vector2(float x, float y)
 
 }
 
+Vector2::Vector2(const Vector3& other)
+	: mX(other.mX)
+	, mY(other.mY)
+{
+
+}
+
 Vector2::~Vector2()
 {
 
