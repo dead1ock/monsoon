@@ -70,12 +70,30 @@ Monsoon::Math::Vector2 GcsToCartesian(GcsLocation location)
 GcsLocation CartesianToGcs(Monsoon::Math::Vector2 cartesian)
 {
 	GcsLocation gcs;
-	gcs.latitude.degrees = (int)cartesian.mX;
+	
+	gcs.latitude.degrees = floor(cartesian.mX);
 	gcs.latitude.minutes = 60 * (cartesian.mX - gcs.latitude.degrees);
 	gcs.latitude.seconds = 3600 * (cartesian.mX - gcs.latitude.degrees) - (60 * (gcs.latitude.minutes));
-	gcs.longitude.degrees = (int)cartesian.mY;
+
+	gcs.longitude.degrees = floor(cartesian.mY);
 	gcs.longitude.minutes = 60 * (cartesian.mY - gcs.longitude.degrees);
 	gcs.longitude.seconds = 3600 * (cartesian.mY - gcs.longitude.degrees) - (60 * (gcs.longitude.minutes));
+	
+	return gcs;
+}
+
+GcsLocation CartesianToGcs(Monsoon::Math::Vector3 cartesian)
+{
+	GcsLocation gcs;
+
+	gcs.latitude.degrees = floor(cartesian.mX);
+	gcs.latitude.minutes = 60 * (cartesian.mX - gcs.latitude.degrees);
+	gcs.latitude.seconds = 3600 * (cartesian.mX - gcs.latitude.degrees) - (60 * (gcs.latitude.minutes));
+
+	gcs.longitude.degrees = floor(cartesian.mZ);
+	gcs.longitude.minutes = 60 * (cartesian.mZ - gcs.longitude.degrees);
+	gcs.longitude.seconds = 3600 * (cartesian.mZ - gcs.longitude.degrees) - (60 * (gcs.longitude.minutes));
+
 	return gcs;
 }
 
