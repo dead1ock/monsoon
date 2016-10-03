@@ -81,7 +81,14 @@ namespace Monsoon {
 			 * @param id The unique-id of the object to remove.
 			 */
 			inline void Remove(Id id) {
+				if ((id < 0) || (id >= mIndexTable.size())) // Bounds check on id.
+					return;
+
 				Index removeIndex = mIndexTable[id];
+
+				if ((index < 0) || (index >= mPackedObjects.size())) // Bounds check on index.
+					return;
+
 				std::pair<Object, Id>& removeObject = mPackedObjects[removeIndex];
 				 
 				// If we are not the end of the vector, swap.
