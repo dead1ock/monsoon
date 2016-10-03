@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <functional>
+#include <assert.h>
 
 #include <Platform/Types.h>
 
@@ -55,22 +56,26 @@ namespace Monsoon {
 			 * @param object The object.
 			 */
 			inline void Add(Id id, Object& object) {
+				assert(((id > 0) || (id < mIndexTable.capacity())) && "Id out of bounds.");
+
 				mIndexTable[id] = (U16)mPackedObjects.size();
 				mPackedObjects.push_back(std::pair<Object, Id>(object, id));
 			}
 
 			/**
-			 * Returns a pointer to the object from the packed array by index. 
+			 * Returns a reference to the object from the packed array by index. 
 			 * Performance: O(1)
 			 */
 			inline Object& At(Index index) {
+				assert((index > 0) || (index < mPackedObjects.capacity()) && "Index out of bounds.");
 				return mPackedObjects[index].first;
 			}
 
 			/**
-			* Returns the object from the packed array by Id. O(1)
+			* Returns a reference to the object from the packed array by Id. O(1)
 			*/
 			inline Object& operator[](Id id) {
+				assert(((id > 0) || (id < mIndexTable.capacity())) && "Id out of bounds.");
 				return mPackedObjects[mIndexTable[id]].first;
 			}
 
@@ -81,13 +86,11 @@ namespace Monsoon {
 			 * @param id The unique-id of the object to remove.
 			 */
 			inline void Remove(Id id) {
-				if ((id < 0) || (id >= mIndexTable.size())) // Bounds check on id.
-					return;
+				assert(((id > 0) || (id < mIndexTable.capacity())) && "Id out of bounds.");
 
 				Index removeIndex = mIndexTable[id];
 
-				if ((index < 0) || (index >= mPackedObjects.size())) // Bounds check on index.
-					return;
+				assert((removeIndex > 0) || (removeIndex < mPackedObjects.capacity()) && "Index out of bounds.");
 
 				std::pair<Object, Id>& removeObject = mPackedObjects[removeIndex];
 				 
@@ -116,6 +119,7 @@ namespace Monsoon {
 			 * @returns True if the object exists in the pool, otherwise false.
 			 */
 			inline bool Exists(Id id) {
+				assert(((id > 0) || (id < mIndexTable.capacity())) && "Id out of bounds.");
 				return (mIndexTable[id] != USHRT_MAX);
 			}
 
@@ -128,6 +132,8 @@ namespace Monsoon {
 			 * @returns The id of the object at the specified index, if it exists.
 			 */
 			inline Id IndexToId(Index index) {
+				assert((index > 0) || (index < mPackedObjects.capacity()) && "Index out of bounds.");
+
 				if (index < 0 || index >(mPackedObjects.size() - 1))
 					return 0; // Temporary fix. This will break anything which tries to create a 
 								// packed pool with an Id type which is not some kind of primative number type.
@@ -137,7 +143,7 @@ namespace Monsoon {
 
 			/**
 			 * Sorts the packed objects and rebuilds the index table. 
-			 * This is current a very expensive operation for large datasets! 
+			 * This can be a very expensive operation for large datasets! 
 			 * Performance: O(n*log(n))
 			 *
 			 * @param A function pointer to the comparitor function which will determine which of 2
