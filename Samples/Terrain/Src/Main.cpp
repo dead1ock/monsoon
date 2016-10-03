@@ -264,7 +264,7 @@ protected:
 		{
 			mFirstPersonPosition += Vector3(cos((3 * PI) / 2 + cameraTheta), 0.0f, sin((3 * PI) / 2 + cameraTheta)) * mGameClock.getDeltaTime() * FirstPersonCameraSpeed;
 		}
-		if (spaceKeyState)
+		if (downKeyState)
 			mQuit = true;
 
 		//
@@ -310,11 +310,11 @@ protected:
 	}
 
 	void OnShutdown() {
-		for (int x = 0; x < numChunks / 2.0f; x++)
+		for (int x = 0; x < numChunks; x++)
 		{
-			for (int y = 0; y < numChunks / 2.0f; y++)
+			for (int y = 0; y < numChunks; y++)
 			{
-				int index = (x * chunkSize) + y;
+				int index = y + (x * numChunks);
 
 				mTransformSystem.DetachComponent(index);
 				mRenderer->DetachMeshComponent(index);
@@ -322,14 +322,11 @@ protected:
 			}
 		}
 
-		mRenderer->DetachMeshComponent(1000);
-		mTransformSystem.DetachComponent(1000);
-
-		delete textureFiles;
-		delete chunkTextures;
-		delete chunkPositions;
-		delete chunkMeshes;
-		delete chunkVertexBuffers;
+		delete[] textureFiles;
+		delete[] chunkTextures;
+		delete[] chunkPositions;
+		delete[] chunkMeshes;
+		delete[] chunkVertexBuffers;
 	}
 
 	Renderer::VertexBufferHandle generateTerrain(U32 chunkX, U32 chunkY) {
