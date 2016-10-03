@@ -9,6 +9,8 @@
 #include <vector>
 #include <functional>
 
+#include <Platform/Types.h>
+
 #define DEFAULT_MAX_POOL_SIZE 4096
 
 namespace Monsoon {
@@ -58,14 +60,15 @@ namespace Monsoon {
 			}
 
 			/**
-			 * Returns the object from the packed array by INDEX. O(1)
+			 * Returns a pointer to the object from the packed array by index. 
+			 * Performance: O(1)
 			 */
 			inline Object& At(Index index) {
 				return mPackedObjects[index].first;
 			}
 
 			/**
-			* Returns the object from the packed array by ID. O(1)
+			* Returns the object from the packed array by Id. O(1)
 			*/
 			inline Object& operator[](Id id) {
 				return mPackedObjects[mIndexTable[id]].first;
@@ -128,7 +131,7 @@ namespace Monsoon {
 			/**
 			 * Sorts the packed objects and rebuilds the index table. 
 			 * This is current a very expensive operation for large datasets! 
-			 * Performance: O(n)
+			 * Performance: O(n*log(n))
 			 *
 			 * @param A function pointer to the comparitor function which will determine which of 2
 			 * elements will come first. This function should return TRUE if object 1 comes before object 2
