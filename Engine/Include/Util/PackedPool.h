@@ -12,16 +12,18 @@
 
 #include <Platform/Types.h>
 
-#define DEFAULT_MAX_POOL_SIZE 4096
+#define DEFAULT_MAX_POOL_SIZE 65536
 
 namespace Monsoon {
 	namespace Util {
 
 		/**
-		* Holds a contiguous pool of objects which can be packed (sorted) for better performance when iterating, 
-		* but accessed via an unchanging unique identifier (for example, a handle or entity id). The goal of this 
-		* container is to pack objects together as close as possible in memory to increase cache coherency when iterating 
-		* over the pool. This comes at a cost of significant memory overhead, due to id-to-index bookkeeping.
+		* Maintains a contiguous block of objects which can be inserted, removed, and accessed
+		* in constant time.
+		*
+		* Memory Overhead: A disadvatage of using this data structure the memory overhead.
+		* There is a sizable amount of overhead (~0.13 MB) for keeping a table
+		* that maps each id to an index in the packed pool.
 		*/
 		template<typename Id, typename Object>
 		class PackedPool
