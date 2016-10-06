@@ -42,10 +42,30 @@ namespace Monsoon
 		class DYNLIB TransformSystem : public ECS::System<TransformComponent>
 		{
 		public:
+
+			/**
+			 * Default constructor.
+			 * @param eventManager The event manager to subscribe to for global events.
+			 */
 			TransformSystem(Event::EventManager* eventManager);
+
+			/**
+			 * Default destructor.
+			 */
 			~TransformSystem();
 
+			/**
+			 * Translates the target entity by the amounts in the delta vector.
+			 * @param entity The entity to translate.
+			 * @param delta The amount to translate by.
+			 */
 			void Translate(Entity entity, Math::Vector3 delta);
+
+			/**
+			 * Rotates the target entity by the amounts (axis angles, in degrees) in the eulers vector.
+			 * @param entity The entity to translate.
+			 * @param eulers The degrees to rotate on each axis.
+			 */
 			void Rotate(Entity entity, Math::Vector3 eulers);
 			void Scale(Entity entity, Math::Vector3 scalars);
 
