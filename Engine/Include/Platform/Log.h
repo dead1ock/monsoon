@@ -51,6 +51,13 @@ namespace Monsoon {
 			void Debug(VERBOSITY verbosity, const char* message);
 
 			/**
+			 * Outputs debug information to the console with a verbosity
+			 * set to ALL.
+			 * @param message The text to print to the debug console.
+			 */
+			void Debug(const char* message);
+
+			/**
 			 * Sets the log verbosity level. Statements will be printed
 			 * if their verbosity are less than or equal to the global 
 			 * verbosity level.

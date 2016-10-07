@@ -43,9 +43,18 @@ Log::~Log()
 void Log::Debug(VERBOSITY verbosity, const char* message)
 {
 #ifdef _DEBUG
-	if (mVerbosityLevel >= verbosity)
+	if (mVerbosityLevel >= verbosity) {
 		std::cout << message << std::endl;
 		mLogFile << "[Debug] " << message << std::endl;
+	}
+#endif
+}
+
+void Log::Debug(const char* message)
+{
+#ifdef _DEBUG
+	std::cout << message << std::endl;
+	mLogFile << "[Debug] " << message << std::endl;
 #endif
 }
 
