@@ -68,7 +68,7 @@ protected:
 		playerLiveMesh.VertexBuffer = playerVB;
 
 		Scene::TransformComponent playerLiveTransform;
-		playerLiveTransform.position += Math::Vector3(14.0f, -19.0f, 0.0f);
+		playerLiveTransform.position += Math::Vector3(-10.0f, 10.0f, 0.0f);
 		playerLiveTransform.scale.mX = 0.7f;
 		playerLiveTransform.scale.mY = 0.7f;
 		playerLiveTransform.scale.mZ = 0.7f;
@@ -186,6 +186,7 @@ protected:
 		U16 leftKeyState = GetAsyncKeyState(VK_LEFT);
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
+		U16 escKeyState = GetAsyncKeyState(VK_ESCAPE);
 
 		Math::Vector3 position = mTransformSystem.GetPosition(player);
 		float roll = mTransformSystem.GetRotation(player).mZ;
@@ -207,6 +208,9 @@ protected:
 				// Reset speed modifier.
 				playerSpeedMod = 1.0f;
 		}
+
+		if (escKeyState)
+			Quit();
 
 		// Move player in the direction it is rotated.
 		mTransformSystem.Translate(player,
@@ -240,8 +244,7 @@ protected:
 				(ASTEROID_SPEED * mGameClock.getDeltaTime() * sin(roll + (D3DX_PI / 2.0f))),
 				0.0f));
 
-			mAsteroidAABBs[x].mX = position.mX;
-			mAsteroidAABBs[x].mY = position.mY;
+			mAsteroidAABBs[x].SetPosition(position.mX, position.mY);
 
 			if (position.mX > 23.0f)
 				mTransformSystem.SetPosition(mAstroids[x], Math::Vector3(-23.0f, position.mY, 0.0f));
@@ -268,8 +271,7 @@ protected:
 				0.0f));
 
 			// Update AABB
-			mBulletAABBs[x].mX = position.mX;
-			mBulletAABBs[x].mY = position.mY;
+			mBulletAABBs[x].SetPosition(position.mX, position.mY);
 
 			//
 			if (position.mX > 23.0f)
@@ -349,8 +351,6 @@ protected:
 	}
 
 	void OnShutdown() {
-		mEventManager.Unsubscribe("Entity::Destroyed", mEventListener);
-
 		mRenderer->DestroyVertexBuffer(astroidVB);
 		mRenderer->DestroyVertexBuffer(bulletVB);
 		mRenderer->DestroyVertexBuffer(playerVB);
@@ -368,8 +368,6 @@ private:
 	double playerLastDeathTime;
 	bool playerDead;
 	int level;
-
-	Event::ListenerHandle mEventListener;
 
 	Math::AABB playerAABB;
 	std::vector<Entity> mAstroids;
