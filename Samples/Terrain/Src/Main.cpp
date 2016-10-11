@@ -264,7 +264,7 @@ protected:
 		{
 			mFirstPersonPosition += Vector3(cos((3 * PI) / 2 + cameraTheta), 0.0f, sin((3 * PI) / 2 + cameraTheta)) * mGameClock.getDeltaTime() * FirstPersonCameraSpeed;
 		}
-		if (downKeyState)
+		if (GetAsyncKeyState(VK_ESCAPE))
 			mQuit = true;
 
 		//
