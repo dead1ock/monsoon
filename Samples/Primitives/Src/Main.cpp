@@ -74,6 +74,9 @@ protected:
 		camera.z = sin(cameraTheta) * 15.0f;
 
 		cameraTheta += mGameClock.getDeltaTime();
+
+		if (GetAsyncKeyState(VK_ESCAPE))
+			Quit();
 	}
 
 	void OnShutdown() {
@@ -85,8 +88,6 @@ protected:
 
 		mTransformSystem.DetachComponent(0);
 		mRenderer->DetachMeshComponent(0);
-
-		mRenderer->ReleaseTexture(0);
 	}
 
 };
