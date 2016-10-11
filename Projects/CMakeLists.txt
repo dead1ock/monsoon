@@ -1,0 +1,3 @@
+ADD_SUBDIRECTORY(asteroids)
+ADD_SUBDIRECTORY(insectcontaineropt)
+ADD_SUBDIRECTORY(platformer2d)

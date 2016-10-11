@@ -271,6 +271,10 @@ protected:
 		U16 leftKeyState = GetAsyncKeyState(VK_LEFT);
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
+		U16 escKeyState = GetAsyncKeyState(VK_ESCAPE);
+
+		if (escKeyState)
+			Quit();
 
 		auto& characterSprite = mRenderer->GetSpriteComponent(mCharacter);
 		
