@@ -95,6 +95,11 @@ protected:
 
 	void OnUpdate() {
 
+		U16 escKeyState = GetAsyncKeyState(VK_ESCAPE);
+		
+		if (escKeyState)
+			Quit();
+
 		if (!playerDead)
 			UpdatePlayerPosition();
 
@@ -186,7 +191,6 @@ protected:
 		U16 leftKeyState = GetAsyncKeyState(VK_LEFT);
 		U16 rightKeyState = GetAsyncKeyState(VK_RIGHT);
 		U16 downKeyState = GetAsyncKeyState(VK_DOWN);
-		U16 escKeyState = GetAsyncKeyState(VK_ESCAPE);
 
 		Math::Vector3 position = mTransformSystem.GetPosition(player);
 		float roll = mTransformSystem.GetRotation(player).mZ;
@@ -208,9 +212,6 @@ protected:
 				// Reset speed modifier.
 				playerSpeedMod = 1.0f;
 		}
-
-		if (escKeyState)
-			Quit();
 
 		// Move player in the direction it is rotated.
 		mTransformSystem.Translate(player,

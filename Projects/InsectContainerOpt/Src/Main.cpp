@@ -101,6 +101,9 @@ protected:
 	}
 
 	void OnUpdate() {
+		if (GetAsyncKeyState(VK_ESCAPE))
+			Quit();
+
 		Renderer::Camera& camera = mRenderer->GetCamera();
 
 		camera.x = cos(cameraTheta) * 250.0f;
@@ -112,12 +115,11 @@ protected:
 		// Destroy Boxes
 		for (int x = 0; x < numContainers; x++)
 		{
-			mRenderer->DetachMeshComponent(boxes[x]);
 			mEntityManager.DestroyEntity(boxes[x]);
 		}
 
 		if (boxes != nullptr)
-			delete boxes;
+			delete[] boxes;
 
 		float L = 50, W = 30, H = 100;
 		float h = 1000 / (D3DX_PI * (radius * radius));

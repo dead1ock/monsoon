@@ -31,14 +31,19 @@ EntityManager::~EntityManager()
 
 Monsoon::Entity EntityManager::CreateEntity()
 {
-	Monsoon::Entity entity = UINT32_MAX;
+	Monsoon::Entity entity = MONSOON_MAX_ENTITIES;
 	if (mEntityFreeList.size())
 	{
 		entity = mEntityFreeList.front();
 		mEntityFreeList.erase(mEntityFreeList.begin());
 	}
-	else
+	else {
 		entity = mNextEntityHandle++;
+	}
+
+	assert((entity < MONSOON_MAX_ENTITIES) && "Maximum entity count reached.");
+
+	mEntities.insert(std::pair<std::string, Entity>(std::to_string(entity), entity));
 
 	return entity;
 }
@@ -48,8 +53,19 @@ Monsoon::Entity EntityManager::CreateEntity(std::string identifier)
 	if (mEntities.find(identifier) != mEntities.end())
 		return std::numeric_limits<Monsoon::Entity>::max();
 
-	Monsoon::Entity entity = CreateEntity();
+	Monsoon::Entity entity = MONSOON_MAX_ENTITIES;
+	if (mEntityFreeList.size())
+	{
+		entity = mEntityFreeList.front();
+		mEntityFreeList.erase(mEntityFreeList.begin());
+	} else {
+		entity = mNextEntityHandle++;
+	}
+
+	assert((entity < MONSOON_MAX_ENTITIES) && "Maximum entity count reached.");
+
 	mEntities.insert(std::pair<std::string, Monsoon::Entity>(identifier, entity));
+	
 	return entity;
 }
 
