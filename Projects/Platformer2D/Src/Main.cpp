@@ -48,21 +48,21 @@ protected:
 		// Create Scene Entities
 		//
 		mLog.Debug("Creating Entities...");
-		mBackground = mEntityManager.CreateEntity();
-		mTiles[0] = mEntityManager.CreateEntity();
-		mTiles[1] = mEntityManager.CreateEntity();
-		mTiles[2] = mEntityManager.CreateEntity();
-		mTrees[0] = mEntityManager.CreateEntity();
-		mTrees[1] = mEntityManager.CreateEntity();
+		mBackground = mEntityManager.Create();
+		mTiles[0] = mEntityManager.Create();
+		mTiles[1] = mEntityManager.Create();
+		mTiles[2] = mEntityManager.Create();
+		mTrees[0] = mEntityManager.Create();
+		mTrees[1] = mEntityManager.Create();
 
 		for (int x = 0; x < 12; x++)
-			mGroundTiles[x] = mEntityManager.CreateEntity();
+			mGroundTiles[x] = mEntityManager.Create();
 
-		mCrystal = mEntityManager.CreateEntity();
-		mCrate = mEntityManager.CreateEntity();
-		mStone = mEntityManager.CreateEntity();
-		mTileset = mEntityManager.CreateEntity();
-		mCharacter = mEntityManager.CreateEntity();
+		mCrystal = mEntityManager.Create();
+		mCrate = mEntityManager.Create();
+		mStone = mEntityManager.Create();
+		mTileset = mEntityManager.Create();
+		mCharacter = mEntityManager.Create();
 
 		//
 		// Load Textures
@@ -381,17 +381,17 @@ protected:
 		//
 		// Clean Up Entities
 		//
-		mEntityManager.DestroyEntity(mCrystal);
-		mEntityManager.DestroyEntity(mCrate);
-		mEntityManager.DestroyEntity(mStone);
+		mEntityManager.Destroy(mCrystal);
+		mEntityManager.Destroy(mCrate);
+		mEntityManager.Destroy(mStone);
 
 		for (int x = 0; x < 2; x++)
-			mEntityManager.DestroyEntity(mTrees[x]);
+			mEntityManager.Destroy(mTrees[x]);
 
 		for (int x = 0; x < 3; x++)
-			mEntityManager.DestroyEntity(mTiles[x]);
+			mEntityManager.Destroy(mTiles[x]);
 
-		mEntityManager.DestroyEntity(mBackground);
+		mEntityManager.Destroy(mBackground);
 
 	}
 

@@ -5,6 +5,7 @@
 #
 
 SET(MODULE_SRC
+	Src/EntityManagerTests.cpp
 	Src/Main.cpp
 	Src/MathTests.cpp
 	Src/PackedPoolTests.cpp

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2015 Dallin Wellington
+ * Copyright (c) 2014-2016 Dallin Wellington
  *
  */
 
@@ -27,6 +27,7 @@
 	 typedef signed long long I64;
 
 	#define MONSOON_MAX_ENTITIES 65536
+	#define MONSOON_INVALID_ENTITY MONSOON_MAX_ENTITIES
 	 typedef U32 Entity;
 
 #ifdef MONSOON_64

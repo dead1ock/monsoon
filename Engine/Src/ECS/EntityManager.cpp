@@ -11,6 +11,7 @@
 
 #include "ECS/EntityManager.h"
 
+using namespace Monsoon;
 using namespace Monsoon::ECS;
 using namespace Monsoon::Event;
 
@@ -18,7 +19,9 @@ EntityManager::EntityManager(EventManager* eventManager)
 : mNextEntityHandle(0)
 , mEntityFreeList()
 , mEventManager(eventManager)
-, mEntities()
+, mLookupTable()
+, mReverseLookupTable()
+, mDefaultIdentifier("null")
 {
 	
 }
@@ -26,80 +29,76 @@ EntityManager::EntityManager(EventManager* eventManager)
 EntityManager::~EntityManager()
 {
 	mEntityFreeList.clear();
-	mEntities.clear();
+	mLookupTable.clear();
 }
 
-Monsoon::Entity EntityManager::CreateEntity()
+Monsoon::Entity EntityManager::Create()
 {
-	Monsoon::Entity entity = MONSOON_MAX_ENTITIES;
-	if (mEntityFreeList.size())
-	{
-		entity = mEntityFreeList.front();
-		mEntityFreeList.erase(mEntityFreeList.begin());
-	}
-	else {
-		entity = mNextEntityHandle++;
-	}
-
-	assert((entity < MONSOON_MAX_ENTITIES) && "Maximum entity count reached.");
-
-	mEntities.insert(std::pair<std::string, Entity>(std::to_string(entity), entity));
-
+	Entity entity = GetNextFreeId();
+	mReverseLookupTable.insert(std::pair<Monsoon::Entity, std::string*>(entity, &mDefaultIdentifier));
 	return entity;
 }
 
-Monsoon::Entity EntityManager::CreateEntity(std::string identifier)
+Monsoon::Entity EntityManager::Create(std::string identifier)
 {
-	if (mEntities.find(identifier) != mEntities.end())
-		return std::numeric_limits<Monsoon::Entity>::max();
+	if (mLookupTable.find(identifier) != mLookupTable.end())
+		return MONSOON_INVALID_ENTITY;
 
-	Monsoon::Entity entity = MONSOON_MAX_ENTITIES;
-	if (mEntityFreeList.size())
-	{
-		entity = mEntityFreeList.front();
-		mEntityFreeList.erase(mEntityFreeList.begin());
-	} else {
-		entity = mNextEntityHandle++;
-	}
+	Entity entity = GetNextFreeId();
 
-	assert((entity < MONSOON_MAX_ENTITIES) && "Maximum entity count reached.");
-
-	mEntities.insert(std::pair<std::string, Monsoon::Entity>(identifier, entity));
+	std::pair<std::string, Monsoon::Entity> pair = std::make_pair(identifier, entity);
+	mLookupTable.insert(pair);
+	mReverseLookupTable.insert(std::pair<Monsoon::Entity, std::string*>(entity, &pair.first));
 	
 	return entity;
 }
 
-Monsoon::Entity EntityManager::FindEntity(std::string identifier)
+Monsoon::Entity EntityManager::Find(std::string identifier)
 {
-	auto entity = mEntities.find(identifier);
-	if (entity == mEntities.end())
-		return std::numeric_limits<Monsoon::Entity>::max();
+	auto entity = mLookupTable.find(identifier);
+	if (entity == mLookupTable.end())
+		return MONSOON_INVALID_ENTITY;
 	else
 		return entity->second;
 }
 
-void EntityManager::DestroyEntity(Monsoon::Entity entity)
+void EntityManager::Destroy(Monsoon::Entity entity)
 {
-	for (auto iter = mEntities.begin(); iter != mEntities.end(); iter++)
-	{
-		if (iter->second == entity)
-		{
-			mEntityFreeList.push_back(entity);
-			mEntities.erase(iter);
-			break;
-		}
+	// Remove string identifier if one exists for this entity.
+	auto identifier = mReverseLookupTable.find(entity);
+	if (identifier != mReverseLookupTable.end()) {
+		mReverseLookupTable.erase(identifier);
+		mEntityFreeList.push_back(entity);
+		mEventManager->Invoke("Entity::Destroyed", (void*)entity);
 	}
-	mEventManager->Invoke("Entity::Destroyed", (void*)entity);
 }
 
-void EntityManager::DestroyEntity(std::string identifier)
-{
-	auto entity = mEntities.find(identifier);
-	if (entity == mEntities.end())
+void EntityManager::Destroy(std::string identifier) {
+	auto entity = mLookupTable.find(identifier);
+	if (entity == mLookupTable.end())
 		return;
 	else {
 		mEntityFreeList.push_back(entity->second);
 		mEventManager->Invoke("Entity::Destroyed", (void*)entity->second);
-		mEntities.erase(entity);
+		mLookupTable.erase(entity);
 	}
+}
+
+U32 EntityManager::Count() {
+	return U32(mNextEntityHandle - mEntityFreeList.size());
+}
+
+Entity EntityManager::GetNextFreeId() {
+	Monsoon::Entity entity = MONSOON_INVALID_ENTITY;
+	if (mEntityFreeList.size())
+	{
+		entity = mEntityFreeList.front();
+		mEntityFreeList.erase(mEntityFreeList.begin());
+	}
+	else {
+		entity = mNextEntityHandle++;
+	}
+
+	assert((entity < MONSOON_MAX_ENTITIES) && "Maximum entity count reached.");
+	return entity;
 }

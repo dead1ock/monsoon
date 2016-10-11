@@ -41,7 +41,7 @@ protected:
 
 		U32 texture = -1; // mRenderer->LoadTexture("all_metal_streaked_b.dds");
 
-		Entity rightPlane = mEntityManager.CreateEntity();
+		Entity rightPlane = mEntityManager.Create();
 		Renderer::MeshComponent rightPlaneMesh;
 		rightPlaneMesh.TextureId = texture;
 		rightPlaneMesh.VertexBuffer = mRenderer->CreatePlane(50, 100);
@@ -54,7 +54,7 @@ protected:
 		mTransformSystem.AttachComponent(rightPlane, rightPlanePosition);
 		mRenderer->AttachMeshComponent(rightPlane, rightPlaneMesh);
 
-		Entity leftPlane = mEntityManager.CreateEntity();
+		Entity leftPlane = mEntityManager.Create();
 		Renderer::MeshComponent leftPlaneMesh;
 		leftPlaneMesh.TextureId = texture;
 		leftPlaneMesh.VertexBuffer = mRenderer->CreatePlane(50, 100);
@@ -67,7 +67,7 @@ protected:
 		mRenderer->AttachMeshComponent(leftPlane, leftPlaneMesh);
 
 
-		Entity backPlane = mEntityManager.CreateEntity();
+		Entity backPlane = mEntityManager.Create();
 		Renderer::MeshComponent backPlaneMesh;
 		backPlaneMesh.TextureId = texture;
 		backPlaneMesh.VertexBuffer = mRenderer->CreatePlane(30, 100);
@@ -81,7 +81,7 @@ protected:
 		mTransformSystem.AttachComponent(backPlane, backPlanePosition);
 
 
-		Entity frontPlane = mEntityManager.CreateEntity();
+		Entity frontPlane = mEntityManager.Create();
 		Renderer::MeshComponent frontPlaneMesh;
 		frontPlaneMesh.TextureId = texture;
 		frontPlaneMesh.VertexBuffer = mRenderer->CreatePlane(30, 100);
@@ -115,7 +115,7 @@ protected:
 		// Destroy Boxes
 		for (int x = 0; x < numContainers; x++)
 		{
-			mEntityManager.DestroyEntity(boxes[x]);
+			mEntityManager.Destroy(boxes[x]);
 		}
 
 		if (boxes != nullptr)
@@ -132,7 +132,7 @@ protected:
 		int cStack = 1, cRow = 1, cCol = 1;
 		for (int x = 0; x < numContainers; x++)
 		{
-			boxes[x] = mEntityManager.CreateEntity();
+			boxes[x] = mEntityManager.Create();
 
 			Renderer::MeshComponent boxMesh;
 			boxMesh.VertexBuffer = mBoxVertexBuffer;

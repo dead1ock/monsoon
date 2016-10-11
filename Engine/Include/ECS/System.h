@@ -77,12 +77,12 @@ namespace Monsoon {
 			};
 
 			/**
-			 * Checks if the target entity has an associated system component.
+			 * Checks if the target entity exists in the system.
 			 *
 			 * @param entity The target entity.
 			 * @return bool True if the component exists for the target entity, otherwise false.
 			 */
-			bool IsValid(Monsoon::Entity entity) {
+			bool Exists(Monsoon::Entity entity) {
 				return mComponents.Exists(entity);
 			}
 

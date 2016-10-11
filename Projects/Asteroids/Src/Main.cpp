@@ -73,17 +73,17 @@ protected:
 		playerLiveTransform.scale.mY = 0.7f;
 		playerLiveTransform.scale.mZ = 0.7f;
 
-		playerLives[0] = mEntityManager.CreateEntity();
+		playerLives[0] = mEntityManager.Create();
 		mRenderer->AttachMeshComponent(playerLives[0], playerLiveMesh);
 		mTransformSystem.AttachComponent(playerLives[0], playerLiveTransform);
 		playerLiveTransform.position += Math::Vector3(0.75f, 0.0f, 0.0f);
 
-		playerLives[1] = mEntityManager.CreateEntity();
+		playerLives[1] = mEntityManager.Create();
 		mRenderer->AttachMeshComponent(playerLives[1], playerLiveMesh);
 		mTransformSystem.AttachComponent(playerLives[1], playerLiveTransform);
 		playerLiveTransform.position += Math::Vector3(0.75f, 0.0f, 0.0f);
 
-		playerLives[2] = mEntityManager.CreateEntity();
+		playerLives[2] = mEntityManager.Create();
 		mRenderer->AttachMeshComponent(playerLives[2], playerLiveMesh);
 		mTransformSystem.AttachComponent(playerLives[2], playerLiveTransform);
 		playerLiveTransform.position += Math::Vector3(0.75f, 0.0f, 0.0f);
@@ -141,7 +141,7 @@ protected:
 		//
 		for (int x = 0; x < numAsteroids; x++)
 		{
-			mAstroids.push_back(mEntityManager.CreateEntity());
+			mAstroids.push_back(mEntityManager.Create());
 
 			Renderer::MeshComponent asteroidMesh;
 			asteroidMesh.VertexBuffer = astroidVB;
@@ -160,7 +160,7 @@ protected:
 	}
 
 	void SpawnPlayer() {
-		player = mEntityManager.CreateEntity("player");
+		player = mEntityManager.Create("player");
 		Renderer::MeshComponent playerMesh;
 		playerMesh.VertexBuffer = playerVB;
 		mRenderer->AttachMeshComponent(player, playerMesh);
@@ -177,7 +177,7 @@ protected:
 
 		bulletSpatialComponent.position += Math::Vector3(cos(bulletSpatialComponent.roll + (D3DX_PI / 2.0f)), sin(bulletSpatialComponent.roll + (D3DX_PI / 2.0f)), 0.0f);
 
-		auto id = mEntityManager.CreateEntity();
+		auto id = mEntityManager.Create();
 		mBullets.push_back(id);
 		mBulletAABBs.push_back(Math::AABB(bulletSpatialComponent.position.mX, bulletSpatialComponent.position.mY, 0.25f, 0.5f));
 		mRenderer->AttachMeshComponent(id, bullet);
@@ -277,28 +277,28 @@ protected:
 			//
 			if (position.mX > 23.0f)
 			{
-				mEntityManager.DestroyEntity(mBullets[x]);
+				mEntityManager.Destroy(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
 			else if (position.mX < -23.0f)
 			{
-				mEntityManager.DestroyEntity(mBullets[x]);
+				mEntityManager.Destroy(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
 			else if (position.mY > 16.0f)
 			{
-				mEntityManager.DestroyEntity(mBullets[x]);
+				mEntityManager.Destroy(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
 			}
 			else if (position.mY < -16.0f)
 			{
-				mEntityManager.DestroyEntity(mBullets[x]);
+				mEntityManager.Destroy(mBullets[x]);
 				mBullets.erase(mBullets.begin() + x);
 				mBulletAABBs.erase(mBulletAABBs.begin() + x);
 				mActiveBullets--;
@@ -316,11 +316,11 @@ protected:
 		{
 			if (playerAABB.Intersects(mAsteroidAABBs[x]) && !playerDead && ((mGameClock.getTime() - playerLastDeathTime) > 4.0f))
 			{
-				mEntityManager.DestroyEntity(playerLives[currentPlayerLives-1]);
+				mEntityManager.Destroy(playerLives[currentPlayerLives-1]);
 				playerLastDeathTime = mGameClock.getTime();
 				currentPlayerLives--;
 
-				mEntityManager.DestroyEntity("player");
+				mEntityManager.Destroy("player");
 				playerDead = true;
 			}
 
@@ -330,12 +330,12 @@ protected:
 				if (mAsteroidAABBs[x].Intersects(mBulletAABBs[y]))
 				{
 					// Destroy asteroid.
-					mEntityManager.DestroyEntity(mAstroids[x]);
+					mEntityManager.Destroy(mAstroids[x]);
 					mAstroids.erase(mAstroids.begin() + x);
 					mAsteroidAABBs.erase(mAsteroidAABBs.begin() + x);
 
 					// Destroy bullet.
-					mEntityManager.DestroyEntity(mBullets[y]);
+					mEntityManager.Destroy(mBullets[y]);
 					mBullets.erase(mBullets.begin() + y);
 					mBulletAABBs.erase(mBulletAABBs.begin() + y);
 					mActiveBullets--;

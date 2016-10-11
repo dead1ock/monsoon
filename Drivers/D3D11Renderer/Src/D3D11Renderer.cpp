@@ -256,7 +256,7 @@ void D3D11Renderer::Render(D3D11Renderer::EYE eye) {
 	// Render 3d Meshes
 	for (int x = 0; x < mMeshComponents.Size(); x++) {
 		Entity entity = mMeshComponents.IndexToId(x);
-		if (mTransformSystem->IsValid(entity))
+		if (mTransformSystem->Exists(entity))
 		{
 			// Gather relevent transform information.
 			Math::Vector3 position = mTransformSystem->GetPosition(entity);
@@ -303,7 +303,7 @@ void D3D11Renderer::Render(D3D11Renderer::EYE eye) {
 	// Render sprites from back to front.
 	for (int x = mSpriteComponents.Size() - 1; x >= 0; x--) {
 		Entity entity = mSpriteComponents.IndexToId(x);
-		if (mTransformSystem->IsValid(entity))
+		if (mTransformSystem->Exists(entity))
 		{
 			// Gather relevent transform information.
 			Math::Vector3 position = mTransformSystem->GetPosition(entity);
