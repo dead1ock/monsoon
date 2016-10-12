@@ -102,3 +102,100 @@ Entity EntityManager::GetNextFreeId() {
 	assert((entity < MONSOON_MAX_ENTITIES) && "Maximum entity count reached.");
 	return entity;
 }
+
+void EntityManager::AddTag(Entity entity, std::string tag)
+{
+	if (!Exists(entity))
+		return;
+
+	const std::string* strPtr = nullptr;
+	auto tags = mTags.find(tag);
+	if (tags != mTags.end()) {
+		tags->second.push_back(entity);
+		strPtr = &tags->first;
+	}
+	else {
+		auto pair = std::pair<std::string, std::list<Entity>>(tag, std::list<Entity>());
+		pair.second.push_back(entity);
+		mTags.insert(pair);
+		strPtr = &pair.first;
+	}
+}
+
+void EntityManager::RemoveTag(Entity entity, std::string tag)
+{
+	if (!Exists(entity))
+		return;
+
+	auto tags = mTags.find(tag);
+	if (tags != mTags.end())
+		tags->second.remove(entity);
+
+}
+
+void EntityManager::AddTag(std::string name, std::string tag)
+{
+	Entity ent = Find(name);
+	if (ent != MONSOON_INVALID_ENTITY)
+		AddTag(ent, tag);
+}
+
+void EntityManager::RemoveTag(std::string name, std::string tag)
+{
+	Entity ent = Find(name);
+	if (ent != MONSOON_INVALID_ENTITY)
+		RemoveTag(ent, tag);
+}
+
+std::list<Entity> EntityManager::FindByTag(std::string tag)
+{
+	auto tags = mTags.find(tag);
+	if (tags != mTags.end())
+		return tags->second;
+	else
+		return std::list<Entity>();
+}
+
+bool EntityManager::Exists(std::string name)
+{
+	auto pair = mLookupTable.find(name);
+	if (pair != mLookupTable.end())
+		return true;
+	else
+		return false;
+}
+
+bool EntityManager::Exists(Entity id)
+{
+	auto pair = mReverseLookupTable.find(id);
+	if (pair != mReverseLookupTable.end())
+		return true;
+	else
+		return false;
+}
+
+bool EntityManager::hasTag(Entity id, std::string tag)
+{
+	bool found = false;
+
+	auto iter = mTags.find(tag);
+	if (iter != mTags.end())
+	{
+		auto entity = std::find(iter->second.begin(), iter->second.end(), id);
+		if (entity != iter->second.end())
+			found = true;
+	}
+
+	return found;
+}
+
+bool EntityManager::hasTag(std::string name, std::string tag)
+{
+	bool found = false;
+
+	Entity ent = Find(name);
+	if (ent != MONSOON_INVALID_ENTITY)
+		found = hasTag(ent, tag);
+
+	return found;
+}

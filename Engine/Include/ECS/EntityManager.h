@@ -65,6 +65,22 @@ namespace Monsoon {
 			void AddTag(Entity entity, std::string tag);
 
 			/**
+			* Adds the specified tag to the target entity by name.
+			*
+			* @param name The name of the entity.
+			* @param tag The specified tag.
+			*/
+			void AddTag(std::string name, std::string tag);
+
+			/**
+			* Removes the specified tag from the target entity by name.
+			*
+			* @param name The name of the entity.
+			* @param tag The specified tag.
+			*/
+			void RemoveTag(std::string name, std::string tag);
+
+			/**
 			* Removes the specified tag from the target entity.
 			*
 			* @param entity The entity to tag.
@@ -78,6 +94,47 @@ namespace Monsoon {
 			 * @param entity The target entity.
 			 */
 			void RemoveAllTags(Entity entity);
+
+			/**
+			* Removes all tags from the target entity by name.
+			*
+			* @param name The name of the entity.
+			*/
+			void RemoveAllTags(std::string name);
+
+			/**
+			 * Determines if the target entity has the specified tag.
+			 *
+			 * @param id Id of the entity.
+			 * @param tag The tag to check for.
+			 * @return Returns true if a match is found, otherwise false.
+			 */
+			bool hasTag(Entity id, std::string tag);
+
+			/**
+			 * Determines if the target entity has the specified tag, by name.
+			 *
+			 * @param name Name of the entity.
+			 * @param tag The tag to check for.
+			 * @return REturns true if a match is found, otherwise false.
+			 */
+			bool hasTag(std::string name, std::string tag);
+
+			/**
+			 * Determines if the target entity exists by name.
+			 * 
+			 * @param name Name of the entity to find.
+			 * @return True if the entity exists, otherwise false.
+			 */
+			bool Exists(std::string name);
+
+			/**
+			* Determines if the target entity exists by id.
+			*
+			* @param id Id of the entity to find.
+			* @return True if the entity exists, otherwise false.
+			*/
+			bool Exists(Entity id);
 
 			/**
 			 * Destroys an entity based on its associated string identifier.
@@ -108,6 +165,7 @@ namespace Monsoon {
 			std::string mDefaultIdentifier;
 
 			std::map<std::string, std::list<Entity>> mTags;
+			std::map<Entity, std::list<const std::string*>> mEntityTags;
 
 			std::vector<Monsoon::Entity> mEntityFreeList;
 		};
