@@ -1,0 +1,11 @@
+This document is not meant to be a detailed software requirements document, but rather an overview of the design philosophy the project should take in terms of the non-functional requirements.
+
+#Efficiency
+As with any real-time application, responsiveness ranks high on the list of attributes required for a useable experience. A simulation running at 60 frames per-second is REQUIRED to perform one iteration of the simulation loop (a single frame) in ~16.6ms. It is important to understand and measure the performance of methods which are called frequently (every frame, or almost every frame) in the simulation loop.
+
+Since Monsoon is a foundation which other applications will be developed on top of, we must leave a certain amount of that allotted ~16.6ms to the application developer. The specifics on how much time we give each engine sub-system (rendering, audio, scripting, ect...) and how much time is left for the application developer, is to be determined.
+
+#Reliability
+Next to efficiency, reliability is the next most important attribute for a userable experience. When an invalid application state is encounted, the engine should fail quickly and loudly. This will motivate developers to quickly find and address issues which cause an invalid application state, and decrease the number faults which can silently persist into released software. This isn't to say the engine shouldn't be fault tolerant to a certain degree, only that the a correct, reliable application state should be valued over fault tolerance.
+
+For example, passing an id to a function which will use it as an index to access some array should fail if the id is invalid (out of bounds), instead of "doing nothing" or returning a "null object." Under most circumstaces, passing in an invalid id already means there is fault else where in the application. Instead, provide a way for application developers to check the validity of an input manually BEFORE it is used in a function which might assert some assumption about the application state.
