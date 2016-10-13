@@ -121,7 +121,6 @@ namespace Monsoon {
 			 * @returns True if the object exists in the pool, otherwise false.
 			 */
 			inline bool Exists(Id id) {
-				assert(((id >= 0) && (id < mIndexTable.capacity())) && "Id out of bounds.");
 				return (mIndexTable[id] != USHRT_MAX);
 			}
 
@@ -131,13 +130,11 @@ namespace Monsoon {
 			 * Performance: O(1)
 			 *
 			 * @param index - The index of the object you want to find the id of.
-			 * @returns The id of the object at the specified index, if it exists.
+			 * @returns The id of the object at the specified index, if it doesn't exist, the method will return MONSOON_INVALID_ENTITY.
 			 */
 			inline Id IndexToId(Index index) {
-				assert((index >= 0) && (index < mPackedObjects.capacity()) && "Index out of bounds.");
-
 				if (index < 0 || index >(mPackedObjects.size() - 1))
-					return 0; // Temporary fix. This will break anything which tries to create a 
+					return MONSOON_INVALID_ENTITY; // Temporary fix. This will break anything which tries to create a 
 								// packed pool with an Id type which is not some kind of primative number type.
 				else
 					return (mPackedObjects[index].second);
