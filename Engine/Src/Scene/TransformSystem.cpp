@@ -23,8 +23,7 @@ TransformSystem::~TransformSystem()
 
 void TransformSystem::Translate(Entity entity, Math::Vector3 delta)
 {
-	if (!mComponents.Exists(entity))
-		return;
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 
 	auto& component = mComponents[entity];
 	component.position += delta;
@@ -32,8 +31,7 @@ void TransformSystem::Translate(Entity entity, Math::Vector3 delta)
 
 void TransformSystem::Rotate(Entity entity, Math::Vector3 eulers)
 {
-	if (!mComponents.Exists(entity))
-		return;
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 
 	mComponents[entity].pitch += eulers.mX;
 	mComponents[entity].yaw += eulers.mY;
@@ -42,8 +40,7 @@ void TransformSystem::Rotate(Entity entity, Math::Vector3 eulers)
 
 void TransformSystem::Scale(Entity entity, Math::Vector3 scale)
 {
-	if (!mComponents.Exists(entity))
-		return;
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 
 	mComponents[entity].scale.mX *= scale.mX;
 	mComponents[entity].scale.mY *= scale.mY;
@@ -52,31 +49,37 @@ void TransformSystem::Scale(Entity entity, Math::Vector3 scale)
 
 const Math::Vector3& TransformSystem::GetPosition(Entity entity)
 {
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 	return mComponents[entity].position;
 }
 
 void TransformSystem::SetPosition(Entity entity, Math::Vector3 position)
 {
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 	mComponents[entity].position = position;
 }
 
 const Math::Vector3& TransformSystem::GetScale(Entity entity)
 {
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 	return mComponents[entity].scale;
 }
 
 void TransformSystem::SetScale(Entity entity, Math::Vector3 scalars)
 {
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 	mComponents[entity].scale = scalars;
 }
 
 const Math::Vector3& TransformSystem::GetRotation(Entity entity)
 {
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 	return Math::Vector3(mComponents[entity].pitch, mComponents[entity].yaw, mComponents[entity].roll);
 }
 
 void TransformSystem::SetRotation(Entity entity, Math::Vector3 eulers)
 {
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 	mComponents[entity].pitch = eulers.mX;
 	mComponents[entity].yaw = eulers.mY;
 	mComponents[entity].roll = eulers.mZ;
@@ -85,8 +88,7 @@ void TransformSystem::SetRotation(Entity entity, Math::Vector3 eulers)
 
 Math::Vector3 TransformSystem::Up(Entity entity)
 {
-	if (!mComponents.Exists(entity))
-		return Math::Vector3::Up();
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 
 	Math::Matrix4x4 globalTransform = Math::Matrix4x4::TransformMatrix(mComponents[entity].position, 
 		Math::Vector3(mComponents[entity].pitch, mComponents[entity].yaw, mComponents[entity].roll),
@@ -97,8 +99,7 @@ Math::Vector3 TransformSystem::Up(Entity entity)
 
 Math::Vector3 TransformSystem::Front(Entity entity)
 {
-	if (!mComponents.Exists(entity))
-		return Math::Vector3::Front();
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 
 	Math::Matrix4x4 globalTransform = Math::Matrix4x4::TransformMatrix(mComponents[entity].position,
 		Math::Vector3(mComponents[entity].pitch, mComponents[entity].yaw, mComponents[entity].roll),
@@ -109,8 +110,7 @@ Math::Vector3 TransformSystem::Front(Entity entity)
 
 Math::Vector3 TransformSystem::Right(Entity entity)
 {
-	if (!mComponents.Exists(entity))
-		return Math::Vector3::Right();
+	assert(mComponents.Exists(entity) && "The target entity doesn't have a component of this type.");
 
 	Math::Matrix4x4 globalTransform = Math::Matrix4x4::TransformMatrix(mComponents[entity].position,
 		Math::Vector3(mComponents[entity].pitch, mComponents[entity].yaw, mComponents[entity].roll),
