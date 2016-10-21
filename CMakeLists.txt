@@ -15,8 +15,18 @@ INCLUDE_DIRECTORIES(
 	D:/ovr_sdk_win_0.2.3_public/LibOVR/Include
 )
 
+OPTION(BUILD_SAMPLES "Builds the same projects for Monsoon." TRUE)
+OPTION(BUILD_TESTS "Builds the test projects for Monsoon." TRUE)
+
 ADD_SUBDIRECTORY(engine)
 ADD_SUBDIRECTORY(drivers)
+
+IF(${BUILD_SAMPLES})
 ADD_SUBDIRECTORY(samples)
+ENDIF(${BUILD_SAMPLES})
+
+IF(${BUILD_TESTS})
 ADD_SUBDIRECTORY(tests)
+ENDIF(${BUILD_TESTS})
+
 ADD_SUBDIRECTORY(projects)
